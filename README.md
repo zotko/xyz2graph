@@ -10,3 +10,5 @@ molecular graph.
 This script accepts an XYZ ﬁle with chemical elements and their cartesian coordinates as input.
 
 The `plotly` package is required for visualisation of the the molecular graph.
+
+![Example](molecule.png)
