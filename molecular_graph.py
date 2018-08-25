@@ -23,9 +23,7 @@ class Graph:
         self.y_coordinates = []
         self.z_coordinates = []
         self.adjacency_list = {}
-        self.atomic_numbers = []
         self.atomic_radii = []
-        self.cpk_colors = []
 
     def read_file(self, file_path: str) -> None:
         """Reads an XYZ file, searches for elements and their cartesian coordinates
