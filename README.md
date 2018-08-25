@@ -12,5 +12,5 @@ This script accepts an XYZ ﬁle with chemical elements and their cartesian coor
 The `plotly` package is required for visualisation of the molecular graph.
 
 <p align="center">
-  <img src="example.png">
+  <img src="picture.png">
 </p>
