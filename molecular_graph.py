@@ -14,8 +14,8 @@ atomic_radii = dict(Ac=1.88, Ag=1.59, Al=1.35, Am=1.51, As=1.21, Au=1.50, B=0.83
 
 class Graph:
     """Represents a molecular graph."""
-    __slots__ = ['elements', 'x_coordinates', 'y_coordinates', 'z_coordinates', 'adjacency_list', 'atomic_numbers',
-                 'atomic_radii', 'cpk_colors']
+    __slots__ = ['elements', 'x_coordinates', 'y_coordinates', 'z_coordinates', 'adjacency_list',
+                 'atomic_radii']
 
     def __init__(self):
         self.elements = []
