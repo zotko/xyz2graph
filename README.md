@@ -1,4 +1,6 @@
-# xyz2graph: molecular graph constructor and visualizer
+# xyz2graph
+
+xyz2graph - a molecular graph constructor and visualizer
 
 This script constructs a molecular graph from atomic coordinates.
 
@@ -11,7 +13,7 @@ molecular graph.
 This script accepts an XYZ ﬁle with chemical elements and their cartesian coordinates as input.
 
 The `Plotly` package is required for visualisation of the molecular graph.
-The 'NetworkX' package is required for converting of the molecular graph into 'NetworkX' graph.
+The 'NetworkX' package is required for converting of the molecular graph into the 'NetworkX' graph.
 
 <p align="center">
   <img src="picture.png">
