@@ -5,3 +5,8 @@
 <p align="center">
   <img src="picture.png">
 </p>
+
+## Requirements
+* **Python 3**
+* [NetworkX](https://networkx.github.io)
+* [Plotly](https://plot.ly)
