@@ -1,6 +1,6 @@
 # xyz2graph
 
-xyz2graph - a molecular graph constructor and visualizer
+xyz2graph - a molecular graph constructor and visualizer.
 
 This script constructs a molecular graph from atomic coordinates.
 
