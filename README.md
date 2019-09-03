@@ -41,7 +41,7 @@ G = to_networkx_graph(mg)
 from xyz2graph import MolGraph, to_networkx_graph, to_plotly_figure
 from plotly.offline import init_notebook_mode, iplot
 
-# initiate the plotly notebook mode
+# Initiate the Plotly notebook mode
 init_notebook_mode(connected=True)
 
 # Create the MolGraph object
