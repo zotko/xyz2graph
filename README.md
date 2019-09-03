@@ -1,20 +1,12 @@
 # xyz2graph
 
-xyz2graph - a molecular graph constructor and visualizer.
-
-This script constructs a molecular graph from atomic coordinates.
-
-This tool relies on the most straightforward method for determination of atomic connectivity in molecules,
-which is based on interatomic distances and atomic covalent radii. Each interatomic distance is compared to the sum
-of covalent radii r<sub>i</sub> and r<sub>j</sub> of both atoms. If the distance between two atoms is within the range d = 1.3(r<sub>i</sub> + r<sub>j</sub>),
-that is the sum of covalent radii plus thirty per cent, then an edge connecting the two nodes is added to the
-molecular graph.
-
-This script accepts an XYZ ﬁle with chemical elements and their cartesian coordinates as input.
-
-The `Plotly` package is required for visualisation of the molecular graph.
-The 'NetworkX' package is required for converting of the molecular graph into the 'NetworkX' graph.
+[**xyz2graph**](https://github.com/zotko/xyz2graph) is a Python package for reading of .xyz files and constructing of molecular graphs from atomic coordinates. The molecular graph can be converted into [NetworkX](https://networkx.github.io) graph or [Plotly](https://plot.ly) figure for 3D visualization in a browser window or in a [Jupyter notebook](https://jupyter.org).
 
 <p align="center">
   <img src="picture.png">
 </p>
+
+## Requirements
+ * **Python 3**
+ * [NetworkX](https://networkx.github.io)
+ * [Plotly](https://plot.ly)
