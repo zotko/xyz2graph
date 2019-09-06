@@ -23,7 +23,7 @@ from plotly.offline import offline
 mg = MolGraph()
 
 # Read the data from the .xyz file
-mg.read_xyz('file_path')
+mg.read_xyz('path/molecule.xyz')
 
 # Create the Plotly figure object
 fig = to_plotly_figure(mg)
@@ -48,7 +48,7 @@ init_notebook_mode(connected=True)
 mg = MolGraph()
 
 # Read the data from the .xyz file
-mg.read_xyz('file_path')
+mg.read_xyz('path/molecule.xyz')
 
 # Create the Plotly figure object
 fig = to_plotly_figure(mg)
