@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="xyz2graph",
-    version="0.1",
+    version="0.0.1",
     author="Mykola Zotko",
     description="Package for reading of .xyz files and constructing of molecular graphs from atomic coordinates.",
     long_description=long_description,
