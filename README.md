@@ -12,7 +12,7 @@
  * [Plotly](https://plot.ly)
  
 ## Installation
-`!pip install -i https://test.pypi.org/simple/ xyz2graph`
+`python -m pip install git+https://github.com/zotko/xyz2graph.git`
 
 ## Usage
 ```
