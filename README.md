@@ -57,4 +57,4 @@ fig = to_plotly_figure(mg)
 iplot(fig)
 ```
 
-### [Example of usage](https://www.kaggle.com/mykolazotko/xyz2graph-xyz-file-to-molecular-graph?scriptVersionId=20042579)
+### [Example of usage](https://www.kaggle.com/code/mykolazotko/xyz2graph-xyz-file-to-molecular-graph/notebook?scriptVersionId=98112967)
