@@ -8,6 +8,7 @@
 
 ## Requirements
  * **Python 3**
+ * [NumPy](https://numpy.org)
  * [NetworkX](https://networkx.github.io)
  * [Plotly](https://plot.ly)
  
