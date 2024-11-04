@@ -11,7 +11,7 @@
  * [NumPy](https://numpy.org)
  * [NetworkX](https://networkx.github.io)
  * [Plotly](https://plot.ly)
- 
+
 ## Installation
 `python -m pip install git+https://github.com/zotko/xyz2graph.git`
 

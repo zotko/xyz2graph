@@ -1,6 +1,4 @@
 import re
-from itertools import combinations
-from math import sqrt
 
 import numpy as np
 
@@ -124,8 +122,15 @@ class MolGraph:
         """Reads an XYZ file, searches for elements and their cartesian coordinates
         and adds them to corresponding arrays."""
         pattern = re.compile(
-            r"([A-Za-z]{1,3})\s*(-?\d+(?:\.\d+)?)\s*(-?\d+(?:\.\d+)?)\s*(-?\d+(?:\.\d+)?)"
+            r"([A-Za-z]{1,3})"  # Element (1-3 characters)
+            r"\s*"  # Optional whitespace
+            r"(-?\d+(?:\.\d+)?)"  # First number (integer or float)
+            r"\s*"  # Optional whitespace
+            r"(-?\d+(?:\.\d+)?)"  # Second number (integer or float)
+            r"\s*"  # Optional whitespace
+            r"(-?\d+(?:\.\d+)?)"  # Third number (integer or float)
         )
+
         with open(file_path) as file:
             for element, x, y, z in pattern.findall(file.read()):
                 self.elements.append(element)
@@ -138,7 +143,6 @@ class MolGraph:
     def _generate_adjacency_list(self):
         """Generates an adjacency list from atomic cartesian coordinates."""
 
-        node_ids = range(len(self.elements))
         xyz = np.stack((self.x, self.y, self.z), axis=-1)
         distances = xyz[:, np.newaxis, :] - xyz
         distances = np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))

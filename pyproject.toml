@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xyz2graph"
+version = "2.0.0"
+authors = [
+    { name = "Mykola Zotko", email = "" }
+]
+description = "Package for reading of .xyz files and constructing of molecular graphs from atomic coordinates."
+readme = "README.md"
+requires-python = ">=3.5"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "plotly",
+    "networkx",
+]
+
+[project.urls]
+Homepage = "https://github.com/zotko/xyz2graph.py"
+Repository = "https://github.com/zotko/xyz2graph.py"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=22.0",
+    "isort>=5.0",
+    "flake8>=5.0",
+    "build>=1.0.0",
+    "twine>=4.0.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py35"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

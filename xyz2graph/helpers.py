@@ -1,5 +1,5 @@
-import plotly.graph_objs as go
 import networkx as nx
+import plotly.graph_objs as go
 
 from xyz2graph import MolGraph
 
@@ -35,6 +35,7 @@ cpk_colors = dict(
     Ti="gray",
     Xe="cyan",
 )
+
 cpk_color_rest = "pink"
 
 
@@ -188,7 +189,8 @@ def to_plotly_figure(graph: MolGraph) -> go.Figure:
 
 def to_networkx_graph(graph: MolGraph) -> nx.Graph:
     """Creates a NetworkX graph.
-    Atomic elements and coordinates are added to the graph as node attributes 'element' and 'xyz" respectively.
+    Atomic elements and coordinates are added to the graph
+    as node attributes 'element' and 'xyz" respectively.
     Bond lengths are added to the graph as edge attribute 'length''"""
     G = nx.Graph(graph.adj_list)
     node_attrs = {
