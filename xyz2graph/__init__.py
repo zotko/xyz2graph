@@ -1,6 +1,6 @@
 import warnings
 
-from .xyz2graph import DEFAULT_CPK_COLORS, DEFAULT_RADII, MolGraph
+from .xyz2graph import MolGraph
 
 
 def to_networkx_graph(graph):
