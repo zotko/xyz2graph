@@ -8,6 +8,9 @@ repos:
     -   id: check-yaml
     -   id: check-toml
     -   id: check-added-large-files
+    -   id: check-merge-conflict
+    -   id: check-ast
+    -   id: debug-statements
 
 -   repo: https://github.com/psf/black
     rev: 24.10.0
