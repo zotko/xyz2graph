@@ -157,4 +157,4 @@ cython_debug/
 .vscode/
 *.swp
 *.swo
-.DS_Store  # Mac files
+**/.DS_Store
