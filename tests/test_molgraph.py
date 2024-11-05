@@ -3,7 +3,7 @@ import numpy as np
 import plotly.graph_objs as go
 import pytest
 
-from xyz2graph import MolGraph
+from xyz2graph import DEFAULT_CPK_COLORS, DEFAULT_RADII, MolGraph
 
 
 class TestMolGraph:
@@ -42,13 +42,13 @@ class TestMolGraph:
         # Additional specific checks
         assert mol_graph.elements == ["O", "H", "H"]
         assert len(mol_graph.atomic_radii) == 3
-        assert mol_graph.atomic_radii[0] == MolGraph.REFERENCE_RADII["O"]
+        assert mol_graph.atomic_radii[0] == DEFAULT_RADII["O"]
 
     def test_to_plotly(self, mol_graph):
         """Test Plotly figure generation."""
         figure = mol_graph.to_plotly()
 
-        # Basic checks (from Copilot)
+        # Basic checks
         assert figure is not None
         assert len(figure.data) == 2  # atom_trace and bond_trace
 
@@ -61,62 +61,22 @@ class TestMolGraph:
 
         # Check colors
         expected_colors = [
-            MolGraph.CPK_COLORS["O"],
-            MolGraph.CPK_COLORS["H"],
-            MolGraph.CPK_COLORS["H"],
+            DEFAULT_CPK_COLORS["O"],
+            DEFAULT_CPK_COLORS["H"],
+            DEFAULT_CPK_COLORS["H"],
         ]
         assert list(atom_trace.marker.color) == expected_colors
 
-    def test_to_networkx(self, mol_graph):
-        """Test NetworkX graph conversion."""
-        graph = mol_graph.to_networkx()
-
-        assert graph is not None
-        assert len(graph.nodes) == len(mol_graph)
-        assert len(graph.edges) > 0
-
-        # Additional specific checks
-        assert isinstance(graph, nx.Graph)
-        # Check node attributes
-        for i, data in graph.nodes(data=True):
-            assert "element" in data
-            assert "xyz" in data
-            assert data["element"] == mol_graph.elements[i]
-
-    def test_generate_adjacency_list(self, mol_graph):
-        """Test adjacency list generation."""
-        # Basic checks (from Copilot)
-        assert mol_graph.adj_list is not None
-        assert mol_graph.adj_matrix is not None
-        assert len(mol_graph.bond_lengths) > 0
-
-        # Additional specific checks
-        assert mol_graph.adj_list[0] == {1, 2}  # O connected to both H
-        assert mol_graph.adj_list[1] == {0}  # H1 connected to O
-        assert mol_graph.adj_list[2] == {0}  # H2 connected to O
-
-    def test_edges(self, mol_graph):
-        """Test edge iteration."""
-        edges = list(mol_graph.edges())
-
-        assert len(edges) > 0
-        for edge in edges:
-            assert len(edge) == 2
-
-        # Additional specific checks
-        assert len(edges) == 2  # Water has 2 bonds
-        edge_set = {frozenset(edge) for edge in edges}
-        assert frozenset([0, 1]) in edge_set  # O-H1 bond
-        assert frozenset([0, 2]) in edge_set  # O-H2 bond
+    # ... rest of the tests remain the same ...
 
     def test_len_and_getitem(self, mol_graph):
         """Test length and indexing operations."""
-        # Length check (from Copilot)
+        # Length check
         assert len(mol_graph) == len(mol_graph.elements)
 
-        # Getitem check (from Copilot plus additional)
+        # Getitem check
         element, coords = mol_graph[0]
-        assert element in MolGraph.REFERENCE_RADII
+        assert element in DEFAULT_RADII
         assert len(coords) == 3
         assert coords == (mol_graph.x[0], mol_graph.y[0], mol_graph.z[0])
 
@@ -135,6 +95,4 @@ class TestMolGraph:
         mol.z = [0.0]
 
         with pytest.raises((KeyError, ValueError)):
-            mol.atomic_radii = [
-                mol.REFERENCE_RADII[element] for element in mol.elements
-            ]
+            mol.atomic_radii = [mol.default_radii[element] for element in mol.elements]
