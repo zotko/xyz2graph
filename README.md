@@ -3,9 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
-
 [![Downloads](https://pepy.tech/badge/xyz2graph)](https://pepy.tech/projects/xyz2graph)
-![Visitors](https://visitor-badge.laobi.icu/badge?page_id=zotko.xyz2graph)
 
 ![GitHub stars](https://img.shields.io/github/stars/zotko/xyz2graph)
 ![GitHub forks](https://img.shields.io/github/forks/zotko/xyz2graph)
