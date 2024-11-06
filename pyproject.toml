@@ -75,4 +75,4 @@ python_files = ["test_*.py"]
 addopts = "--cov=xyz2graph --cov-report=term-missing"
 
 [project.scripts]
-xyz2graph_cli = "xyz2graph.xyz2graph_cli:main"
+xyz2graph = "xyz2graph.xyz2graph_cli:main"

@@ -73,13 +73,13 @@ Quickly visualize molecules from XYZ files:
 
 ```bash
 # Save visualization as HTML
-xyz2graph_cli molecule.xyz
+xyz2graph molecule.xyz
 
 # Specify output file
-xyz2graph_cli molecule.xyz -o visualization.html
+xyz2graph molecule.xyz -o visualization.html
 
 # Open directly in browser
-xyz2graph_cli molecule.xyz --browser
+xyz2graph molecule.xyz --browser
 ```
 
 ## Customization
