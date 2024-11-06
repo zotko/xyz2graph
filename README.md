@@ -9,7 +9,7 @@ A lightweight Python package for reading XYZ files and creating interactive mole
 
 <p align="center">
   <img src=".github/images/mol.gif",  width="1024">
-</p>picture
+</p>
 
 ## Features
 
