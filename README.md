@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/main/LICENSE)
-[![Downloads](https://static.pepy.tech/badge/xyz2graph)](https://pepy.tech/project/xyz2graph)
+[![Downloads](https://static.pepy.tech/badge/xyz2graph)](https://pepy.tech/projects/xyz2graph)
 
 A lightweight Python package for reading XYZ files and creating interactive molecular visualizations. Convert molecular structures into 3D visualizations using Plotly or analyze them as NetworkX graphs.
 
