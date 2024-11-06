@@ -8,6 +8,7 @@ import numpy as np
 import plotly.graph_objs as go
 from numpy.typing import NDArray
 
+
 DEFAULT_RADII: Dict[str, float] = {
     "Ac": 1.88,
     "Ag": 1.59,

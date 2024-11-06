@@ -1,51 +1,75 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.0.0"]
 build-backend = "hatchling.build"
 
 [project]
 name = "xyz2graph"
-version = "2.0.0"
-authors = [
-    { name = "Mykola Zotko", email = "" }
-]
+dynamic = "3.0.0"
 description = "Package for reading of .xyz files and constructing of molecular graphs from atomic coordinates."
 readme = "README.md"
-requires-python = ">=3.5"
+requires-python = ">=3.8"
 license = { text = "MIT" }
+authors = [
+    { name = "Mykola Zotko", email = "dev.zotko@outlook.de" }
+]
+keywords = ["chemistry", "molecular-graphs", "xyz-files", "visualization"]
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "numpy",
-    "plotly",
-    "networkx",
+    "numpy>=1.21.0",
+    "plotly>=5.0.0",
+    "networkx>=2.6.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/zotko/xyz2graph.py"
-Repository = "https://github.com/zotko/xyz2graph.py"
+Homepage = "https://github.com/zotko/xyz2graph"
+Repository = "https://github.com/zotko/xyz2graph"
+Documentation = "https://github.com/zotko/xyz2graph#readme"
+"Bug Tracker" = "https://github.com/zotko/xyz2graph/issues"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "black>=22.0",
-    "isort>=5.0",
-    "flake8>=5.0",
-    "build>=1.0.0",
-    "twine>=4.0.0",
+    "pytest>=7.0.0,<8.0.0",
+    "pytest-cov>=4.0.0,<5.0.0",
+    "ruff>=0.1.0,<1.0.0",
+    "mypy>=1.0.0,<2.0.0",
+    "build>=1.0.0,<2.0.0",
+    "twine>=4.0.0,<5.0.0",
 ]
 
-[tool.black]
+[tool.ruff]
+target-version = "py38"
 line-length = 88
-target-version = ["py35"]
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "W", "C", "UP", "N", "ANN", "T20", "PT"]
+ignore = ["ANN101", "N806", "T201", "C408"]
+
+[tool.ruff.isort]
+force-single-line = false
+lines-after-imports = 2
+known-first-party = ["xyz2graph"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+addopts = "--cov=xyz2graph --cov-report=term-missing"

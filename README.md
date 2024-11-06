@@ -1,61 +1,108 @@
 # xyz2graph
 
-[**xyz2graph**](https://github.com/zotko/xyz2graph) is a Python package for reading of .xyz files and constructing of molecular graphs from atomic coordinates. The molecular graph can be converted into [NetworkX](https://networkx.github.io) graph or [Plotly](https://plot.ly) figure for 3D visualization in a browser window or in a [Jupyter notebook](https://jupyter.org).
+[![PyPI version](https://img.shields.io/pypi/v/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
+[![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
+[![License](https://img.shields.io/github/license/yourusername/xyz2graph.svg)](https://github.com/yourusername/xyz2graph/blob/main/LICENSE)
+[![Downloads](https://pepy.tech/badge/xyz2graph)](https://pepy.tech/project/xyz2graph)
+
+A lightweight Python package for reading XYZ files and creating interactive molecular visualizations. Convert molecular structures into 3D visualizations using Plotly or analyze them as NetworkX graphs.
 
 <p align="center">
   <img src=".github/images/mol.gif",  width="1024">
 </p>picture
 
-## Requirements
- * **Python 3**
- * [NumPy](https://numpy.org)
- * [NetworkX](https://networkx.github.io)
- * [Plotly](https://plot.ly)
+## Features
+
+- Read and parse XYZ molecular structure files
+- Generate interactive 3D molecular visualizations using Plotly
+- Convert molecular structures to NetworkX graphs for analysis
+- Command-line interface for quick visualizations
 
 ## Installation
-`python -m pip install git+https://github.com/zotko/xyz2graph.git`
+
+```bash
+pip install xyz2graph
+```
+
+
+## Requirements
+
+- Python 3.8+
+- numpy
+- networkx
+- plotly
 
 ## Usage
-```
-from xyz2graph import MolGraph, to_networkx_graph, to_plotly_figure
-from plotly.offline import offline
 
-# Create the MolGraph object
+### Python API
+
+```python
+from xyz2graph import MolGraph
+from plotly.offline import plot
+
+# Create molecular graph and read XYZ file
 mg = MolGraph()
+mg.read_xyz('molecule.xyz')
 
-# Read the data from the .xyz file
-mg.read_xyz('path/molecule.xyz')
+# Generate interactive 3D visualization
+fig = mg.to_plotly()
+plot(fig)
 
-# Create the Plotly figure object
-fig = to_plotly_figure(mg)
-
-# Plot the figure
-offline.plot(fig)
-
-# Convert the molecular graph to the NetworkX graph
-G = to_networkx_graph(mg)
+# Convert to NetworkX graph for analysis
+G = mg.to_networkx()
 ```
 
-## Usage in Jupyter Notebook
+### Jupyter Notebook
 
-```
-from xyz2graph import MolGraph, to_networkx_graph, to_plotly_figure
+```python
+from xyz2graph import MolGraph
 from plotly.offline import init_notebook_mode, iplot
 
-# Initiate the Plotly notebook mode
+# Initialize Plotly for notebook
 init_notebook_mode(connected=True)
 
-# Create the MolGraph object
+# Create and display molecular visualization
 mg = MolGraph()
-
-# Read the data from the .xyz file
-mg.read_xyz('path/molecule.xyz')
-
-# Create the Plotly figure object
-fig = to_plotly_figure(mg)
-
-# Plot the figure
-iplot(fig)
+mg.read_xyz('molecule.xyz')
+iplot(mg.to_plotly())
 ```
 
-### [Example of usage](https://www.kaggle.com/code/mykolazotko/xyz2graph-xyz-file-to-molecular-graph/notebook?scriptVersionId=98112967)
+### Command Line Interface
+
+Quickly visualize molecules from XYZ files:
+
+```bash
+# Save visualization as HTML
+xyz2graph molecule.xyz
+
+# Specify output file
+xyz2graph molecule.xyz -o visualization.html
+
+# Open directly in browser
+xyz2graph molecule.xyz --browser
+```
+
+## Customization
+
+Customize atomic properties for visualization:
+
+```python
+mg = MolGraph()
+
+# Customize atomic radius
+mg.set_element_radius('C', 0.75)
+
+# Customize element color
+mg.set_element_color('O', 'red')
+
+# Set default color for unlisted elements
+mg.set_default_color('pink')
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

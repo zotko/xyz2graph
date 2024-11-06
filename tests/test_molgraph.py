@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import plotly.graph_objs as go
 import pytest
 
@@ -6,7 +8,7 @@ from xyz2graph import DEFAULT_CPK_COLORS, DEFAULT_RADII, MolGraph
 
 class TestMolGraph:
     @pytest.fixture
-    def test_xyz_file(self, tmp_path):
+    def test_xyz_file(self, tmp_path: Path) -> str:
         """Create a test XYZ file."""
         content = """3
         Water molecule
@@ -19,13 +21,13 @@ class TestMolGraph:
         return str(file_path)
 
     @pytest.fixture
-    def mol_graph(self, test_xyz_file):
+    def mol_graph(self, test_xyz_file: str) -> MolGraph:
         """Create a MolGraph instance with test data."""
         mol = MolGraph()
         mol.read_xyz(test_xyz_file)
         return mol
 
-    def test_read_xyz(self, mol_graph):
+    def test_read_xyz(self, mol_graph: MolGraph) -> None:
         """Test reading XYZ file and basic structure."""
         assert len(mol_graph) > 0
         assert (
@@ -42,7 +44,7 @@ class TestMolGraph:
         assert len(mol_graph.atomic_radii) == 3
         assert mol_graph.atomic_radii[0] == DEFAULT_RADII["O"]
 
-    def test_to_plotly(self, mol_graph):
+    def test_to_plotly(self, mol_graph: MolGraph) -> None:
         """Test Plotly figure generation."""
         figure = mol_graph.to_plotly()
 
@@ -67,7 +69,7 @@ class TestMolGraph:
 
     # ... rest of the tests remain the same ...
 
-    def test_len_and_getitem(self, mol_graph):
+    def test_len_and_getitem(self, mol_graph: MolGraph) -> None:
         """Test length and indexing operations."""
         # Length check
         assert len(mol_graph) == len(mol_graph.elements)
@@ -78,7 +80,7 @@ class TestMolGraph:
         assert len(coords) == 3
         assert coords == (mol_graph.x[0], mol_graph.y[0], mol_graph.z[0])
 
-    def test_error_handling(self):
+    def test_error_handling(self) -> None:
         """Test error conditions."""
         mol = MolGraph()
 
