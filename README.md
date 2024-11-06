@@ -99,6 +99,10 @@ mg.set_element_color('O', 'red')
 mg.set_default_color('pink')
 ```
 
+## Examples
+
+Example XYZ files and usage demonstrations can be found in the [`examples`](examples/) directory.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
