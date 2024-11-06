@@ -152,7 +152,7 @@ class MolGraph:
         atomic_radii: List of atomic radii for each atom
         bond_lengths: Dictionary mapping pairs of connected atoms to their bond lengths
         adj_matrix: Numpy array representing the adjacency matrix of the molecular graph
-        reference_radii: Dictionary of reference atomic radii for each element
+        default_radii: Dictionary of reference atomic radii for each element
         cpk_colors: Dictionary of CPK colors for each element
         cpk_color_rest: Default color for elements not in cpk_colors
     """
