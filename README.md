@@ -101,7 +101,7 @@ mg.set_default_color('pink')
 
 ## Examples
 
-Example XYZ files and usage demonstrations can be found in the [`examples`](examples/) directory.
+Example XYZ files can be found in the [`examples`](examples/) directory.
 
 ## Contributing
 
