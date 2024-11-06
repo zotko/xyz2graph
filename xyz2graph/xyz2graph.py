@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -158,6 +156,9 @@ class MolGraph:
         cpk_color_rest: Default color for elements not in cpk_colors
     """
 
+    DEFAULT_ATOMIC_RADII = DEFAULT_RADII
+    DEFAULT_CPK_COLORS = DEFAULT_CPK_COLORS
+
     elements: List[str] = field(default_factory=list)
     x: List[float] = field(default_factory=list)
     y: List[float] = field(default_factory=list)
@@ -174,17 +175,17 @@ class MolGraph:
 
     def set_element_radius(self, element: str, radius: float) -> None:
         """
-        Set the reference radius for a specific element.
+        Set the reference radius for a specific element and update the adjacency list.
 
         Args:
             element: Chemical element symbol
             radius: New radius value in Angstroms
         """
         self.default_radii[element] = radius
-        # Update atomic_radii if the element is present in the current molecule
-        if self.elements:
-            self.atomic_radii = [self.default_radii[elem] for elem in self.elements]
-            # Regenerate adjacency list with new radii
+        if element in self.elements:
+            self.atomic_radii = [
+                self.default_radii[element] for element in self.elements
+            ]
             self._generate_adjacency_list()
 
     def set_element_color(self, element: str, color: str) -> None:
@@ -218,13 +219,13 @@ class MolGraph:
             ValueError: If the file format is invalid or contains unknown elements
         """
         pattern = re.compile(
-            r"([A-Za-z]{1,3})"  # Element (1-3 characters)
+            r"([A-Za-z]{1,3})"  # Element symbol (1-3 characters)
             r"\s*"  # Optional whitespace
-            r"(-?\d+(?:\.\d+)?)"  # First number (integer or float)
+            r"(-?\d+(?:\.\d+)?)"  # x-coordinate (integer or float)
             r"\s*"  # Optional whitespace
-            r"(-?\d+(?:\.\d+)?)"  # Second number (integer or float)
+            r"(-?\d+(?:\.\d+)?)"  # y-coordinate (integer or float)
             r"\s*"  # Optional whitespace
-            r"(-?\d+(?:\.\d+)?)"  # Third number (integer or float)
+            r"(-?\d+(?:\.\d+)?)"  # z-coordinate (integer or float)
         )
 
         file_path = Path(file_path)
