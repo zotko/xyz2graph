@@ -28,9 +28,9 @@ pip install xyz2graph
 ## Requirements
 
 - Python 3.8+
-- numpy
-- networkx
-- plotly
+- NumPy
+- NetworkX
+- Plotly
 
 ## Usage
 
@@ -76,7 +76,7 @@ Quickly visualize molecules from XYZ files:
 xyz2graph molecule.xyz
 
 # Specify output file
-xyz2graph molecule.xyz -o visualization.html
+xyz2graph molecule.xyz --output visualization.html
 
 # Open directly in browser
 xyz2graph molecule.xyz --browser
