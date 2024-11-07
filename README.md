@@ -13,7 +13,9 @@
 
 A lightweight Python package for reading XYZ files and creating interactive molecular visualizations. Convert molecular structures into 3D visualizations using Plotly or analyze them as NetworkX graphs.
 
-![Molecular Visualization](./github/images/mol.gif)
+<div align="center">
+  <img src=".github/images/mol.gif" width="1024">
+</div>
 
 ## Features
 
