@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import argparse
+import logging
+import sys
 import tempfile
 from pathlib import Path
 
@@ -7,6 +9,7 @@ import plotly.offline as offline
 from plotly.io import write_html
 
 from xyz2graph import MolGraph
+from xyz2graph.logging import logger
 
 
 def parse_args() -> argparse.Namespace:
@@ -27,6 +30,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Open the visualization in browser without saving the file",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug logging",
+    )
 
     return parser.parse_args()
 
@@ -44,13 +52,18 @@ def main() -> None:
     """Main function for the command-line interface."""
     args = parse_args()
 
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+        logger.debug(f"Arguments: {args}")
+
     # Create MolGraph instance and read XYZ file
     mg = MolGraph()
     try:
+        logger.info(f"Reading XYZ file: {args.xyz_file}")
         mg.read_xyz(args.xyz_file)
     except (FileNotFoundError, ValueError) as e:
-        print(f"Error: {e}")
-        return
+        logger.error(f"Error reading XYZ file: {e}")
+        sys.exit(1)
 
     # Generate figure
     fig = mg.to_plotly()
@@ -58,19 +71,22 @@ def main() -> None:
     # Save/display the visualization
     try:
         if args.browser:
+            logger.info("Opening visualization in browser")
             # Create a temporary file that will be automatically cleaned up
             with tempfile.NamedTemporaryFile(
                 prefix=Path(args.xyz_file).stem + "_", suffix=".html", delete=False
             ) as tmp:
                 offline.plot(fig, filename=tmp.name, auto_open=True)
+                logger.debug(f"Created temporary file: {tmp.name}")
         else:
             output_path = generate_output_path(args.xyz_file, args.output)
+            logger.info(f"Saving visualization to: {output_path}")
             write_html(fig, str(output_path))
             print(f"Visualization saved to: {output_path}")
 
     except Exception as e:
-        print(f"Error saving visualization: {e}")
-        return
+        logger.error(f"Error saving visualization: {e}", exc_info=True)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

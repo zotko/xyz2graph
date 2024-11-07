@@ -8,6 +8,8 @@ import numpy as np
 import plotly.graph_objs as go
 from numpy.typing import NDArray
 
+from .logging import logger
+
 
 DEFAULT_RADII: Dict[str, float] = {
     "Ac": 1.88,
@@ -219,6 +221,8 @@ class MolGraph:
             FileNotFoundError: If the specified file does not exist
             ValueError: If the file format is invalid or contains unknown elements
         """
+        logger.debug(f"Reading XYZ file: {file_path}")
+
         pattern = re.compile(
             r"([A-Za-z]{1,3})"  # Element symbol (1-3 characters)
             r"\s*"  # Optional whitespace
@@ -231,31 +235,49 @@ class MolGraph:
 
         file_path = Path(file_path)
         if not file_path.exists():
+            logger.error(f"XYZ file not found: {file_path}")
             raise FileNotFoundError(f"XYZ file not found: {file_path}")
 
-        content = file_path.read_text()
-        matches = pattern.findall(content)
+        try:
+            content = file_path.read_text().strip()
+            if not content:
+                logger.error(f"XYZ file is empty: {file_path}")
+                raise ValueError(f"XYZ file is empty: {file_path}")
 
-        if not matches:
-            raise ValueError(f"No valid molecular structure data found in {file_path}")
+            matches = pattern.findall(content)
 
-        # Clear existing data
-        self.elements.clear()
-        self.x.clear()
-        self.y.clear()
-        self.z.clear()
+            if not matches:
+                logger.error(f"No valid molecular structure data found in {file_path}")
+                raise ValueError(
+                    f"No valid molecular structure data found in {file_path}"
+                )
 
-        for element, x, y, z in matches:
-            if element not in self.default_radii:
-                raise ValueError(f"Unknown element found in XYZ file: {element}")
+            # Clear existing data
+            self.elements.clear()
+            self.x.clear()
+            self.y.clear()
+            self.z.clear()
 
-            self.elements.append(element)
-            self.x.append(float(x))
-            self.y.append(float(y))
-            self.z.append(float(z))
+            for element, x, y, z in matches:
+                if element not in self.default_radii:
+                    logger.error(f"Unknown element found in XYZ file: {element}")
+                    raise ValueError(f"Unknown element found in XYZ file: {element}")
 
-        self.atomic_radii = [self.default_radii[element] for element in self.elements]
-        self._generate_adjacency_list()
+                self.elements.append(element)
+                self.x.append(float(x))
+                self.y.append(float(y))
+                self.z.append(float(z))
+            logger.info(
+                f"Successfully read {len(self.elements)} atoms from {file_path}"
+            )
+
+            self.atomic_radii = [
+                self.default_radii[element] for element in self.elements
+            ]
+            self._generate_adjacency_list()
+        except Exception as e:
+            logger.error(f"Error reading XYZ file: {e}", exc_info=True)
+            raise
 
     def to_plotly(self) -> go.Figure:
         """
@@ -264,6 +286,8 @@ class MolGraph:
         Returns:
             go.Figure: Interactive 3D visualization of the molecular structure
         """
+
+        logger.debug("Creating Plotly figure")
 
         def atom_trace() -> go.Scatter3d:
             """Creates an atom trace for the plot."""
@@ -410,7 +434,7 @@ class MolGraph:
             showlegend=False,
             updatemenus=updatemenus,
         )
-
+        logger.debug("Plotly figure created successfully")
         return go.Figure(data=data, layout=layout)
 
     def to_networkx(self) -> nx.Graph:
@@ -420,6 +444,8 @@ class MolGraph:
         Returns:
             nx.Graph: NetworkX graph representation with node and edge attributes
         """
+        logger.debug("Creating NetworkX graph")
+
         G = nx.Graph(self.adj_list)
 
         # Add node attributes
@@ -434,6 +460,7 @@ class MolGraph:
             edge: {"length": length} for edge, length in self.bond_lengths.items()
         }
         nx.set_edge_attributes(G, edge_attrs)
+        logger.debug("NetworkX graph created successfully")
 
         return G
 
@@ -445,26 +472,34 @@ class MolGraph:
         between atoms. Two atoms are considered bonded if their distance is less
         than 1.3 times the sum of their atomic radii.
         """
-        xyz = np.stack((self.x, self.y, self.z), axis=-1)
-        distances = xyz[:, np.newaxis, :] - xyz
-        distances = np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
+        logger.debug("Generating adjacency list")
 
-        atomic_radii = np.array(self.atomic_radii)
-        distance_bond = (atomic_radii[:, np.newaxis] + atomic_radii) * 1.3
+        try:
+            xyz = np.stack((self.x, self.y, self.z), axis=-1)
+            distances = xyz[:, np.newaxis, :] - xyz
+            distances = np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
 
-        self.adj_matrix = np.logical_and(
-            0.1 < distances, distance_bond > distances
-        ).astype(int)
+            atomic_radii = np.array(self.atomic_radii)
+            distance_bond = (atomic_radii[:, np.newaxis] + atomic_radii) * 1.3
 
-        # Clear existing adjacency data
-        self.adj_list.clear()
-        self.bond_lengths.clear()
+            self.adj_matrix = np.logical_and(
+                0.1 < distances, distance_bond > distances
+            ).astype(int)
 
-        # Generate new adjacency data
-        for i, j in zip(*np.nonzero(self.adj_matrix)):
-            self.adj_list.setdefault(i, set()).add(j)
-            self.adj_list.setdefault(j, set()).add(i)
-            self.bond_lengths[frozenset([i, j])] = round(distances[i, j], 5)
+            # Clear existing adjacency data
+            self.adj_list.clear()
+            self.bond_lengths.clear()
+
+            # Generate new adjacency data
+            for i, j in zip(*np.nonzero(self.adj_matrix)):
+                self.adj_list.setdefault(i, set()).add(j)
+                self.adj_list.setdefault(j, set()).add(i)
+                self.bond_lengths[frozenset([i, j])] = round(distances[i, j], 5)
+            logger.debug("Adjacency list generated successfully")
+
+        except Exception as e:
+            logger.error(f"Error generating adjacency list: {e}", exc_info=True)
+            raise
 
     def edges(self) -> Iterator[Tuple[int, int]]:
         """
