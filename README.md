@@ -3,10 +3,12 @@
 [![PyPI version](https://img.shields.io/pypi/v/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
-[![Downloads](https://pepy.tech/badge/xyz2graph)](https://pepy.tech/projects/xyz2graph)
 
-![GitHub stars](https://img.shields.io/github/stars/zotko/xyz2graph)
-![GitHub forks](https://img.shields.io/github/forks/zotko/xyz2graph)
+[![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph)](https://pepy.tech/project/xyz2graph)
+[![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/network/members)
+
+[!["Buy Me A Coffee"](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/mykola_zotko)
 
 A lightweight Python package for reading XYZ files and creating interactive molecular visualizations. Convert molecular structures into 3D visualizations using Plotly or analyze them as NetworkX graphs.
 
