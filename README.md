@@ -4,7 +4,7 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
 
-[![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph)](https://pepy.tech/projects/xyz2graph)
+[![PyPI Downloads](https://pepy.tech/badge/xyz2graph/month)](https://pepy.tech/project/xyz2graph)
 [![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/network/members)
 
@@ -69,7 +69,8 @@ init_notebook_mode(connected=True)
 # Create and display molecular visualization
 mg = MolGraph()
 mg.read_xyz('molecule.xyz')
-iplot(mg.to_plotly())
+fig = mg.to_plotly()
+iplot(fig)
 ```
 
 ### Command Line Interface
@@ -115,3 +116,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Citation
+If you use xyz2graph in your research, please cite:
+
+```bibtex
+@misc{xyz2graph,
+  author       = {Zotko, Mykola},
+  title        = {xyz2graph: Molecular Structure Visualization},
+  year         = {2018},
+  publisher    = {GitHub},
+  url          = {https://github.com/zotko/xyz2graph}
+}
+```
