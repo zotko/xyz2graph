@@ -50,6 +50,9 @@ from plotly.offline import plot
 mg = MolGraph()
 mg.read_xyz('molecule.xyz')
 
+print(mg)  # e.g., "MolGraph(H20: 3 atoms, 2 bonds)"
+print(mg.formula())  # e.g., "H20"
+
 # Generate interactive 3D visualization
 fig = mg.to_plotly()
 plot(fig)

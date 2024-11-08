@@ -80,6 +80,46 @@ class TestMolGraph:
         assert len(coords) == 3
         assert coords == (mol_graph.x[0], mol_graph.y[0], mol_graph.z[0])
 
+    def test_formula(self) -> None:
+        """Test the molecular formula generation in Hill notation"""
+        mg = MolGraph()
+
+        # Test empty molecule
+        assert mg.formula() == ""
+
+        # Helper to set up test molecules
+        def setup_molecule(elements: list[str]) -> MolGraph:
+            mg.elements = elements
+            mg.x = [0.0] * len(elements)  # Dummy coordinates
+            mg.y = [0.0] * len(elements)
+            mg.z = [0.0] * len(elements)
+            return mg
+
+        # Test carbon-containing molecules
+        test_cases = [
+            # (elements list, expected formula)
+            (["C", "C", "H", "H", "H", "H", "H", "H"], "C2H6"),  # Ethane
+            (["C", "O", "H", "H", "H", "H"], "CH4O"),  # Methanol
+            (["C", "C", "H", "H", "H", "H", "O", "O"], "C2H4O2"),  # Acetic acid
+            # Molecules without carbon (alphabetical ordering)
+            (["H", "O", "H"], "H2O"),  # Water
+            (["N", "H", "H", "H"], "H3N"),  # Ammonia
+            (["H", "H", "S", "O", "O", "O", "O"], "H2O4S"),  # Sulfuric acid
+            (["Na", "Cl"], "ClNa"),  # Sodium chloride
+            # Edge cases
+            (["H"], "H"),  # Single hydrogen
+            (["O"], "O"),  # Single oxygen
+            (["C"], "C"),  # Single carbon
+            (["C", "C", "C"], "C3"),  # Pure carbon
+            (["H", "H"], "H2"),  # Hydrogen molecule
+        ]
+
+        for elements, expected in test_cases:
+            mg = setup_molecule(elements)
+            assert (
+                mg.formula() == expected
+            ), f"Failed for {elements}: expected {expected}, got {mg.formula()}"
+
     def test_error_handling(self) -> None:
         """Test error conditions."""
         mol = MolGraph()

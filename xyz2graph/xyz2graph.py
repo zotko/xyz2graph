@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, FrozenSet, Iterator, List, Set, Tuple
+from typing import Counter, Dict, FrozenSet, Iterator, List, Set, Tuple
 
 import networkx as nx
 import numpy as np
@@ -213,6 +213,17 @@ class MolGraph:
     def read_xyz(self, file_path: str | Path) -> None:
         """
         Reads molecular structure data from an XYZ file.
+
+        The XYZ file format should look like this:
+        3
+        Water
+        O    0.000000    0.000000    0.000000
+        H    0.758602    0.000000    0.504284
+        H    0.758602    0.000000   -0.504284
+
+        First line: number of atoms
+        Second line: comment/title
+        Following lines: element and x, y, z coordinates in Angstroms
 
         Args:
             file_path: Path to the XYZ file
@@ -517,6 +528,42 @@ class MolGraph:
                 edges.add(edge)
                 yield node, neighbour
 
+    def formula(self) -> str:
+        """
+        Returns the molecular formula in standard Hill notation.
+
+        The Hill system orders elements as:
+        1. Carbon first (if present)
+        2. Hydrogen second (if carbon is present)
+        3. All other elements alphabetically
+
+        Returns:
+            str: Molecular formula string
+        """
+        if not self.elements:
+            return ""
+
+        element_counts = Counter(self.elements)
+
+        # Build formula in Hill notation
+        formula_parts = []
+
+        # Carbon and Hydrogen first if carbon is present
+        if "C" in element_counts:
+            count = element_counts.pop("C")
+            formula_parts.append(f"C{count if count > 1 else ''}")
+
+            if "H" in element_counts:
+                count = element_counts.pop("H")
+                formula_parts.append(f"H{count if count > 1 else ''}")
+
+        # Add remaining elements alphabetically
+        for element in sorted(element_counts):
+            count = element_counts[element]
+            formula_parts.append(f"{element}{count if count > 1 else ''}")
+
+        return "".join(formula_parts)
+
     def __len__(self) -> int:
         """
         Returns the number of atoms in the molecule.
@@ -558,3 +605,31 @@ class MolGraph:
             tuples of (element, coordinates) for each atom
         """
         return (self[i] for i in range(len(self)))
+
+    def __repr__(self) -> str:
+        """
+        Creates a simplified string representation of the molecular graph.
+
+        Returns:
+            str: A string showing molecular formula and basic structural information
+        """
+        if not self.elements:
+            return "MolGraph(empty)"
+
+        element_counts = Counter(self.elements)
+
+        # Build formula prioritizing C and H
+        formula_parts = []
+        for element in ["C", "H"]:
+            if count := element_counts.pop(element, 0):
+                formula_parts.append(f"{element}{count if count > 1 else ''}")
+
+        # Add remaining elements alphabetically
+        for element in sorted(element_counts):
+            count = element_counts[element]
+            formula_parts.append(f"{element}{count if count > 1 else ''}")
+
+        formula = "".join(formula_parts)
+        num_bonds = sum(len(neighbors) for neighbors in self.adj_list.values()) // 2
+
+        return f"MolGraph({formula}: {len(self.elements)} atoms, {num_bonds} bonds)"
