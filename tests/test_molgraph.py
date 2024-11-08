@@ -120,6 +120,55 @@ class TestMolGraph:
                 mg.formula() == expected
             ), f"Failed for {elements}: expected {expected}, got {mg.formula()}"
 
+    def test_xyz_start_custom(self, tmp_path: Path) -> None:
+        """Test reading coordinates with custom start line."""
+        xyz_content = """HEADER
+        SOME INFO
+        ANOTHER LINE
+        O  0.0 0.0 0.0
+        H  1.0 0.0 0.0
+        H -1.0 0.0 0.0"""
+        xyz_file = tmp_path / "molecule.xyz"
+        xyz_file.write_text(xyz_content)
+
+        mol = MolGraph()
+        mol.read_xyz(xyz_file, xyz_start=3)
+
+        assert len(mol.elements) == 3
+        assert mol.elements == ["O", "H", "H"]
+        assert mol.x == [0.0, 1.0, -1.0]
+
+    def test_validate_with_xyz_start_zero(self, tmp_path: Path) -> None:
+        """Test validation is disabled when xyz_start=0."""
+        xyz_content = """O  0.0 0.0 0.0
+        H  1.0 0.0 0.0
+        H -1.0 0.0 0.0"""
+        xyz_file = tmp_path / "molecule.xyz"
+        xyz_file.write_text(xyz_content)
+
+        mol = MolGraph()
+        # Should not raise error even though no atom count is present
+        mol.read_xyz(xyz_file, xyz_start=0, validate=True)
+
+        assert len(mol.elements) == 3
+        assert mol.elements == ["O", "H", "H"]
+
+    def test_validate_true_invalid(self, tmp_path: Path) -> None:
+        """Test validation with mismatching atom count."""
+        xyz_content = """2
+        Water molecule
+        O  0.0 0.0 0.0
+        H  1.0 0.0 0.0
+        H -1.0 0.0 0.0"""
+        xyz_file = tmp_path / "molecule.xyz"
+        xyz_file.write_text(xyz_content)
+
+        mol = MolGraph()
+        with pytest.raises(
+            ValueError, match="Number of coordinates doesn't match atom count"
+        ):
+            mol.read_xyz(xyz_file, validate=True)
+
     def test_error_handling(self) -> None:
         """Test error conditions."""
         mol = MolGraph()

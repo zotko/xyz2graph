@@ -210,23 +210,84 @@ class MolGraph:
         """
         self.cpk_color_rest = color
 
-    def read_xyz(self, file_path: str | Path) -> None:
+    def _parse_coordinates(
+        self, data: list[str]
+    ) -> tuple[list[str], list[float], list[float], list[float]]:
         """
-        Reads molecular structure data from an XYZ file.
+        Parse atomic coordinates from a list of coordinate strings.
 
-        The XYZ file format should look like this:
+        Args:
+            data: List of strings, each containing element and coordinates in format:
+                        'element x y z' (e.g., 'H 0.0 0.0 0.0')
+
+        Returns:
+            Tuple containing (elements, x_coords, y_coords, z_coords)
+
+        Raises:
+            ValueError: If coordinate format is invalid or contains unknown elements
+        """
+        elements, xs, ys, zs = [], [], [], []
+
+        pattern = re.compile(
+            r"^([a-z]{1,3})\s+"  # Element symbol (1-3 letters)
+            r"(-?\d+\.?\d*)\s+"  # x coordinate (integer or float)
+            r"(-?\d+\.?\d*)\s+"  # y coordinate (integer or float)
+            r"(-?\d+\.?\d*)$",  # z coordinate (integer or float)
+            re.IGNORECASE,
+        )
+
+        for string in data:
+            if not (string := string.strip()):
+                continue
+
+            if not (match := pattern.match(string)):
+                logger.error(f"Invalid coordinate format: {string}")
+                raise ValueError(f"Invalid coordinate format: {string}")
+
+            element, x, y, z = match.groups()
+            if element not in self.default_radii:
+                logger.error(f"Unknown element found: {element}")
+                raise ValueError(f"Unknown element found: {element}")
+
+            elements.append(element)
+            xs.append(float(x))
+            ys.append(float(y))
+            zs.append(float(z))
+
+        if not elements:
+            logger.error("No valid coordinates found")
+            raise ValueError("No valid coordinates found")
+
+        return elements, xs, ys, zs
+
+    def read_xyz(
+        self, file_path: str | Path, xyz_start: int = 2, validate: bool = False
+    ) -> None:
+        """
+        Reads molecular structure data from an XYZ file starting from a specified line.
+
+        The XYZ file format specification:
+        - Line 0: Number of atoms (integer)
+        - Line 1: Comment or title (can be empty)
+        - Line 2 onwards: Atomic coordinates in format:
+            element  x  y  z
+        where:
+        - element: Chemical element symbol (e.g., H, He, Li)
+        - x, y, z: Cartesian coordinates in Angstroms (float)
+
+        Example of XYZ file:
         3
-        Water
-        O    0.000000    0.000000    0.000000
-        H    0.758602    0.000000    0.504284
-        H    0.758602    0.000000   -0.504284
-
-        First line: number of atoms
-        Second line: comment/title
-        Following lines: element and x, y, z coordinates in Angstroms
+        Water molecule
+        O  0.000000  0.000000  0.000000
+        H  0.758602  0.000000  0.504284
+        H  0.758602  0.000000 -0.504284
 
         Args:
             file_path: Path to the XYZ file
+            xyz_start: Line number where XYZ coordinate data starts (default=2)
+            validate: If True, validates that the number of coordinates matches
+                    the atom count in the first line. Note: validation is automatically
+                    disabled if xyz_start=0
 
         Raises:
             FileNotFoundError: If the specified file does not exist
@@ -234,15 +295,14 @@ class MolGraph:
         """
         logger.debug(f"Reading XYZ file: {file_path}")
 
-        pattern = re.compile(
-            r"([A-Za-z]{1,3})"  # Element symbol (1-3 characters)
-            r"\s*"  # Optional whitespace
-            r"(-?\d+(?:\.\d+)?)"  # x-coordinate (integer or float)
-            r"\s*"  # Optional whitespace
-            r"(-?\d+(?:\.\d+)?)"  # y-coordinate (integer or float)
-            r"\s*"  # Optional whitespace
-            r"(-?\d+(?:\.\d+)?)"  # z-coordinate (integer or float)
-        )
+        # Handle validation conflict
+        if validate and xyz_start < 1:
+            logger.warning(
+                "Atom count validation disabled:"
+                " cannot validate when reading from first line "
+                "(xyz_start=0)"
+            )
+            validate = False
 
         file_path = Path(file_path)
         if not file_path.exists():
@@ -250,18 +310,24 @@ class MolGraph:
             raise FileNotFoundError(f"XYZ file not found: {file_path}")
 
         try:
-            content = file_path.read_text().strip()
-            if not content:
-                logger.error(f"XYZ file is empty: {file_path}")
-                raise ValueError(f"XYZ file is empty: {file_path}")
-
-            matches = pattern.findall(content)
-
-            if not matches:
-                logger.error(f"No valid molecular structure data found in {file_path}")
+            lines = file_path.read_text().strip().split("\n")
+            if len(lines) <= xyz_start:
+                logger.error(f"XYZ file has no coordinate data after line {xyz_start}")
                 raise ValueError(
-                    f"No valid molecular structure data found in {file_path}"
+                    f"XYZ file has no coordinate data after line {xyz_start}"
                 )
+
+            # Get expected atom count if validation is requested
+            expected_atoms = None
+            if validate:
+                try:
+                    expected_atoms = int(lines[0])
+                    logger.debug(f"Expected number of atoms: {expected_atoms}")
+                except (IndexError, ValueError) as err:
+                    logger.error("Could not read atom count from first line")
+                    raise ValueError(
+                        "Could not read atom count from first line"
+                    ) from err
 
             # Clear existing data
             self.elements.clear()
@@ -269,15 +335,21 @@ class MolGraph:
             self.y.clear()
             self.z.clear()
 
-            for element, x, y, z in matches:
-                if element not in self.default_radii:
-                    logger.error(f"Unknown element found in XYZ file: {element}")
-                    raise ValueError(f"Unknown element found in XYZ file: {element}")
+            self.elements, self.x, self.y, self.z = self._parse_coordinates(
+                lines[xyz_start:]
+            )
 
-                self.elements.append(element)
-                self.x.append(float(x))
-                self.y.append(float(y))
-                self.z.append(float(z))
+            # Validate number of atoms if requested
+            if validate and len(self.elements) != expected_atoms:
+                logger.error(
+                    f"Number of coordinates doesn't match atom count in first line. "
+                    f"Expected: {expected_atoms}, Found: {len(self.elements)}"
+                )
+                raise ValueError(
+                    f"Number of coordinates doesn't match atom count in first line. "
+                    f"Expected: {expected_atoms}, Found: {len(self.elements)}"
+                )
+
             logger.info(
                 f"Successfully read {len(self.elements)} atoms from {file_path}"
             )
@@ -286,6 +358,7 @@ class MolGraph:
                 self.default_radii[element] for element in self.elements
             ]
             self._generate_adjacency_list()
+
         except Exception as e:
             logger.error(f"Error reading XYZ file: {e}", exc_info=True)
             raise
