@@ -14,8 +14,7 @@
 A lightweight Python package for reading XYZ files and creating interactive molecular visualizations. Convert molecular structures into 3D visualizations using Plotly or analyze them as NetworkX graphs.
 
 <div align="center">
- <img src="https://raw.githubusercontent.com/zotko/xyz2graph/master
- /.github/images/mol.gif" width="1024">
+ <img src="https://raw.githubusercontent.com/zotko/xyz2graph/main/.github/images/mol.gif" width="1024">
 </div>
 
 ## Features
