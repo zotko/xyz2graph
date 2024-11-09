@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling>=1.0.0"]
+requires = ["hatchling>=1.0.0", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "xyz2graph"
-version = "3.0.4"
+dynamic = ["version"]
 description = "Package for reading of .xyz files and constructing of molecular graphs from atomic coordinates."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -32,6 +32,9 @@ dependencies = [
     "plotly>=5.0.0",
     "networkx>=2.6.0",
 ]
+
+[tool.hatch.version]
+source = "vcs"
 
 [project.urls]
 Homepage = "https://github.com/zotko/xyz2graph"
