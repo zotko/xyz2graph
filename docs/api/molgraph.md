@@ -18,7 +18,7 @@ fig.show()
 
 ## Methods
 
-### `read_xyz(file_path, xyz_start=2, validate=False)`
+### `read_xyz`
 Reads and parses molecular structure data from an XYZ file.
 ```python
 mg.read_xyz('molecule.xyz')
@@ -28,7 +28,7 @@ mg.read_xyz('molecule.xyz')
 - `xyz_start` (int): Line number where coordinates start (default: 2)
 - `validate` (bool): Validate atom count against file header (default: False)
 
-### `to_plotly()`
+### `to_plotly`
 Creates a plotly figure with interactive 3D visualization of the molecule.
 ```python
 fig = mg.to_plotly()
@@ -36,7 +36,7 @@ fig = mg.to_plotly()
 
 - Returns: Plotly Figure object for 3D visualization
 
-### `to_networkx()`
+### `to_networkx`
 Creates a NetworkX graph representation of the molecule.
 ```python
 G = mg.to_networkx()
@@ -44,7 +44,7 @@ G = mg.to_networkx()
 
 - Returns: NetworkX Graph object with node and edge attributes
 
-### `formula()`
+### `formula`
 Returns the molecular formula using Hill notation convention.
 ```python
 formula = mg.formula()
@@ -53,7 +53,7 @@ print(formula)  # e.g., "CH4O"
 
 - Returns: str, molecular formula
 
-### `set_element_radius(element, radius)`
+### `set_element_radius`
 Sets the reference radius for a specific element.
 ```python
 mg.set_element_radius('C', 0.75)  # Set carbon atom radius
@@ -62,7 +62,7 @@ mg.set_element_radius('C', 0.75)  # Set carbon atom radius
 - `element` (str): Chemical element symbol
 - `radius` (float): New radius value in Angstroms
 
-### `set_element_color(element, color)`
+### `set_element_color`
 Sets the CPK color for a specific element.
 ```python
 mg.set_element_color('O', 'red')  # Set oxygen atoms to red
@@ -71,7 +71,7 @@ mg.set_element_color('O', 'red')  # Set oxygen atoms to red
 - `element` (str): Chemical element symbol
 - `color` (str): Color name or code accepted by Plotly
 
-### `set_default_color(color)`
+### `set_default_color`
 Sets the default color for elements without specified colors.
 ```python
 mg.set_default_color('gray')
