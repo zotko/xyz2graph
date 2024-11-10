@@ -1,0 +1,32 @@
+site_name: xyz2graph
+site_description: Convert molecular .xyz files into graph representations and 3D visualizations
+repo_url: https://github.com/zotko/xyz2graph
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - API Reference:
+      - CLI: api/cli.md
+      - MolGraph: api/molgraph.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+
+plugins:
+  - search

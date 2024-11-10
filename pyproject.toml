@@ -39,10 +39,14 @@ source = "vcs"
 [project.urls]
 Homepage = "https://github.com/zotko/xyz2graph"
 Repository = "https://github.com/zotko/xyz2graph"
-Documentation = "https://github.com/zotko/xyz2graph#readme"
+Documentation = "https://zotko.github.io/xyz2graph"
 "Bug Tracker" = "https://github.com/zotko/xyz2graph/issues"
 
 [project.optional-dependencies]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+]
 dev = [
     "pytest>=7.0.0,<8.0.0",
     "pytest-cov>=4.0.0,<5.0.0",
