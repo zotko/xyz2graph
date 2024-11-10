@@ -35,51 +35,29 @@ pip install xyz2graph
 
 - Python 3.8+
 - NumPy
-- NetworkX
 - Plotly
+- NetworkX
 
 ## Usage
 
-### Python API
+### Basic Usage
 
 ```python
 from xyz2graph import MolGraph
-from plotly.offline import plot
 
 # Create molecular graph and read XYZ file
 mg = MolGraph()
 mg.read_xyz('molecule.xyz')
 
-print(mg)  # e.g., "MolGraph(H20: 3 atoms, 2 bonds)"
-print(mg.formula())  # e.g., "H20"
-
 # Generate interactive 3D visualization
 fig = mg.to_plotly()
-plot(fig)
+fig.show()
 
-# Convert to NetworkX graph for analysis
+# Convert to NetworkX graph
 G = mg.to_networkx()
 ```
 
-### Jupyter Notebook
-
-```python
-from xyz2graph import MolGraph
-from plotly.offline import init_notebook_mode, iplot
-
-# Initialize Plotly for notebook
-init_notebook_mode(connected=True)
-
-# Create and display molecular visualization
-mg = MolGraph()
-mg.read_xyz('molecule.xyz')
-fig = mg.to_plotly()
-iplot(fig)
-```
-
-### Command Line Interface
-
-Quickly visualize molecules from XYZ files:
+### Command Line
 
 ```bash
 # Save visualization as HTML
@@ -90,23 +68,6 @@ xyz2graph molecule.xyz --output visualization.html
 
 # Open directly in browser
 xyz2graph molecule.xyz --browser
-```
-
-## Customization
-
-Customize atomic properties for visualization:
-
-```python
-mg = MolGraph()
-
-# Customize atomic radius
-mg.set_element_radius('C', 0.75)
-
-# Customize element color
-mg.set_element_color('O', 'red')
-
-# Set default color for unlisted elements
-mg.set_default_color('pink')
 ```
 
 ## Examples
