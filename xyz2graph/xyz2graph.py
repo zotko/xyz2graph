@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Counter, Dict, FrozenSet, Iterator, List, Set, Tuple
+from typing import Counter, Dict, FrozenSet, Iterator, List, Sequence, Set, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -159,9 +159,6 @@ class MolGraph:
         cpk_color_rest: Default color for elements not in cpk_colors
     """
 
-    DEFAULT_ATOMIC_RADII = DEFAULT_RADII
-    DEFAULT_CPK_COLORS = DEFAULT_CPK_COLORS
-
     elements: List[str] = field(default_factory=list)
     x: List[float] = field(default_factory=list)
     y: List[float] = field(default_factory=list)
@@ -169,7 +166,7 @@ class MolGraph:
     adj_list: Dict[int, Set[int]] = field(default_factory=dict)
     atomic_radii: List[float] = field(default_factory=list)
     bond_lengths: Dict[FrozenSet[int], float] = field(default_factory=dict)
-    adj_matrix: NDArray[np.int_] | None = field(default=None)
+    adj_matrix: Union[NDArray[np.int_], None] = field(default=None)
 
     # Customizable parameters with defaults
     default_radii: Dict[str, float] = field(default_factory=lambda: dict(DEFAULT_RADII))
@@ -211,8 +208,8 @@ class MolGraph:
         self.cpk_color_rest = color
 
     def _parse_coordinates(
-        self, data: list[str]
-    ) -> tuple[list[str], list[float], list[float], list[float]]:
+        self, data: Sequence[str]
+    ) -> Tuple[List[str], List[float], List[float], List[float]]:
         """
         Parse atomic coordinates from a list of coordinate strings.
 
@@ -261,10 +258,10 @@ class MolGraph:
         return elements, xs, ys, zs
 
     def read_xyz(
-        self, file_path: str | Path, xyz_start: int = 2, validate: bool = False
+        self, file_path: Union[str, Path], xyz_start: int = 2, validate: bool = False
     ) -> None:
         """
-        Reads molecular structure data from an XYZ file starting from a specified line.
+        Reads molecular structure data from an XYZ file.
 
         The XYZ file format specification:
         - Line 0: Number of atoms (integer)
@@ -329,15 +326,8 @@ class MolGraph:
                         "Could not read atom count from first line"
                     ) from err
 
-            # Clear existing data
-            self.elements.clear()
-            self.x.clear()
-            self.y.clear()
-            self.z.clear()
-
-            self.elements, self.x, self.y, self.z = self._parse_coordinates(
-                lines[xyz_start:]
-            )
+            coordinates = self._parse_coordinates(lines[xyz_start:])
+            self.elements, self.x, self.y, self.z = coordinates
 
             # Validate number of atoms if requested
             if validate and len(self.elements) != expected_atoms:

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 import plotly.graph_objs as go
 import pytest
@@ -88,7 +89,7 @@ class TestMolGraph:
         assert mg.formula() == ""
 
         # Helper to set up test molecules
-        def setup_molecule(elements: list[str]) -> MolGraph:
+        def setup_molecule(elements: List[str]) -> MolGraph:
             mg.elements = elements
             mg.x = [0.0] * len(elements)  # Dummy coordinates
             mg.y = [0.0] * len(elements)

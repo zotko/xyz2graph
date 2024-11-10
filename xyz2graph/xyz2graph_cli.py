@@ -4,6 +4,7 @@ import logging
 import sys
 import tempfile
 from pathlib import Path
+from typing import Union
 
 import plotly.offline as offline
 from plotly.io import write_html
@@ -39,13 +40,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def generate_output_path(input_path: str, output_path: str | None) -> Path:
+def generate_output_path(input_path: str, output_path: Union[str, None]) -> Path:
     """Generate the output file path based on input path."""
     if output_path:
         return Path(output_path)
-
-    input_path = Path(input_path)
-    return input_path.with_suffix(".html")
+    return Path(input_path).with_suffix(".html")
 
 
 def main() -> None:
