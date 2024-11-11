@@ -3,11 +3,11 @@
 [![PyPI version](https://img.shields.io/pypi/v/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://zotko.github.io/xyz2graph)
 
 [![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph)](https://pepy.tech/projects/xyz2graph)
 [![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/network/members)
-[![Documentation Status](https://img.shields.io/github/deployments/zotko/xyz2graph/github-pages?label=docs)](https://zotko.github.io/xyz2graph)
 
 [!["Buy Me A Coffee"](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/mykola_zotko)
 [![Stand With Ukraine](https://img.shields.io/badge/Stand%20With-Ukraine-FFD500?style=flat&labelColor=005BBB)](https://stand-with-ukraine.pp.ua)
@@ -77,7 +77,7 @@ xyz2graph molecule.xyz --browser
 
 ## Examples
 
-Example XYZ files can be found in the [`examples`](examples/) directory.
+Example XYZ files can be found in the [`examples`](https://github.com/zotko/xyz2graph/tree/main/examples/) directory.
 
 ## Contributing
 
