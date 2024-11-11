@@ -150,6 +150,7 @@ class MolGraph:
         x: List of x-coordinates for each atom
         y: List of y-coordinates for each atom
         z: List of z-coordinates for each atom
+        comment: Optional comment or title from the XYZ file
         adj_list: Dictionary mapping atom indices to their connected neighbors
         atomic_radii: List of atomic radii for each atom
         bond_lengths: Dictionary mapping pairs of connected atoms to their bond lengths
@@ -163,6 +164,7 @@ class MolGraph:
     x: List[float] = field(default_factory=list)
     y: List[float] = field(default_factory=list)
     z: List[float] = field(default_factory=list)
+    comment: str = field(default="")
     adj_list: Dict[int, Set[int]] = field(default_factory=dict)
     atomic_radii: List[float] = field(default_factory=list)
     bond_lengths: Dict[FrozenSet[int], float] = field(default_factory=dict)
@@ -325,6 +327,11 @@ class MolGraph:
                     raise ValueError(
                         "Could not read atom count from first line"
                     ) from err
+
+            # Store comment if available (line 1 in standard XYZ format)
+            if xyz_start > 1:
+                self.comment = lines[1].strip()
+                logger.debug(f"Read comment: {self.comment}")
 
             coordinates = self._parse_coordinates(lines[xyz_start:])
             self.elements, self.x, self.y, self.z = coordinates

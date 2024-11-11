@@ -96,4 +96,7 @@ List of atomic radii for each atom in the molecule
 ### `x, y, z`
 Lists of coordinates for each atom
 
+### `comment`
+Optional comment or title from the second line of XYZ file
+
 These properties are automatically updated when reading an XYZ file or modifying the molecular structure.

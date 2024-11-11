@@ -44,6 +44,7 @@ class TestMolGraph:
         assert mol_graph.elements == ["O", "H", "H"]
         assert len(mol_graph.atomic_radii) == 3
         assert mol_graph.atomic_radii[0] == DEFAULT_RADII["O"]
+        assert mol_graph.comment == "Water molecule"
 
     def test_to_plotly(self, mol_graph: MolGraph) -> None:
         """Test Plotly figure generation."""
@@ -169,6 +170,48 @@ class TestMolGraph:
             ValueError, match="Number of coordinates doesn't match atom count"
         ):
             mol.read_xyz(xyz_file, validate=True)
+
+    def test_xyz_comment_handling(self, tmp_path: Path) -> None:
+        """Test handling of XYZ file comments."""
+
+        # Test with normal comment
+        xyz_with_comment = """3
+        Test Comment
+        O    0.0    0.0    0.0
+        H    0.757  0.586  0.0
+        H   -0.757  0.586  0.0
+        """
+        file_path = tmp_path / "with_comment.xyz"
+        file_path.write_text(xyz_with_comment)
+
+        mol = MolGraph()
+        mol.read_xyz(str(file_path))
+        assert mol.comment == "Test Comment"
+
+        # Test with empty comment
+        xyz_empty_comment = """3
+
+        O    0.0    0.0    0.0
+        H    0.757  0.586  0.0
+        H   -0.757  0.586  0.0
+        """
+        file_path = tmp_path / "empty_comment.xyz"
+        file_path.write_text(xyz_empty_comment)
+
+        mol = MolGraph()
+        mol.read_xyz(str(file_path))
+        assert mol.comment == ""
+
+        # Test with xyz_start=0 (should not set comment)
+        xyz_no_header = """O    0.0    0.0    0.0
+        H    0.757  0.586  0.0
+        H   -0.757  0.586  0.0"""
+        file_path = tmp_path / "no_header.xyz"
+        file_path.write_text(xyz_no_header)
+
+        mol = MolGraph()
+        mol.read_xyz(str(file_path), xyz_start=0)
+        assert mol.comment == ""
 
     def test_error_handling(self) -> None:
         """Test error conditions."""
