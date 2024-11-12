@@ -64,7 +64,7 @@ line-length = 88
 select = ["E", "F", "B", "I", "W", "C", "UP", "N", "ANN", "T20", "PT"]
 ignore = ["ANN101", "N806", "T201", "C408"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 force-single-line = false
 lines-after-imports = 2
 known-first-party = ["xyz2graph"]
