@@ -31,12 +31,7 @@ class TestMolGraph:
     def test_read_xyz(self, mol_graph: MolGraph) -> None:
         """Test reading XYZ file and basic structure."""
         assert len(mol_graph) > 0
-        assert (
-            len(mol_graph.elements)
-            == len(mol_graph.x)
-            == len(mol_graph.y)
-            == len(mol_graph.z)
-        )
+        assert len(mol_graph.elements) == len(mol_graph.x) == len(mol_graph.y) == len(mol_graph.z)
         assert mol_graph.atomic_radii is not None
         assert mol_graph.adj_list is not None
 
@@ -166,9 +161,7 @@ class TestMolGraph:
         xyz_file.write_text(xyz_content)
 
         mol = MolGraph()
-        with pytest.raises(
-            ValueError, match="Number of coordinates doesn't match atom count"
-        ):
+        with pytest.raises(ValueError, match="Number of coordinates doesn't match atom count"):
             mol.read_xyz(xyz_file, validate=True)
 
     def test_xyz_comment_handling(self, tmp_path: Path) -> None:

@@ -1,7 +1,19 @@
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Counter, Dict, FrozenSet, Iterator, List, Sequence, Set, Tuple, Union
+from typing import (
+    Counter,
+    Dict,
+    FrozenSet,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 import networkx as nx
 import numpy as np
@@ -136,6 +148,31 @@ DEFAULT_CPK_COLORS: Dict[str, str] = {
 }
 
 
+class PlotConfig(TypedDict, total=False):
+    atom_size: int
+    atom_opacity: float
+    atom_border_color: str
+    atom_border_width: int
+    bond_color: str
+    bond_width: int
+    show_grid: bool
+    label_offset: int
+    bond_label_color: str
+
+
+DEFAULT_PLOT_CONFIG: PlotConfig = {
+    "atom_size": 7,
+    "atom_opacity": 0.8,
+    "atom_border_color": "lightgray",
+    "atom_border_width": 2,
+    "bond_color": "grey",
+    "bond_width": 2,
+    "show_grid": False,
+    "label_offset": 15,
+    "bond_label_color": "steelblue",
+}
+
+
 @dataclass
 class MolGraph:
     """
@@ -185,9 +222,7 @@ class MolGraph:
         """
         self.default_radii[element] = radius
         if element in self.elements:
-            self.atomic_radii = [
-                self.default_radii[element] for element in self.elements
-            ]
+            self.atomic_radii = [self.default_radii[element] for element in self.elements]
             self._generate_adjacency_list()
 
     def set_element_color(self, element: str, color: str) -> None:
@@ -312,9 +347,7 @@ class MolGraph:
             lines = file_path.read_text().strip().split("\n")
             if len(lines) <= xyz_start:
                 logger.error(f"XYZ file has no coordinate data after line {xyz_start}")
-                raise ValueError(
-                    f"XYZ file has no coordinate data after line {xyz_start}"
-                )
+                raise ValueError(f"XYZ file has no coordinate data after line {xyz_start}")
 
             # Get expected atom count if validation is requested
             expected_atoms = None
@@ -324,9 +357,7 @@ class MolGraph:
                     logger.debug(f"Expected number of atoms: {expected_atoms}")
                 except (IndexError, ValueError) as err:
                     logger.error("Could not read atom count from first line")
-                    raise ValueError(
-                        "Could not read atom count from first line"
-                    ) from err
+                    raise ValueError("Could not read atom count from first line") from err
 
             # Store comment if available (line 1 in standard XYZ format)
             if xyz_start > 1:
@@ -347,174 +378,268 @@ class MolGraph:
                     f"Expected: {expected_atoms}, Found: {len(self.elements)}"
                 )
 
-            logger.info(
-                f"Successfully read {len(self.elements)} atoms from {file_path}"
-            )
+            logger.info(f"Successfully read {len(self.elements)} atoms from {file_path}")
 
-            self.atomic_radii = [
-                self.default_radii[element] for element in self.elements
-            ]
+            self.atomic_radii = [self.default_radii[element] for element in self.elements]
             self._generate_adjacency_list()
 
         except Exception as e:
             logger.error(f"Error reading XYZ file: {e}", exc_info=True)
             raise
 
-    def to_plotly(self) -> go.Figure:
+    def _create_atom_trace(self, plot_config: PlotConfig) -> go.Scatter3d:
+        """Creates a Plotly trace for atoms in the molecule."""
+        colors = [self.cpk_colors.get(element, self.cpk_color_rest) for element in self.elements]
+
+        hover_text = [
+            f"{i}. {elem} ({x:.2f}, {y:.2f}, {z:.2f})"
+            for i, (elem, x, y, z) in enumerate(zip(self.elements, self.x, self.y, self.z))
+        ]
+
+        return go.Scatter3d(
+            x=self.x,
+            y=self.y,
+            z=self.z,
+            mode="markers",
+            marker=dict(
+                color=colors,
+                line=dict(
+                    color=plot_config["atom_border_color"],
+                    width=plot_config["atom_border_width"],
+                ),
+                size=plot_config["atom_size"],
+                opacity=plot_config["atom_opacity"],
+                symbol="circle",
+            ),
+            text=self.elements,
+            hovertext=hover_text,
+            hoverinfo="text",
+            name="atoms",
+        )
+
+    def _create_bond_trace(self, plot_config: PlotConfig) -> go.Scatter3d:
+        """Creates a Plotly trace for bonds in the molecule."""
+
+        # Create line segments for each bond (use None to separate segments)
+        xs, ys, zs = [], [], []
+        for i, j in self.edges():
+            xs.extend([self.x[i], self.x[j], None])
+            ys.extend([self.y[i], self.y[j], None])
+            zs.extend([self.z[i], self.z[j], None])
+
+        return go.Scatter3d(
+            x=xs,
+            y=ys,
+            z=zs,
+            mode="lines",
+            line=dict(color=plot_config["bond_color"], width=plot_config["bond_width"]),
+            hoverinfo="none",
+            name="bonds",
+        )
+
+    def _create_annotations(
+        self,
+        plot_config: PlotConfig,
+        atom_label_type: Optional[str] = None,
+        show_distances: bool = False,
+    ) -> List[dict]:
+        """
+        Creates annotations for atom and bond labels in the plot.
+
+        Args:
+            plot_config: Plot configuration dictionary
+            atom_label_type: Type of atom labels to show (None, "element", or "index")
+            show_bond_lengths: Whether to show bond length labels
+
+        Returns:
+            List of annotation dictionaries for Plotly
+
+        Raises:
+            ValueError: If atom_label_type is not None, "element", or "index"
+        """
+        labels = []
+
+        if atom_label_type is not None:
+            if atom_label_type not in ("element", "index"):
+                raise ValueError('atom_label_type must be None, "element", or "index"')
+
+            for idx, (element, (x, y, z)) in enumerate(self):
+                text = element if atom_label_type == "element" else str(idx)
+                labels.append(
+                    dict(
+                        text=text,
+                        x=x,
+                        y=y,
+                        z=z,
+                        showarrow=False,
+                        yshift=plot_config["label_offset"],
+                    )
+                )
+
+        if show_distances:
+            for (i, j), length in self.bond_lengths.items():
+                labels.append(
+                    dict(
+                        text=f"{length:.2f}",
+                        x=(self.x[i] + self.x[j]) / 2,
+                        y=(self.y[i] + self.y[j]) / 2,
+                        z=(self.z[i] + self.z[j]) / 2,
+                        showarrow=False,
+                        yshift=plot_config["label_offset"],
+                        font=dict(color=plot_config["bond_label_color"]),
+                    )
+                )
+
+        return labels
+
+    def _create_menu_buttons(self, plot_config: PlotConfig) -> List[dict]:
+        """Creates menu buttons for toggling different label displays."""
+        return [
+            dict(
+                label="Elements",
+                method="relayout",
+                args=[
+                    {
+                        "scene.annotations": self._create_annotations(
+                            plot_config, atom_label_type="element"
+                        )
+                    }
+                ],
+            ),
+            dict(
+                label="Elements & Distances",
+                method="relayout",
+                args=[
+                    {
+                        "scene.annotations": self._create_annotations(
+                            plot_config,
+                            atom_label_type="element",
+                            show_distances=True,
+                        )
+                    }
+                ],
+            ),
+            dict(
+                label="IDs",
+                method="relayout",
+                args=[
+                    {
+                        "scene.annotations": self._create_annotations(
+                            plot_config, atom_label_type="index"
+                        )
+                    }
+                ],
+            ),
+            dict(
+                label="IDs & Distances",
+                method="relayout",
+                args=[
+                    {
+                        "scene.annotations": self._create_annotations(
+                            plot_config, atom_label_type="index", show_distances=True
+                        )
+                    }
+                ],
+            ),
+            dict(
+                label="Distances",
+                method="relayout",
+                args=[
+                    {
+                        "scene.annotations": self._create_annotations(
+                            plot_config, show_distances=True
+                        )
+                    }
+                ],
+            ),
+            dict(label="Clear", method="relayout", args=[{"scene.annotations": []}]),
+        ]
+
+    def to_plotly(
+        self,
+        config: Optional[PlotConfig] = None,
+        title: Optional[str] = None,
+    ) -> go.Figure:
         """
         Creates a Plotly figure for 3D visualization of the molecule.
 
-        Returns:
-            go.Figure: Interactive 3D visualization of the molecular structure
-        """
+        Args:
+            config: Plot configuration with the following options:
+                atom_size (int): Size of atom markers (default: 7)
+                atom_opacity (float): Opacity of atom markers between 0 and 1 (default: 0.8)
+                atom_border_color (str): Color of atom marker borders (default: "lightgray")
+                atom_border_width (int): Width of atom marker borders (default: 2)
+                bond_color (str): Color of bonds between atoms (default: "grey")
+                bond_width (int): Width of bond lines (default: 2)
+                show_grid (bool): Whether to show the grid in the plot (default: False)
+                label_offset (int): Vertical offset for atom and bond labels (default: 15)
+                bond_label_color (str): Color of bond length labels (default: "steelblue")
+            title: Title text for the visualization (default: None)
 
+        Returns:
+            go.Figure: Interactive 3D visualization of the molecular structure with:
+                - Atoms represented as spheres colored by element
+                - Bonds shown as lines between atoms
+                - Interactive menu for toggling element symbols, indices, and bond lengths
+                - Hover information showing element type and coordinates
+
+        Example:
+            >>> mol = MolGraph()
+            >>> mol.read_xyz('molecule.xyz')
+            >>> fig = mol.to_plotly(
+            ...     config={"atom_size": 10, "bond_width": 3},
+            ...     title="Water Molecule"
+            ... )
+            >>> fig.show()
+        """
         logger.debug("Creating Plotly figure")
 
-        def atom_trace() -> go.Scatter3d:
-            """Creates an atom trace for the plot."""
-            colors = [
-                self.cpk_colors.get(element, self.cpk_color_rest)
-                for element in self.elements
-            ]
-            markers = dict(
-                color=colors,
-                line=dict(color="lightgray", width=2),
-                size=7,
-                symbol="circle",
-                opacity=0.8,
-            )
-            return go.Scatter3d(
-                x=self.x,
-                y=self.y,
-                z=self.z,
-                mode="markers",
-                marker=markers,
-                text=self.elements,
-            )
+        if not self.elements:
+            logger.warning("No molecular data to visualize")
+            return go.Figure()
 
-        def bond_trace() -> go.Scatter3d:
-            """Creates a bond trace for the plot."""
-            trace = go.Scatter3d(
-                x=[],
-                y=[],
-                z=[],
-                hoverinfo="none",
-                mode="lines",
-                marker=dict(color="grey", size=7, opacity=1),
-            )
-            for i, j in self.edges():
-                trace["x"] += (self.x[i], self.x[j], None)
-                trace["y"] += (self.y[i], self.y[j], None)
-                trace["z"] += (self.z[i], self.z[j], None)
-            return trace
-
-        # Create annotations
-        def create_annotations(
-            elements: bool = True, indices: bool = False, bond_lengths: bool = False
-        ) -> List[dict]:
-            annotations = []
-
-            if elements or indices:
-                for idx, (element, (x, y, z)) in enumerate(self):
-                    text = element if elements else str(idx)
-                    annotations.append(
-                        dict(text=text, x=x, y=y, z=z, showarrow=False, yshift=15)
-                    )
-
-            if bond_lengths:
-                for (i, j), length in self.bond_lengths.items():
-                    x = (self.x[i] + self.x[j]) / 2
-                    y = (self.y[i] + self.y[j]) / 2
-                    z = (self.z[i] + self.z[j]) / 2
-                    annotations.append(
-                        dict(
-                            text=round(length, 2),
-                            x=x,
-                            y=y,
-                            z=z,
-                            showarrow=False,
-                            yshift=15,
-                            font=dict(color="steelblue"),
-                        )
-                    )
-
-            return annotations
-
-        # Create update menu
-        buttons = [
-            dict(
-                label=" Elements",
-                method="relayout",
-                args=[{"scene.annotations": create_annotations(elements=True)}],
-            ),
-            dict(
-                label=" Elements & Bond Lengths",
-                method="relayout",
-                args=[
-                    {
-                        "scene.annotations": create_annotations(
-                            elements=True, bond_lengths=True
-                        )
-                    }
-                ],
-            ),
-            dict(
-                label="Indices",
-                method="relayout",
-                args=[{"scene.annotations": create_annotations(indices=True)}],
-            ),
-            dict(
-                label="Indices & Bond Lengths",
-                method="relayout",
-                args=[
-                    {
-                        "scene.annotations": create_annotations(
-                            indices=True, bond_lengths=True
-                        )
-                    }
-                ],
-            ),
-            dict(
-                label="Bond Lengths",
-                method="relayout",
-                args=[{"scene.annotations": create_annotations(bond_lengths=True)}],
-            ),
-            dict(
-                label="Hide All",
-                method="relayout",
-                args=[{"scene.annotations": []}],
-            ),
-        ]
-
-        updatemenus = [
-            dict(
-                buttons=buttons,
-                direction="down",
-                xanchor="left",
-                yanchor="top",
-            )
-        ]
+        plot_config = DEFAULT_PLOT_CONFIG.copy()
+        if config:
+            plot_config.update(config)
 
         # Create figure
-        data = [atom_trace(), bond_trace()]
+        data = [
+            self._create_atom_trace(plot_config),
+            self._create_bond_trace(plot_config),
+        ]
+
+        # Configure axis parameters
         axis_params = dict(
-            showgrid=False,
+            showgrid=plot_config["show_grid"],
             showbackground=False,
             showticklabels=False,
             zeroline=False,
             titlefont=dict(color="white"),
+            showspikes=False,
         )
+
+        # Build layout
         layout = dict(
+            title=title,
             scene=dict(
                 xaxis=axis_params,
                 yaxis=axis_params,
                 zaxis=axis_params,
-                annotations=create_annotations(),
+                annotations=self._create_annotations(plot_config, atom_label_type="element"),
             ),
-            margin=dict(r=0, l=0, b=0, t=0),
+            margin=dict(r=0, l=0, b=0, t=0 if not title else 40),
             showlegend=False,
-            updatemenus=updatemenus,
+            updatemenus=[
+                dict(
+                    buttons=self._create_menu_buttons(plot_config),
+                    direction="down",
+                    xanchor="left",
+                    yanchor="top",
+                    pad=dict(r=10, t=10),
+                )
+            ],
         )
+
         logger.debug("Plotly figure created successfully")
         return go.Figure(data=data, layout=layout)
 
@@ -537,9 +662,7 @@ class MolGraph:
         nx.set_node_attributes(G, node_attrs)
 
         # Add edge attributes
-        edge_attrs = {
-            edge: {"length": length} for edge, length in self.bond_lengths.items()
-        }
+        edge_attrs = {edge: {"length": length} for edge, length in self.bond_lengths.items()}
         nx.set_edge_attributes(G, edge_attrs)
         logger.debug("NetworkX graph created successfully")
 
@@ -563,9 +686,7 @@ class MolGraph:
             atomic_radii = np.array(self.atomic_radii)
             distance_bond = (atomic_radii[:, np.newaxis] + atomic_radii) * 1.3
 
-            self.adj_matrix = np.logical_and(
-                0.1 < distances, distance_bond > distances
-            ).astype(int)
+            self.adj_matrix = np.logical_and(0.1 < distances, distance_bond > distances).astype(int)
 
             # Clear existing adjacency data
             self.adj_list.clear()
