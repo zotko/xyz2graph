@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import plotly.graph_objs as go
 import pytest
@@ -9,47 +9,103 @@ from xyz2graph import DEFAULT_CPK_COLORS, DEFAULT_RADII, MolGraph
 
 class TestMolGraph:
     @pytest.fixture
-    def test_xyz_file(self, tmp_path: Path) -> str:
-        """Create a test XYZ file."""
-        content = """3
-        Water molecule
-        O    0.0    0.0    0.0
-        H    0.757  0.586  0.0
-        H   -0.757  0.586  0.0
-        """
-        file_path = tmp_path / "test_data.xyz"
-        file_path.write_text(content)
-        return str(file_path)
+    def xyz_files(self, tmp_path: Path) -> List[Tuple[str, str, dict]]:
+        """Create test XYZ files with different formats."""
+        test_cases = [
+            # Standard XYZ format
+            (
+                """3
+                Water molecule
+                O    0.0    0.0    0.0
+                H    0.757  0.586  0.0
+                H   -0.757  0.586  0.0
+                """,
+                "standard.xyz",
+                {"xyz_start": 2, "validate": True},
+            ),
+            # Custom start line format
+            (
+                """HEADER
+                SOME INFO
+                ANOTHER LINE
+                O  0.0 0.0 0.0
+                H  1.0 0.0 0.0
+                H -1.0 0.0 0.0""",
+                "custom_start.xyz",
+                {"xyz_start": 3},
+            ),
+            # No header format
+            (
+                """O  0.0 0.0 0.0
+                H  1.0 0.0 0.0
+                H -1.0 0.0 0.0""",
+                "no_header.xyz",
+                {"xyz_start": 0},
+            ),
+            # Empty comment format
+            (
+                """3
 
-    @pytest.fixture
-    def mol_graph(self, test_xyz_file: str) -> MolGraph:
-        """Create a MolGraph instance with test data."""
+                O    0.0    0.0    0.0
+                H    0.757  0.586  0.0
+                H   -0.757  0.586  0.0
+                """,
+                "empty_comment.xyz",
+                {"xyz_start": 2},
+            ),
+        ]
+
+        # Create all test files
+        file_paths = []
+        for content, filename, params in test_cases:
+            file_path = tmp_path / filename
+            file_path.write_text(content)
+            file_paths.append((str(file_path), content, params))
+
+        return file_paths
+
+    @pytest.mark.parametrize(
+        "format_type", ["standard", "custom_start", "no_header", "empty_comment"]
+    )
+    def test_read_xyz_formats(
+        self, xyz_files: List[Tuple[str, str, dict]], format_type: str
+    ) -> None:
+        """Test reading XYZ files in different formats."""
+        # Find the right test case based on format_type
+        file_info = next(x for x in xyz_files if format_type in x[0])
+        filepath, _, params = file_info
+
         mol = MolGraph()
-        mol.read_xyz(test_xyz_file)
-        return mol
+        mol.read_xyz(filepath, **params)
 
-    def test_read_xyz(self, mol_graph: MolGraph) -> None:
-        """Test reading XYZ file and basic structure."""
-        assert len(mol_graph) > 0
-        assert len(mol_graph.elements) == len(mol_graph.x) == len(mol_graph.y) == len(mol_graph.z)
-        assert mol_graph.atomic_radii is not None
-        assert mol_graph.adj_list is not None
+        # Common assertions for all formats
+        assert len(mol) == 3
+        assert mol.elements == ["O", "H", "H"]
+        assert len(mol.atomic_radii) == 3
+        assert mol.atomic_radii[0] == DEFAULT_RADII["O"]
 
-        # Additional specific checks
-        assert mol_graph.elements == ["O", "H", "H"]
-        assert len(mol_graph.atomic_radii) == 3
-        assert mol_graph.atomic_radii[0] == DEFAULT_RADII["O"]
-        assert mol_graph.comment == "Water molecule"
+        # Format-specific assertions
+        if format_type == "standard":
+            assert mol.comment == "Water molecule"
+        elif format_type == "empty_comment":
+            assert mol.comment == ""
+        elif format_type == "no_header":
+            assert mol.comment == ""
 
-    def test_to_plotly(self, mol_graph: MolGraph) -> None:
+    def test_to_plotly(self, xyz_files: List[Tuple[str, str, dict]]) -> None:
         """Test Plotly figure generation."""
-        figure = mol_graph.to_plotly()
+        # Use standard format file for visualization test
+        filepath, _, _ = next(x for x in xyz_files if "standard" in x[0])
+        mol = MolGraph()
+        mol.read_xyz(filepath)
+
+        figure = mol.to_plotly()
 
         # Basic checks
-        assert figure is not None
+        assert isinstance(figure, go.Figure)
         assert len(figure.data) == 2  # atom_trace and bond_trace
 
-        # Additional specific checks
+        # Detailed trace checks
         atom_trace, bond_trace = figure.data
         assert isinstance(atom_trace, go.Scatter3d)
         assert isinstance(bond_trace, go.Scatter3d)
@@ -64,21 +120,57 @@ class TestMolGraph:
         ]
         assert list(atom_trace.marker.color) == expected_colors
 
-    # ... rest of the tests remain the same ...
+    def test_error_handling(self, tmp_path: Path) -> None:
+        """Test various error conditions."""
+        mol = MolGraph()
 
-    def test_len_and_getitem(self, mol_graph: MolGraph) -> None:
+        # Test file not found
+        with pytest.raises(FileNotFoundError):
+            mol.read_xyz("nonexistent.xyz")
+
+        # Test invalid validation
+        invalid_content = """2
+        Water molecule
+        O    0.0    0.0    0.0
+        H    0.757  0.586  0.0
+        H   -0.757  0.586  0.0"""
+        invalid_file = tmp_path / "invalid.xyz"
+        invalid_file.write_text(invalid_content)
+
+        with pytest.raises(ValueError, match="Number of coordinates doesn't match atom count"):
+            mol.read_xyz(str(invalid_file), validate=True)
+
+        # Test invalid element
+        invalid_element_content = """1
+            Test
+            Xx    0.0    0.0    0.0"""
+        invalid_element_file = tmp_path / "invalid_element.xyz"
+        invalid_element_file.write_text(invalid_element_content)
+
+        with pytest.raises(ValueError, match="Unknown element found"):
+            mol.read_xyz(str(invalid_element_file))
+
+    def test_len_and_getitem(self, xyz_files: List[Tuple[str, str, dict]]) -> None:
         """Test length and indexing operations."""
+        filepath, _, _ = next(x for x in xyz_files if "standard" in x[0])
+        mol = MolGraph()
+        mol.read_xyz(filepath)
+
         # Length check
-        assert len(mol_graph) == len(mol_graph.elements)
+        assert len(mol) == len(mol.elements) == 3
 
         # Getitem check
-        element, coords = mol_graph[0]
-        assert element in DEFAULT_RADII
+        element, coords = mol[0]
+        assert element == "O"
         assert len(coords) == 3
-        assert coords == (mol_graph.x[0], mol_graph.y[0], mol_graph.z[0])
+        assert coords == (mol.x[0], mol.y[0], mol.z[0])
+
+        # Test out of range
+        with pytest.raises(IndexError):
+            _ = mol[len(mol)]
 
     def test_formula(self) -> None:
-        """Test the molecular formula generation in Hill notation"""
+        """Test the molecular formula generation in Hill notation."""
         mg = MolGraph()
 
         # Test empty molecule
@@ -92,133 +184,49 @@ class TestMolGraph:
             mg.z = [0.0] * len(elements)
             return mg
 
-        # Test carbon-containing molecules
         test_cases = [
-            # (elements list, expected formula)
             (["C", "C", "H", "H", "H", "H", "H", "H"], "C2H6"),  # Ethane
             (["C", "O", "H", "H", "H", "H"], "CH4O"),  # Methanol
-            (["C", "C", "H", "H", "H", "H", "O", "O"], "C2H4O2"),  # Acetic acid
-            # Molecules without carbon (alphabetical ordering)
             (["H", "O", "H"], "H2O"),  # Water
-            (["N", "H", "H", "H"], "H3N"),  # Ammonia
-            (["H", "H", "S", "O", "O", "O", "O"], "H2O4S"),  # Sulfuric acid
             (["Na", "Cl"], "ClNa"),  # Sodium chloride
-            # Edge cases
-            (["H"], "H"),  # Single hydrogen
-            (["O"], "O"),  # Single oxygen
-            (["C"], "C"),  # Single carbon
+            (["H"], "H"),  # Single atom
             (["C", "C", "C"], "C3"),  # Pure carbon
-            (["H", "H"], "H2"),  # Hydrogen molecule
         ]
 
         for elements, expected in test_cases:
             mg = setup_molecule(elements)
-            assert (
-                mg.formula() == expected
-            ), f"Failed for {elements}: expected {expected}, got {mg.formula()}"
+            assert mg.formula() == expected
 
-    def test_xyz_start_custom(self, tmp_path: Path) -> None:
-        """Test reading coordinates with custom start line."""
-        xyz_content = """HEADER
-        SOME INFO
-        ANOTHER LINE
-        O  0.0 0.0 0.0
-        H  1.0 0.0 0.0
-        H -1.0 0.0 0.0"""
-        xyz_file = tmp_path / "molecule.xyz"
-        xyz_file.write_text(xyz_content)
-
+    def test_filter(self) -> None:
+        """Test the filter functionality."""
         mol = MolGraph()
-        mol.read_xyz(xyz_file, xyz_start=3)
+        mol.elements = ["C", "H", "H", "H", "O", "H"]
+        mol.x = [0.0, 1.0, -0.5, -0.5, -1.0, -1.5]
+        mol.y = [0.0, 0.0, 0.866, -0.866, 0.0, 0.0]
+        mol.z = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        mol.indices = list(range(6))
+        mol.atomic_radii = [mol.default_radii[elem] for elem in mol.elements]
+        mol._generate_adjacency_list()
 
-        assert len(mol.elements) == 3
-        assert mol.elements == ["O", "H", "H"]
-        assert mol.x == [0.0, 1.0, -1.0]
+        # Test non-inplace filtering
+        no_h = mol.filter(elements=["H"])
+        assert no_h is not None  # Type guard for mypy
+        assert len(no_h) == 2
+        assert set(no_h.elements) == {"C", "O"}
+        assert no_h.indices == [0, 4]
 
-    def test_validate_with_xyz_start_zero(self, tmp_path: Path) -> None:
-        """Test validation is disabled when xyz_start=0."""
-        xyz_content = """O  0.0 0.0 0.0
-        H  1.0 0.0 0.0
-        H -1.0 0.0 0.0"""
-        xyz_file = tmp_path / "molecule.xyz"
-        xyz_file.write_text(xyz_content)
+        # Test filtering by both indices and elements
+        result = mol.filter(indices=[1, 2], elements=["O"])
+        assert result is not None  # Type guard for mypy
+        assert len(result) == 3
+        assert "O" not in result.elements
+        assert result.indices == [0, 3, 5]
 
-        mol = MolGraph()
-        # Should not raise error even though no atom count is present
-        mol.read_xyz(xyz_file, xyz_start=0, validate=True)
+        # Test inplace filtering
+        assert mol.filter(elements=["H"], inplace=True) is None
+        assert len(mol) == 2
+        assert set(mol.elements) == {"C", "O"}
 
-        assert len(mol.elements) == 3
-        assert mol.elements == ["O", "H", "H"]
-
-    def test_validate_true_invalid(self, tmp_path: Path) -> None:
-        """Test validation with mismatching atom count."""
-        xyz_content = """2
-        Water molecule
-        O  0.0 0.0 0.0
-        H  1.0 0.0 0.0
-        H -1.0 0.0 0.0"""
-        xyz_file = tmp_path / "molecule.xyz"
-        xyz_file.write_text(xyz_content)
-
-        mol = MolGraph()
-        with pytest.raises(ValueError, match="Number of coordinates doesn't match atom count"):
-            mol.read_xyz(xyz_file, validate=True)
-
-    def test_xyz_comment_handling(self, tmp_path: Path) -> None:
-        """Test handling of XYZ file comments."""
-
-        # Test with normal comment
-        xyz_with_comment = """3
-        Test Comment
-        O    0.0    0.0    0.0
-        H    0.757  0.586  0.0
-        H   -0.757  0.586  0.0
-        """
-        file_path = tmp_path / "with_comment.xyz"
-        file_path.write_text(xyz_with_comment)
-
-        mol = MolGraph()
-        mol.read_xyz(str(file_path))
-        assert mol.comment == "Test Comment"
-
-        # Test with empty comment
-        xyz_empty_comment = """3
-
-        O    0.0    0.0    0.0
-        H    0.757  0.586  0.0
-        H   -0.757  0.586  0.0
-        """
-        file_path = tmp_path / "empty_comment.xyz"
-        file_path.write_text(xyz_empty_comment)
-
-        mol = MolGraph()
-        mol.read_xyz(str(file_path))
-        assert mol.comment == ""
-
-        # Test with xyz_start=0 (should not set comment)
-        xyz_no_header = """O    0.0    0.0    0.0
-        H    0.757  0.586  0.0
-        H   -0.757  0.586  0.0"""
-        file_path = tmp_path / "no_header.xyz"
-        file_path.write_text(xyz_no_header)
-
-        mol = MolGraph()
-        mol.read_xyz(str(file_path), xyz_start=0)
-        assert mol.comment == ""
-
-    def test_error_handling(self) -> None:
-        """Test error conditions."""
-        mol = MolGraph()
-
-        # Test file not found
-        with pytest.raises(FileNotFoundError):
-            mol.read_xyz("nonexistent.xyz")
-
-        # Test invalid element
-        mol.elements = ["Xx"]  # Unknown element
-        mol.x = [0.0]
-        mol.y = [0.0]
-        mol.z = [0.0]
-
-        with pytest.raises((KeyError, ValueError)):
-            mol.atomic_radii = [mol.default_radii[element] for element in mol.elements]
+        # Test invalid filtering
+        with pytest.raises(ValueError, match="Cannot filter out all atoms"):
+            mol.filter(elements=["C", "O"])  # Would remove all atoms

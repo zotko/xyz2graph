@@ -192,9 +192,8 @@ class MolGraph:
         atomic_radii: List of atomic radii for each atom
         bond_lengths: Dictionary mapping pairs of connected atoms to their bond lengths
         adj_matrix: Numpy array representing the adjacency matrix of the molecular graph
-        default_radii: Dictionary of reference atomic radii for each element
-        cpk_colors: Dictionary of CPK colors for each element
-        cpk_color_rest: Default color for elements not in cpk_colors
+        indices: List of original indices for each atom, preserved during filtering operations.
+                Maps current atoms back to their positions in the original structure.
     """
 
     elements: List[str] = field(default_factory=list)
@@ -206,6 +205,7 @@ class MolGraph:
     atomic_radii: List[float] = field(default_factory=list)
     bond_lengths: Dict[FrozenSet[int], float] = field(default_factory=dict)
     adj_matrix: Union[NDArray[np.int_], None] = field(default=None)
+    indices: List[int] = field(default_factory=list)
 
     # Customizable parameters with defaults
     default_radii: Dict[str, float] = field(default_factory=lambda: dict(DEFAULT_RADII))
@@ -243,6 +243,112 @@ class MolGraph:
             color: Color name or code (any format accepted by Plotly)
         """
         self.cpk_color_rest = color
+
+    def filter(
+        self,
+        indices: Optional[List[int]] = None,
+        elements: Optional[List[str]] = None,
+        inplace: bool = False,
+    ) -> Optional["MolGraph"]:
+        """
+        Filter out atoms by indices and/or elements.
+
+        Args:
+            indices: List of atom indices to filter out. If None, no indices are removed.
+            elements: List of element symbols to filter out. If None, no elements are removed.
+            inplace: If True, modifies the current object. If False, returns a new object.
+
+        Returns:
+            MolGraph or None: If inplace=False, returns a new filtered MolGraph object.
+                            If inplace=True, returns None and modifies current object.
+
+        Examples:
+            # Filter out all hydrogen atoms
+            >>> mol_without_h = mol.filter(elements=['H'])
+
+            # Filter out specific atoms by index
+            >>> mol_trimmed = mol.filter(indices=[0, 1, 2])
+
+            # Filter out hydrogens at specific positions
+            >>> mol_modified = mol.filter(indices=[0, 1, 2], elements=['H'])
+
+            # Modify in place
+            >>> mol.filter(elements=['H'], inplace=True)
+
+        Raises:
+            ValueError: If filtering would remove all atoms
+            IndexError: If any index is out of range
+        """
+        from itertools import compress, starmap
+        from operator import and_
+
+        # Create mask for all atoms (True means keep)
+        mask = [True] * len(self)
+
+        # Apply indices filter if specified
+        if indices is not None:
+            # Validate indices
+            if any(i < 0 or i >= len(self) for i in indices):
+                raise IndexError("Atom index out of range")
+            for idx in indices:
+                mask[idx] = False
+
+        # Apply elements filter if specified
+        if elements is not None:
+            # Track which filter elements are actually used
+            found_elements = set()
+            for elem in self.elements:
+                if elem in elements:
+                    found_elements.add(elem)
+
+            # Warn about unused filter elements
+            unused_elements = set(elements) - found_elements
+            if unused_elements:
+                logger.warning(
+                    f"Element(s) not found: {', '.join(sorted(unused_elements))}. "
+                    "Use proper case (e.g., 'H' not 'h')"
+                )
+
+        # Update mask to remove specified elements
+        element_mask = [elem not in (elements or []) for elem in self.elements]
+        mask = list(starmap(and_, zip(mask, element_mask)))
+
+        # Check if any atoms remain
+        if not any(mask):
+            raise ValueError("Cannot filter out all atoms from molecule")
+
+        # If modifying in place
+        if inplace:
+            # Store filtered data using compress
+            self.elements = list(compress(self.elements, mask))
+            self.x = list(compress(self.x, mask))
+            self.y = list(compress(self.y, mask))
+            self.z = list(compress(self.z, mask))
+            self.atomic_radii = list(compress(self.atomic_radii, mask))
+            self.indices = list(compress(self.indices, mask))
+
+            # Regenerate adjacency information
+            self._generate_adjacency_list()
+            return None
+
+        # Create new instance
+        new_mol = MolGraph()
+        new_mol.elements = list(compress(self.elements, mask))
+        new_mol.x = list(compress(self.x, mask))
+        new_mol.y = list(compress(self.y, mask))
+        new_mol.z = list(compress(self.z, mask))
+        new_mol.atomic_radii = list(compress(self.atomic_radii, mask))
+        new_mol.indices = list(compress(self.indices, mask))
+        new_mol.comment = self.comment
+
+        # Copy customization settings
+        new_mol.default_radii = self.default_radii.copy()
+        new_mol.cpk_colors = self.cpk_colors.copy()
+        new_mol.cpk_color_rest = self.cpk_color_rest
+
+        # Generate adjacency information for new molecule
+        new_mol._generate_adjacency_list()
+        return new_mol
 
     def _parse_coordinates(
         self, data: Sequence[str]
@@ -382,6 +488,15 @@ class MolGraph:
 
             self.atomic_radii = [self.default_radii[element] for element in self.elements]
             self._generate_adjacency_list()
+
+            # Store only essential geometric and reference data
+            self._original_state = {
+                "elements": self.elements.copy(),
+                "x": self.x.copy(),
+                "y": self.y.copy(),
+                "z": self.z.copy(),
+                "indices": self.indices.copy(),
+            }
 
         except Exception as e:
             logger.error(f"Error reading XYZ file: {e}", exc_info=True)
