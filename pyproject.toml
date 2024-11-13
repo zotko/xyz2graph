@@ -37,8 +37,8 @@ dependencies = [
 source = "vcs"
 
 [project.urls]
-Homepage = "https://github.com/zotko/xyz2graph"
-Repository = "https://github.com/zotko/xyz2graph"
+Homepage = "https://github.com/farhanarrafi/xyz2graph"
+Repository = "https://github.com/farhanarrafi/xyz2graph"
 Documentation = "https://zotko.github.io/xyz2graph"
 "Bug Tracker" = "https://github.com/zotko/xyz2graph/issues"
 
