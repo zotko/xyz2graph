@@ -1,0 +1,31 @@
+/* Bouncing emoji animation */
+.bounce-container {
+    text-align: center;
+    padding: 5px;
+    margin-top: -5px;
+}
+
+.bouncing-emoji {
+    display: inline-block;
+    font-size: 1em;
+    animation: bounce 1s infinite;
+    color: var(--md-primary-fg-color);
+    padding: 2px 8px;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+/* Dark mode support */
+[data-md-color-scheme="slate"] .bouncing-emoji {
+    color: var(--md-primary-fg-color);
+}

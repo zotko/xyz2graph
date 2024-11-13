@@ -14,7 +14,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../api/cli/">
+        <link rel="next" href="../python/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -48,6 +48,10 @@
       
     
     
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -59,6 +63,8 @@
   
   
     
+    
+      
     
     
     
@@ -116,7 +122,43 @@
     </div>
     
       
+        <form class="md-header__option" data-md-component="palette">
+  
     
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -291,15 +333,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
       Basic Usage
@@ -319,53 +352,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#using-the-command-line" class="md-nav__link">
+  <a href="#advanced-reading-options" class="md-nav__link">
     <span class="md-ellipsis">
-      Using the Command Line
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#customization" class="md-nav__link">
-    <span class="md-ellipsis">
-      Customization
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Customization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#changing-colors" class="md-nav__link">
-    <span class="md-ellipsis">
-      Changing Colors
+      Advanced Reading Options
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#adjusting-atomic-radii" class="md-nav__link">
-    <span class="md-ellipsis">
-      Adjusting Atomic Radii
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#network-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       Network Analysis
@@ -373,11 +368,34 @@
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#visualization-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visualization Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structure-manipulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Structure Manipulation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#xyz-file-format" class="md-nav__link">
+  <a href="#using-the-command-line" class="md-nav__link">
     <span class="md-ellipsis">
-      XYZ File Format
+      Using the Command Line
     </span>
   </a>
   
@@ -387,6 +405,15 @@
   <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xyz-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      XYZ File Format
     </span>
   </a>
   
@@ -439,54 +466,12 @@
   
   
   
-    
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  <span class="md-ellipsis">
-    API Reference
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            API Reference
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../api/cli/" class="md-nav__link">
+      <a href="../python/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    CLI
+    Python API
   </span>
   
 
@@ -494,20 +479,19 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../api/molgraph/" class="md-nav__link">
+      <a href="../cli/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    MolGraph
+    Command Line
   </span>
   
 
@@ -515,11 +499,23 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
       
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -551,15 +547,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
       Basic Usage
@@ -579,53 +566,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#using-the-command-line" class="md-nav__link">
+  <a href="#advanced-reading-options" class="md-nav__link">
     <span class="md-ellipsis">
-      Using the Command Line
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#customization" class="md-nav__link">
-    <span class="md-ellipsis">
-      Customization
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Customization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#changing-colors" class="md-nav__link">
-    <span class="md-ellipsis">
-      Changing Colors
+      Advanced Reading Options
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#adjusting-atomic-radii" class="md-nav__link">
-    <span class="md-ellipsis">
-      Adjusting Atomic Radii
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#network-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       Network Analysis
@@ -633,11 +582,34 @@
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#visualization-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visualization Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structure-manipulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Structure Manipulation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#xyz-file-format" class="md-nav__link">
+  <a href="#using-the-command-line" class="md-nav__link">
     <span class="md-ellipsis">
-      XYZ File Format
+      Using the Command Line
     </span>
   </a>
   
@@ -647,6 +619,15 @@
   <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xyz-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      XYZ File Format
     </span>
   </a>
   
@@ -705,61 +686,93 @@
 
 <h1 id="getting-started">Getting Started</h1>
 <p>This guide will help you get started with xyz2graph.</p>
-<h2 id="installation">Installation</h2>
-<p>Install xyz2graph using pip:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>xyz2graph
-</code></pre></div>
 <h2 id="basic-usage">Basic Usage</h2>
 <h3 id="creating-a-molecular-visualization">Creating a Molecular Visualization</h3>
 <p>The most common use case is to create an interactive 3D visualization of a molecular structure:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span> <span class="nn">xyz2graph</span> <span class="kn">import</span> <span class="n">MolGraph</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Create a molecular graph</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">mg</span> <span class="o">=</span> <span class="n">MolGraph</span><span class="p">()</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Read structure from XYZ file</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s1">&#39;molecule.xyz&#39;</span><span class="p">)</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Generate and display visualization</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">fig</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">to_plotly</span><span class="p">()</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">xyz2graph</span> <span class="kn">import</span> <span class="n">MolGraph</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Create a molecular graph</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">mg</span> <span class="o">=</span> <span class="n">MolGraph</span><span class="p">()</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Read structure from XYZ file</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s1">&#39;molecule.xyz&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Generate and display visualization</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">fig</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">to_plotly</span><span class="p">()</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div>
-<h3 id="using-the-command-line">Using the Command Line</h3>
-<p>For quick visualizations, you can use the command-line interface:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>xyz2graph<span class="w"> </span>molecule.xyz
+<h3 id="advanced-reading-options">Advanced Reading Options</h3>
+<p>Control how files are read and validated:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Read raw coordinates (no header)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s1">&#39;coords.xyz&#39;</span><span class="p">,</span> <span class="n">xyz_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Read coordinates from custom start line</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s1">&#39;custom.xyz&#39;</span><span class="p">,</span> <span class="n">xyz_start</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Validate coordinate count against header</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s1">&#39;molecule.xyz&#39;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-<p>This will create an HTML file with the visualization in your current directory.</p>
-<h2 id="customization">Customization</h2>
-<h3 id="changing-colors">Changing Colors</h3>
-<p>You can customize the appearance of your molecular visualization by changing element colors:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">mg</span> <span class="o">=</span> <span class="n">MolGraph</span><span class="p">()</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s1">&#39;molecule.xyz&#39;</span><span class="p">)</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Change specific element colors</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">mg</span><span class="o">.</span><span class="n">set_element_color</span><span class="p">(</span><span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;pink&#39;</span><span class="p">)</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Set default color for unspecified elements</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">mg</span><span class="o">.</span><span class="n">set_default_color</span><span class="p">(</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Create visualization with custom colors</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">fig</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">to_plotly</span><span class="p">()</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div>
-<h3 id="adjusting-atomic-radii">Adjusting Atomic Radii</h3>
-<p>Modify atomic radii to adjust the visual representation:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Change radius for specific elements</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">mg</span><span class="o">.</span><span class="n">set_element_radius</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">)</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">mg</span><span class="o">.</span><span class="n">set_element_radius</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="network-analysis">Network Analysis</h2>
+<h3 id="network-analysis">Network Analysis</h3>
 <p>Convert your molecular structure to a NetworkX graph for analysis:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Convert to NetworkX graph</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">G</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">to_networkx</span><span class="p">()</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Access molecular properties</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of atoms: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of bonds: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Convert to NetworkX graph</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">G</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">to_networkx</span><span class="p">()</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Calculate graph properties</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Graph density: </span><span class="si">{</span><span class="n">nx</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
+<h3 id="visualization-settings">Visualization Settings</h3>
+<p>You can customize the appearance of your molecular visualization:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">&quot;atom_size&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">&quot;atom_opacity&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">&quot;atom_border_color&quot;</span><span class="p">:</span> <span class="s2">&quot;lightgray&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">&quot;atom_border_width&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">&quot;bond_color&quot;</span><span class="p">:</span> <span class="s2">&quot;grey&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">&quot;bond_width&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="s2">&quot;show_grid&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="s2">&quot;label_offset&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="s2">&quot;bond_label_color&quot;</span><span class="p">:</span> <span class="s2">&quot;steelblue&quot;</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">}</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="c1"># Create visualization with custom settings</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="n">fig</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">to_plotly</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="structure-manipulation">Structure Manipulation</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Remove all hydrogen atoms</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">mg</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Remove multiple element types</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">mg</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Remove all hydrogen atoms and atoms at indices 1 and 5</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">new_mg</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+</code></pre></div>
+<h2 id="using-the-command-line">Using the Command Line</h2>
+<p>For quick visualizations, you can use the command-line interface:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Basic usage - saves visualization as HTML in the same directory</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>xyz2graph<span class="w"> </span>molecule.xyz
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Save visualization to specific path</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--output<span class="w"> </span>viz.html
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Open directly in browser without saving</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--browser
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1"># Remove hydrogen atoms from visualization</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;H&quot;</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="c1"># Remove specific atoms by index (0-based)</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;0,1,2&quot;</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="c1"># Combine element and index filtering</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;H,O,1,2,5&quot;</span>
+</code></pre></div>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>See the <a href="../python/">API documentation</a> for detailed reference</li>
+<li>Learn about <a href="../cli/">command-line options</a> for batch processing</li>
+</ul>
 <h2 id="xyz-file-format">XYZ File Format</h2>
 <p>The XYZ file format is a simple text format for molecular structures:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>3
@@ -773,11 +786,6 @@
 <li>First line: Number of atoms</li>
 <li>Second line: Comment or title</li>
 <li>Following lines: Element and coordinates (x, y, z) in Angstroms</li>
-</ul>
-<h2 id="next-steps">Next Steps</h2>
-<ul>
-<li>See the <a href="../api/molgraph/">API documentation</a> for detailed reference</li>
-<li>Learn about <a href="../api/cli/">command-line options</a> for batch processing</li>
 </ul>
 <h2 id="common-issues">Common Issues</h2>
 <h3 id="file-not-found">File Not Found</h3>
@@ -796,10 +804,10 @@
 <li>Verify element symbols are valid</li>
 <li>If your file doesn't have the standard header (atom count and comment),
 use the <code>xyz_start</code> parameter to specify where coordinates begin:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Start reading from first line (no header)</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Start reading coordinates from first line (no header)</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s2">&quot;molecule.xyz&quot;</span><span class="p">,</span> <span class="n">xyz_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Start reading from line 3</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Start reading coordinates from line 3</span>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">mg</span><span class="o">.</span><span class="n">read_xyz</span><span class="p">(</span><span class="s2">&quot;molecule.xyz&quot;</span><span class="p">,</span> <span class="n">xyz_start</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </code></pre></div></li>
 </ul>
@@ -828,6 +836,46 @@ use the <code>xyz_start</code> parameter to specify where coordinates begin:
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Home
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../python/" class="md-footer__link md-footer__link--next" aria-label="Next: Python API">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Python API
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -850,7 +898,7 @@ use the <code>xyz_start</code> parameter to specify where coordinates begin:
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.footer", "content.code.copy"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
