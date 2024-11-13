@@ -360,6 +360,107 @@ class MolGraph:
             logger.error(f"Error reading XYZ file: {e}", exc_info=True)
             raise
 
+
+    def read_xyz_string(
+        self, xyz_string: str, xyz_start: int = 2, validate: bool = False
+    ) -> None:
+        """
+        Reads molecular structure data from an XYZ string.
+
+        The XYZ String format specification:
+        - Line 0: Number of atoms (integer)
+        - Line 1: Comment or title (can be empty)
+        - Line 2 onwards: Atomic coordinates in format:
+            element  x  y  z
+        where:
+        - element: Chemical element symbol (e.g., H, He, Li)
+        - x, y, z: Cartesian coordinates in Angstroms (float)
+
+        Example of XYZ string:
+        3
+        Water molecule
+        O  0.000000  0.000000  0.000000
+        H  0.758602  0.000000  0.504284
+        H  0.758602  0.000000 -0.504284
+
+        Args:
+            xyz_string: String concating XYZ coordinates
+            xyz_start: Line number where XYZ coordinate data starts (default=2)
+            validate: If True, validates that the number of coordinates matches
+                    the atom count in the first line. Note: validation is automatically
+                    disabled if xyz_start=0
+
+        Raises:
+            ValueError: If the string format is invalid or contains unknown elements
+        """
+        logger.debug(f"Reading XYZ string")
+
+        # Handle validation conflict
+        if validate and xyz_start < 1:
+            logger.warning(
+                "Atom count validation disabled:"
+                " cannot validate when reading from first line "
+                "(xyz_start=0)"
+            )
+            validate = False
+
+        if not xyz_string:
+            logger.error(f"XYZ string empty")
+            raise ValueError(f"XYZ string empty")
+
+        try:
+            lines = xyz_string.strip().split("\n")
+            if len(lines) <= xyz_start:
+                logger.error(f"XYZ file has no coordinate data after line {xyz_start}")
+                raise ValueError(
+                    f"XYZ file has no coordinate data after line {xyz_start}"
+                )
+
+            # Get expected atom count if validation is requested
+            expected_atoms = None
+            if validate:
+                try:
+                    expected_atoms = int(lines[0])
+                    logger.debug(f"Expected number of atoms: {expected_atoms}")
+                except (IndexError, ValueError) as err:
+                    logger.error("Could not read atom count from first line")
+                    raise ValueError(
+                        "Could not read atom count from first line"
+                    ) from err
+
+            # Store comment if available (line 1 in standard XYZ format)
+            if xyz_start > 1:
+                self.comment = lines[1].strip()
+                logger.debug(f"Read comment: {self.comment}")
+
+            coordinates = self._parse_coordinates(lines[xyz_start:])
+            self.elements, self.x, self.y, self.z = coordinates
+
+            # Validate number of atoms if requested
+            if validate and len(self.elements) != expected_atoms:
+                logger.error(
+                    f"Number of coordinates doesn't match atom count in first line. "
+                    f"Expected: {expected_atoms}, Found: {len(self.elements)}"
+                )
+                raise ValueError(
+                    f"Number of coordinates doesn't match atom count in first line. "
+                    f"Expected: {expected_atoms}, Found: {len(self.elements)}"
+                )
+
+            logger.info(
+                f"Successfully read {len(self.elements)} atoms from {xyz_string}"
+            )
+
+            self.atomic_radii = [
+                self.default_radii[element] for element in self.elements
+            ]
+            self._generate_adjacency_list()
+
+        except Exception as e:
+            logger.error(f"Error reading XYZ string: {e}", exc_info=True)
+            raise
+
+
     def to_plotly(self) -> go.Figure:
         """
         Creates a Plotly figure for 3D visualization of the molecule.
@@ -518,6 +619,7 @@ class MolGraph:
         logger.debug("Plotly figure created successfully")
         return go.Figure(data=data, layout=layout)
 
+    
     def to_networkx(self) -> nx.Graph:
         """
         Converts the molecular structure to a NetworkX graph.
