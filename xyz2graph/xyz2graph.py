@@ -252,9 +252,9 @@ class MolGraph:
             operations. Maps current atoms back to their positions in the original structure.
 
     Examples:
-        >>> mol = MolGraph()
-        >>> mol.read_xyz('molecule.xyz')
-        >>> print(mol.formula())
+        >>> mg = MolGraph()
+        >>> mg.read_xyz('molecule.xyz')
+        >>> print(mg.formula())
         'C2H6O'
     """
 
@@ -285,7 +285,7 @@ class MolGraph:
             radius (float): New radius value in Angstroms
 
         Examples:
-            >>> mol.set_element_radius('C', 0.75)
+            >>> mg.set_element_radius('C', 0.75)
         """
         self.default_radii[element] = radius
         if element in self.elements:
@@ -303,8 +303,8 @@ class MolGraph:
             color (str): Color name or code (any format accepted by Plotly)
 
         Examples:
-            >>> mol.set_element_color('O', 'green')
-            >>> mol.set_element_color('C', '#00FF00')
+            >>> mg.set_element_color('O', 'green')
+            >>> mg.set_element_color('C', '#00FF00')
         """
         self.cpk_colors[element] = color
 
@@ -318,8 +318,8 @@ class MolGraph:
             color (str): Color name or code (any format accepted by Plotly)
 
         Examples:
-            >>> mol.set_default_color('gray')
-            >>> mol.set_default_color('#A0A0A0')
+            >>> mg.set_default_color('gray')
+            >>> mg.set_default_color('#A0A0A0')
         """
         self.cpk_color_rest = color
 
@@ -351,10 +351,10 @@ class MolGraph:
             IndexError: If any index is out of range.
 
         Examples:
-            >>> mol_without_h = mol.filter(elements=['H']) # Filter out all hydrogen atoms
-            >>> mol_trimmed = mol.filter(indices=[0, 1, 2]) # Filter out specific atoms by index
-            >>> mol_modified = mol.filter(indices=[0, 1, 2], elements=['H'])
-            >>> mol.filter(elements=['H'], inplace=True) # Modify in place
+            >>> mg_without_h = mg.filter(elements=['H']) # Filter out all hydrogen atoms
+            >>> mg_trimmed = mg.filter(indices=[0, 1, 2]) # Filter out specific atoms by index
+            >>> mg_modified = mg.filter(indices=[0, 1, 2], elements=['H'])
+            >>> mg.filter(elements=['H'], inplace=True) # Modify in place
         """
         from itertools import compress, starmap
         from operator import and_
@@ -409,23 +409,23 @@ class MolGraph:
             return None
 
         # Create new instance
-        new_mol = MolGraph()
-        new_mol.elements = list(compress(self.elements, mask))
-        new_mol.x = list(compress(self.x, mask))
-        new_mol.y = list(compress(self.y, mask))
-        new_mol.z = list(compress(self.z, mask))
-        new_mol.atomic_radii = list(compress(self.atomic_radii, mask))
-        new_mol.indices = list(compress(self.indices, mask))
-        new_mol.comment = self.comment
+        new_mg = MolGraph()
+        new_mg.elements = list(compress(self.elements, mask))
+        new_mg.x = list(compress(self.x, mask))
+        new_mg.y = list(compress(self.y, mask))
+        new_mg.z = list(compress(self.z, mask))
+        new_mg.atomic_radii = list(compress(self.atomic_radii, mask))
+        new_mg.indices = list(compress(self.indices, mask))
+        new_mg.comment = self.comment
 
         # Copy customization settings
-        new_mol.default_radii = self.default_radii.copy()
-        new_mol.cpk_colors = self.cpk_colors.copy()
-        new_mol.cpk_color_rest = self.cpk_color_rest
+        new_mg.default_radii = self.default_radii.copy()
+        new_mg.cpk_colors = self.cpk_colors.copy()
+        new_mg.cpk_color_rest = self.cpk_color_rest
 
         # Generate adjacency information for new molecule
-        new_mol._generate_adjacency_list()
-        return new_mol
+        new_mg._generate_adjacency_list()
+        return new_mg
 
     def _parse_coordinates(
         self, data: Sequence[str]
@@ -450,9 +450,9 @@ class MolGraph:
             symbols not present in the default radii dictionary.
 
         Examples:
-            >>> mol = MolGraph()
+            >>> mg = MolGraph()
             >>> coords = ['H 0.0 0.0 0.0', 'O 0.0 0.0 1.0']
-            >>> elements, x, y, z = mol._parse_coordinates(coords)
+            >>> elements, x, y, z = mg._parse_coordinates(coords)
             >>> print(elements)
             ['H', 'O']
             >>> print(x)
@@ -523,10 +523,10 @@ class MolGraph:
             matches the atom count specified in the first line.
 
         Examples:
-            >>> mol = MolGraph()
-            >>> mol.read_xyz("molecule.xyz")  # Read standard XYZ file (starts at line 2)
-            >>> mol.read_xyz("coords.xyz", xyz_start=0)  # Read XYZ data starting from first line
-            >>> mol.read_xyz("molecule.xyz", validate=True)  # Enable validation of atom count
+            >>> mg = MolGraph()
+            >>> mg.read_xyz("molecule.xyz")  # Read standard XYZ file (starts at line 2)
+            >>> mg.read_xyz("coords.xyz", xyz_start=0)  # Read XYZ data starting from first line
+            >>> mg.read_xyz("molecule.xyz", validate=True)  # Enable validation of atom count
         """
         logger.debug(f"Reading XYZ file: {file_path}")
 
@@ -811,7 +811,7 @@ class MolGraph:
                 - Mouse controls for rotation, zoom, and pan
 
         Examples:
-            >>> fig = mol.to_plotly(config={
+            >>> fig = mg.to_plotly(config={
             ...     "atom_size": 12,
             ...     "atom_opacity": 0.9,
             ...     "bond_color": "black",
@@ -883,12 +883,12 @@ class MolGraph:
                 and 'xyz' (coordinates), and edge attribute 'length' (bond length).
 
         Examples:
-            >>> mol = MolGraph()
-            >>> mol.read_xyz('molecule.xyz')  # Load molecular data
-            >>> G = mol.to_networkx()  # Convert to NetworkX graph
-            >>> print(G.nodes[0]['element'])  # Access node attributes
+            >>> mg = MolGraph()
+            >>> mg.read_xyz('molecule.xyz')
+            >>> G = mg.to_networkx()
+            >>> print(G.nodes[0]['element'])
             'C'
-            >>> print(G.edges[(0, 1)]['length'])  # Access edge attributes
+            >>> print(G.edges[(0, 1)]['length'])
             1.54
         """
         logger.debug("Creating NetworkX graph")
@@ -954,20 +954,20 @@ class MolGraph:
                 where each index corresponds to the atom's position in the molecular structure.
 
         Examples:
-            >>> mol = MolGraph()
-            >>> mol.read_xyz('molecule.xyz')
-            >>> for atom1, atom2 in mol.bonds():
+            >>> mg = MolGraph()
+            >>> mg.read_xyz('molecule.xyz')
+            >>> for atom1, atom2 in mg.edges():
             ...     print(f"Bond between atoms {atom1} and {atom2}")
             Bond between atoms 0 and 1
             Bond between atoms 1 and 2
         """
-        bonds = set()
+        edges = set()
         for node, neighbours in self.adj_list.items():
             for neighbour in neighbours:
                 bond = frozenset([node, neighbour])
-                if bond in bonds:
+                if bond in edges:
                     continue
-                bonds.add(bond)
+                edges.add(bond)
                 yield node, neighbour
 
     def formula(self) -> str:
@@ -983,9 +983,9 @@ class MolGraph:
                 (e.g., 'C2H6O' for ethanol).
 
         Examples:
-            >>> mol = MolGraph()
-            >>> mol.read_xyz('ethanol.xyz')
-            >>> print(mol.formula())
+            >>> mg = MolGraph()
+            >>> mg.read_xyz('ethanol.xyz')
+            >>> print(mg.formula())
             'C2H6O'
         """
         if not self.elements:
