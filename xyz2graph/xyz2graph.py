@@ -1,3 +1,44 @@
+"""Read, analyze, and visualize molecular structures from XYZ files.
+
+It includes a `MolGraph` class that represents a molecular graph structure, with methods for
+setting element radii and colors, filtering atoms, reading XYZ files, generating adjacency lists,
+and converting to Plotly and NetworkX representations.
+
+Classes:
+    PlotConfig: TypedDict for configuring molecular plot visualization.
+    MolGraph: Represents a molecular graph structure with methods for reading, analyzing, and
+        visualizing molecular data.
+
+Constants:
+    DEFAULT_RADII: Default atomic radii for various elements.
+    DEFAULT_CPK_COLORS: Default CPK colors for various elements.
+    DEFAULT_PLOT_CONFIG: Default configuration for molecular plot visualization.
+
+Functions:
+    set_element_radius: Sets the reference radius for a specific element and updates the adjacency
+        list.
+    set_element_color: Sets the CPK color for a specific element.
+    set_default_color: Sets the default color for elements not in cpk_colors.
+    filter: Filters out atoms by indices and/or elements.
+    _parse_coordinates: Parses atomic coordinates from a list of coordinate strings.
+    read_xyz: Reads molecular structure data from an XYZ file.
+    _create_atom_trace: Creates a Plotly trace for atoms in the molecule.
+    _create_bond_trace: Creates a Plotly trace for bonds in the molecule.
+    _create_annotations: Creates annotations for atom and bond labels in the plot.
+    _create_menu_buttons: Creates menu buttons for toggling different label displays.
+    to_plotly: Creates a Plotly figure for 3D visualization of the molecule.
+    to_networkx: Converts the molecular structure to a NetworkX graph.
+    _generate_adjacency_list: Generates the adjacency list and matrix based on atomic positions
+        and radii.
+    bonds: Creates an iterator with all graph bonds.
+    edges: Creates an iterator with all graph bonds (alias for bonds method).
+    formula: Returns the molecular formula in standard Hill notation.
+    __len__: Returns the number of atoms in the molecule.
+    __getitem__: Returns the element and coordinates for the atom at the given position.
+    __iter__: Creates an iterator over all atoms in the molecule.
+    __repr__: Creates a simplified string representation of the molecular graph.
+"""
+
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -149,6 +190,20 @@ DEFAULT_CPK_COLORS: Dict[str, str] = {
 
 
 class PlotConfig(TypedDict, total=False):
+    """Configuration dictionary for molecular plot visualization.
+
+    Attributes:
+        atom_size: Size of atom markers in the plot. Default is 7.
+        atom_opacity: Opacity of atom markers (0.0 to 1.0). Default is 0.8.
+        atom_border_color: Color string for atom marker borders. Default is "lightgray".
+        atom_border_width: Width of atom marker borders in pixels. Default is 2.
+        bond_color: Color string for bonds between atoms. Default is "grey".
+        bond_width: Width of bond lines in pixels. Default is 2.
+        show_grid: Whether to display the plot grid. Default is False.
+        label_offset: Vertical offset for labels in pixels. Default is 15.
+        bond_label_color: Color string for bond length labels. Default is "steelblue".
+    """
+
     atom_size: int
     atom_opacity: float
     atom_border_color: str
@@ -175,25 +230,32 @@ DEFAULT_PLOT_CONFIG: PlotConfig = {
 
 @dataclass
 class MolGraph:
-    """
-    Represents a molecular graph structure from XYZ file format.
+    """Represents a molecular graph structure.
 
     This class provides functionality to read molecular structure data from XYZ files,
     analyze molecular geometry, and visualize the molecular structure using Plotly.
-    Colors and atomic radii can be customized per instance.
 
     Attributes:
-        elements: List of atomic elements in the molecule
-        x: List of x-coordinates for each atom
-        y: List of y-coordinates for each atom
-        z: List of z-coordinates for each atom
-        comment: Optional comment or title from the XYZ file
-        adj_list: Dictionary mapping atom indices to their connected neighbors
-        atomic_radii: List of atomic radii for each atom
-        bond_lengths: Dictionary mapping pairs of connected atoms to their bond lengths
-        adj_matrix: Numpy array representing the adjacency matrix of the molecular graph
-        indices: List of original indices for each atom, preserved during filtering operations.
-                Maps current atoms back to their positions in the original structure.
+        elements (List[str]): List of atomic elements in the molecule.
+        x (List[float]): List of x-coordinates for each atom.
+        y (List[float]): List of y-coordinates for each atom.
+        z (List[float]): List of z-coordinates for each atom.
+        comment (str): Optional comment or title from the XYZ file.
+        adj_list (Dict[int, Set[int]]): Dictionary mapping atom indices to their
+            connected neighbors.
+        atomic_radii (List[float]): List of atomic radii for each atom.
+        bond_lengths (Dict[FrozenSet[int], float]): Dictionary mapping pairs of
+            connected atoms to their bond lengths.
+        adj_matrix (NDArray[np.int_] | None): Numpy array representing the adjacency
+            matrix of the molecular graph.
+        indices (List[int]): List of original indices for each atom, preserved during filtering
+            operations. Maps current atoms back to their positions in the original structure.
+
+    Examples:
+        >>> mol = MolGraph()
+        >>> mol.read_xyz('molecule.xyz')
+        >>> print(mol.formula())
+        'C2H6O'
     """
 
     elements: List[str] = field(default_factory=list)
@@ -213,12 +275,17 @@ class MolGraph:
     cpk_color_rest: str = field(default="pink")
 
     def set_element_radius(self, element: str, radius: float) -> None:
-        """
-        Set the reference radius for a specific element and update the adjacency list.
+        """Set the reference radius for a specific element and update the adjacency list.
+
+        Updates the reference radius for the specified chemical element
+        and recalculates the molecular adjacency list based on the new radius value.
 
         Args:
-            element: Chemical element symbol
-            radius: New radius value in Angstroms
+            element (str): Chemical element symbol
+            radius (float): New radius value in Angstroms
+
+        Examples:
+            >>> mol.set_element_radius('C', 0.75)
         """
         self.default_radii[element] = radius
         if element in self.elements:
@@ -226,21 +293,33 @@ class MolGraph:
             self._generate_adjacency_list()
 
     def set_element_color(self, element: str, color: str) -> None:
-        """
-        Set the CPK color for a specific element.
+        """Set the CPK color for a specific element.
+
+        Assigns a custom CPK (Corey-Pauling-Koltun) color to the specified chemical element
+        for use in molecular visualizations.
 
         Args:
-            element: Chemical element symbol
-            color: Color name or code (any format accepted by Plotly)
+            element (str): Chemical element symbol
+            color (str): Color name or code (any format accepted by Plotly)
+
+        Examples:
+            >>> mol.set_element_color('O', 'green')
+            >>> mol.set_element_color('C', '#00FF00')
         """
         self.cpk_colors[element] = color
 
     def set_default_color(self, color: str) -> None:
-        """
-        Set the default color for elements not in cpk_colors.
+        """Set the default color for elements not in the standard CPK color scheme.
+
+        Specifies the fallback color to use for any chemical elements
+        that don't have a standard CPK color assignment.
 
         Args:
-            color: Color name or code (any format accepted by Plotly)
+            color (str): Color name or code (any format accepted by Plotly)
+
+        Examples:
+            >>> mol.set_default_color('gray')
+            >>> mol.set_default_color('#A0A0A0')
         """
         self.cpk_color_rest = color
 
@@ -250,34 +329,32 @@ class MolGraph:
         elements: Optional[List[str]] = None,
         inplace: bool = False,
     ) -> Optional["MolGraph"]:
-        """
-        Filter out atoms by indices and/or elements.
+        """Filter out atoms by indices and/or elements.
+
+        Filter atoms from the molecular structure based on their indices or element types.
+        Can either modify the existing structure or create a new filtered copy.
 
         Args:
-            indices: List of atom indices to filter out. If None, no indices are removed.
-            elements: List of element symbols to filter out. If None, no elements are removed.
-            inplace: If True, modifies the current object. If False, returns a new object.
+            indices (List[int], optional): List of atom indices to filter out.
+                If None, no indices are removed.
+            elements (List[str], optional): List of element symbols to filter out.
+                If None, no elements are removed.
+            inplace (bool, default=False): If True, modifies the current object.
+                If False, returns a new object.
 
         Returns:
-            MolGraph or None: If inplace=False, returns a new filtered MolGraph object.
-                            If inplace=True, returns None and modifies current object.
-
-        Examples:
-            # Filter out all hydrogen atoms
-            >>> mol_without_h = mol.filter(elements=['H'])
-
-            # Filter out specific atoms by index
-            >>> mol_trimmed = mol.filter(indices=[0, 1, 2])
-
-            # Filter out hydrogens at specific positions
-            >>> mol_modified = mol.filter(indices=[0, 1, 2], elements=['H'])
-
-            # Modify in place
-            >>> mol.filter(elements=['H'], inplace=True)
+            Optional[MolGraph]: A new filtered MolGraph object if inplace=False,
+                None if inplace=True.
 
         Raises:
-            ValueError: If filtering would remove all atoms
-            IndexError: If any index is out of range
+            ValueError: If filtering would remove all atoms.
+            IndexError: If any index is out of range.
+
+        Examples:
+            >>> mol_without_h = mol.filter(elements=['H']) # Filter out all hydrogen atoms
+            >>> mol_trimmed = mol.filter(indices=[0, 1, 2]) # Filter out specific atoms by index
+            >>> mol_modified = mol.filter(indices=[0, 1, 2], elements=['H'])
+            >>> mol.filter(elements=['H'], inplace=True) # Modify in place
         """
         from itertools import compress, starmap
         from operator import and_
@@ -353,18 +430,33 @@ class MolGraph:
     def _parse_coordinates(
         self, data: Sequence[str]
     ) -> Tuple[List[str], List[float], List[float], List[float]]:
-        """
-        Parse atomic coordinates from a list of coordinate strings.
+        """Parse atomic coordinates from a coordinate string list.
+
+        Takes a list of coordinate strings in 'element x y z' format and parses them into
+        separate lists of elements and their corresponding x, y, z coordinates. Each coordinate
+        string should contain an element symbol followed by three space-separated numeric values
+        representing the atomic position in 3D space.
 
         Args:
-            data: List of strings, each containing element and coordinates in format:
-                        'element x y z' (e.g., 'H 0.0 0.0 0.0')
+            data (Sequence[str]): List of coordinate strings, where each string contains an
+            element symbol and coordinates in the format 'element x y z' (e.g., 'H 0.0 0.0 0.0').
 
         Returns:
-            Tuple containing (elements, x_coords, y_coords, z_coords)
+            Tuple[List[str], List[float], List[float], List[float]]: A tuple containing four lists:
+            elements, x_coordinates, y_coordinates, and z_coordinates.
 
         Raises:
-            ValueError: If coordinate format is invalid or contains unknown elements
+            ValueError: If any coordinate string has invalid format or contains unknown element
+            symbols not present in the default radii dictionary.
+
+        Examples:
+            >>> mol = MolGraph()
+            >>> coords = ['H 0.0 0.0 0.0', 'O 0.0 0.0 1.0']
+            >>> elements, x, y, z = mol._parse_coordinates(coords)
+            >>> print(elements)
+            ['H', 'O']
+            >>> print(x)
+            [0.0, 0.0]
         """
         elements, xs, ys, zs = [], [], [], []
 
@@ -403,35 +495,38 @@ class MolGraph:
     def read_xyz(
         self, file_path: Union[str, Path], xyz_start: int = 2, validate: bool = False
     ) -> None:
-        """
-        Reads molecular structure data from an XYZ file.
+        """Reads molecular structure data from an XYZ file.
 
-        The XYZ file format specification:
-        - Line 0: Number of atoms (integer)
-        - Line 1: Comment or title (can be empty)
-        - Line 2 onwards: Atomic coordinates in format:
-            element  x  y  z
-        where:
-        - element: Chemical element symbol (e.g., H, He, Li)
-        - x, y, z: Cartesian coordinates in Angstroms (float)
-
-        Example of XYZ file:
-        3
-        Water molecule
-        O  0.000000  0.000000  0.000000
-        H  0.758602  0.000000  0.504284
-        H  0.758602  0.000000 -0.504284
+        The file should have a header with the number of atoms and optional comment, followed by
+        atomic coordinates in Angstroms with element symbols.
 
         Args:
-            file_path: Path to the XYZ file
-            xyz_start: Line number where XYZ coordinate data starts (default=2)
-            validate: If True, validates that the number of coordinates matches
-                    the atom count in the first line. Note: validation is automatically
-                    disabled if xyz_start=0
+            file_path (Union[str, Path]): Path to the XYZ file
+            xyz_start (int, optional): Line number where XYZ coordinate data starts. Defaults to 2.
+            validate (bool, optional, default=False): If True, validates that the number
+                of coordinates matches the atom count in the first line. Note: validation is
+                automatically disabled if xyz_start=0. Defaults to False.
 
         Raises:
             FileNotFoundError: If the specified file does not exist
             ValueError: If the file format is invalid or contains unknown elements
+
+        Notes:
+            The XYZ file format is a standard chemical file format that contains:
+
+                - First line: Number of atoms
+                - Second line: Comment or molecule name (optional)
+                - Remaining lines: Atomic coordinates in format "element x y z"
+
+            The function supports both standard XYZ files (xyz_start=2) and raw coordinate data
+            (xyz_start=0). When validation is enabled, it checks that the number of coordinates
+            matches the atom count specified in the first line.
+
+        Examples:
+            >>> mol = MolGraph()
+            >>> mol.read_xyz("molecule.xyz")  # Read standard XYZ file (starts at line 2)
+            >>> mol.read_xyz("coords.xyz", xyz_start=0)  # Read XYZ data starting from first line
+            >>> mol.read_xyz("molecule.xyz", validate=True)  # Enable validation of atom count
         """
         logger.debug(f"Reading XYZ file: {file_path}")
 
@@ -534,7 +629,6 @@ class MolGraph:
 
     def _create_bond_trace(self, plot_config: PlotConfig) -> go.Scatter3d:
         """Creates a Plotly trace for bonds in the molecule."""
-
         # Create line segments for each bond (use None to separate segments)
         xs, ys, zs = [], [], []
         for i, j in self.edges():
@@ -558,19 +652,25 @@ class MolGraph:
         atom_label_type: Optional[str] = None,
         show_distances: bool = False,
     ) -> List[dict]:
-        """
-        Creates annotations for atom and bond labels in the plot.
+        """Create annotations for atom and bond labels in the molecular plot.
+
+        Creates Plotly annotation dictionaries for displaying atom labels (either element
+        symbols or indices) and/or bond length labels. The annotations are positioned above
+        each atom or bond with configurable vertical offset.
 
         Args:
-            plot_config: Plot configuration dictionary
-            atom_label_type: Type of atom labels to show (None, "element", or "index")
-            show_bond_lengths: Whether to show bond length labels
+            plot_config (PlotConfig): Plot configuration dictionary containing visual
+                parameters like label offsets and colors.
+            atom_label_type (Optional[str]): Type of atom labels to show. Must be one of:
+                None, "element", or "index". None means no atom labels.
+            show_distances (bool): Whether to show bond length labels centered on each bond.
 
         Returns:
-            List of annotation dictionaries for Plotly
+            List[dict]: List of Plotly annotation dictionaries containing text, position,
+                and style information for atom and bond labels.
 
         Raises:
-            ValueError: If atom_label_type is not None, "element", or "index"
+            ValueError: If atom_label_type is not one of: None, "element", or "index".
         """
         labels = []
 
@@ -675,36 +775,49 @@ class MolGraph:
         config: Optional[PlotConfig] = None,
         title: Optional[str] = None,
     ) -> go.Figure:
-        """
-        Creates a Plotly figure for 3D visualization of the molecule.
+        """Creates an interactive 3D visualization of the molecular structure.
+
+        Generates a Plotly figure displaying atoms as spheres and bonds as lines, with
+        configurable visual properties and interactive features for exploring the molecule's
+        geometry.
 
         Args:
-            config: Plot configuration with the following options:
-                atom_size (int): Size of atom markers (default: 7)
-                atom_opacity (float): Opacity of atom markers between 0 and 1 (default: 0.8)
-                atom_border_color (str): Color of atom marker borders (default: "lightgray")
-                atom_border_width (int): Width of atom marker borders (default: 2)
-                bond_color (str): Color of bonds between atoms (default: "grey")
-                bond_width (int): Width of bond lines (default: 2)
-                show_grid (bool): Whether to show the grid in the plot (default: False)
-                label_offset (int): Vertical offset for atom and bond labels (default: 15)
-                bond_label_color (str): Color of bond length labels (default: "steelblue")
-            title: Title text for the visualization (default: None)
+            config (Optional[PlotConfig]): Dictionary of visualization settings:
+
+                - atom_size (int): Size of atom markers (default: 7)
+                - atom_opacity (float): Opacity of atoms from 0.0-1.0 (default: 0.8)
+                - atom_border_color (str): Color of atom borders (default: "lightgray")
+                - atom_border_width (int): Width of atom borders (default: 2)
+                - bond_color (str): Color of bonds between atoms (default: "grey")
+                - bond_width (int): Width of bond lines (default: 2)
+                - show_grid (bool): Whether to display axis grid (default: False)
+                - label_offset (int): Vertical offset for labels (default: 15)
+                - bond_label_color (str): Color of bond length labels (default: "steelblue")
+
+            title (Optional[str]): Title displayed above visualization (default: None)
 
         Returns:
-            go.Figure: Interactive 3D visualization of the molecular structure with:
-                - Atoms represented as spheres colored by element
-                - Bonds shown as lines between atoms
-                - Interactive menu for toggling element symbols, indices, and bond lengths
-                - Hover information showing element type and coordinates
+            go.Figure: Plotly figure object containing:
 
-        Example:
-            >>> mol = MolGraph()
-            >>> mol.read_xyz('molecule.xyz')
-            >>> fig = mol.to_plotly(
-            ...     config={"atom_size": 10, "bond_width": 3},
-            ...     title="Water Molecule"
-            ... )
+                - 3D scatter plot of atoms colored by element
+                - Line segments representing bonds
+                - Interactive menu for toggling labels:
+
+                    - Element symbols
+                    - Atom indices
+                    - Bond lengths
+                    - Combinations of the above
+
+                - Mouse controls for rotation, zoom, and pan
+
+        Examples:
+            >>> fig = mol.to_plotly(config={
+            ...     "atom_size": 12,
+            ...     "atom_opacity": 0.9,
+            ...     "bond_color": "black",
+            ...     "show_grid": True,
+            ...     "label_offset": 20
+            ... })
             >>> fig.show()
         """
         logger.debug("Creating Plotly figure")
@@ -759,11 +872,29 @@ class MolGraph:
         return go.Figure(data=data, layout=layout)
 
     def to_networkx(self) -> nx.Graph:
-        """
-        Converts the molecular structure to a NetworkX graph.
+        """Create a Plotly figure for 3D visualization of the molecular structure.
+
+        Generates an interactive 3D visualization of the molecule using Plotly, with
+        configurable visual properties for atoms and bonds. Includes a menu for toggling
+        different label types and bond distance displays.
+
+        Args:
+            config (Optional[PlotConfig]): Plot configuration options controlling visual appearance
+                like atom sizes, colors, and bond widths. See PlotConfig class for full options.
+            title (Optional[str]): Title text displayed above the visualization. Defaults to None.
 
         Returns:
-            nx.Graph: NetworkX graph representation with node and edge attributes
+            go.Figure: Interactive 3D Plotly figure object containing the molecule visualization
+                with atoms as spheres and bonds as lines.
+
+        Examples:
+            >>> mol = MolGraph()
+            >>> mol.read_xyz('molecule.xyz')
+            >>> fig = mol.to_plotly(
+            ...     config={"atom_size": 10, "bond_width": 3},
+            ...     title="Water Molecule"
+            ... )
+            >>> fig.show()
         """
         logger.debug("Creating NetworkX graph")
 
@@ -784,8 +915,7 @@ class MolGraph:
         return G
 
     def _generate_adjacency_list(self) -> None:
-        """
-        Generates the adjacency list and matrix based on atomic positions and radii.
+        """Generates the adjacency list and matrix based on atomic positions and radii.
 
         This method uses atomic positions and reference radii to determine bonding
         between atoms. Two atoms are considered bonded if their distance is less
@@ -819,32 +949,49 @@ class MolGraph:
             raise
 
     def edges(self) -> Iterator[Tuple[int, int]]:
-        """
-        Creates an iterator with all graph edges.
+        """Create an iterator yielding all bonds in the molecular graph.
 
-        Returns:
-            Iterator[Tuple[int, int]]: Iterator yielding pairs of connected atom indices
+        Iterates through the adjacency list to generate all unique pairs of bonded atoms
+        in the structure, ensuring each bond is only yielded once.
+
+        Yields:
+            tuple[int, int]: A pair of atom indices representing a bonded atomic pair,
+                where each index corresponds to the atom's position in the molecular structure.
+
+        Examples:
+            >>> mol = MolGraph()
+            >>> mol.read_xyz('molecule.xyz')
+            >>> for atom1, atom2 in mol.bonds():
+            ...     print(f"Bond between atoms {atom1} and {atom2}")
+            Bond between atoms 0 and 1
+            Bond between atoms 1 and 2
         """
-        edges = set()
+        bonds = set()
         for node, neighbours in self.adj_list.items():
             for neighbour in neighbours:
-                edge = frozenset([node, neighbour])
-                if edge in edges:
+                bond = frozenset([node, neighbour])
+                if bond in bonds:
                     continue
-                edges.add(edge)
+                bonds.add(bond)
                 yield node, neighbour
 
     def formula(self) -> str:
-        """
-        Returns the molecular formula in standard Hill notation.
+        """Return the molecular formula of the structure in Hill notation.
 
-        The Hill system orders elements as:
-        1. Carbon first (if present)
-        2. Hydrogen second (if carbon is present)
-        3. All other elements alphabetically
+        Generates a string representation of the molecular formula following Hill
+        notation conventions, where carbon and hydrogen (if present) are listed first,
+        followed by other elements in alphabetical order. Numbers are added as
+        subscripts for elements appearing multiple times.
 
         Returns:
-            str: Molecular formula string
+            str: The molecular formula string with elements ordered by Hill notation
+                (e.g., 'C2H6O' for ethanol).
+
+        Examples:
+            >>> mol = MolGraph()
+            >>> mol.read_xyz('ethanol.xyz')
+            >>> mol.formula()
+            'C2H6O'
         """
         if not self.elements:
             return ""
@@ -871,8 +1018,7 @@ class MolGraph:
         return "".join(formula_parts)
 
     def __len__(self) -> int:
-        """
-        Returns the number of atoms in the molecule.
+        """Returns the number of atoms in the molecule.
 
         Returns:
             int: Number of atoms
@@ -880,8 +1026,7 @@ class MolGraph:
         return len(self.elements)
 
     def __getitem__(self, position: int) -> Tuple[str, Tuple[float, float, float]]:
-        """
-        Returns the element and coordinates for the atom at the given position.
+        """Returns the element and coordinates for the atom at the given position.
 
         Args:
             position: Index of the atom
@@ -903,8 +1048,7 @@ class MolGraph:
         )
 
     def __iter__(self) -> Iterator[Tuple[str, Tuple[float, float, float]]]:
-        """
-        Creates an iterator over all atoms in the molecule.
+        """Creates an iterator over all atoms in the molecule.
 
         Returns:
             Iterator[Tuple[str, Tuple[float, float, float]]]: Iterator yielding
@@ -913,8 +1057,7 @@ class MolGraph:
         return (self[i] for i in range(len(self)))
 
     def __repr__(self) -> str:
-        """
-        Creates a simplified string representation of the molecular graph.
+        """Creates a simplified string representation of the molecular graph.
 
         Returns:
             str: A string showing molecular formula and basic structural information
