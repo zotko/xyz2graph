@@ -1,4 +1,26 @@
 #!/usr/bin/env python3
+"""Command-line interface for generating 3D molecular visualizations from XYZ files.
+
+Functions:
+    parse_filter_arg(filter_str: str) -> Tuple[List[int], List[str]]:
+        Parse filter argument string into indices and elements.
+
+    format_filter_message(indices: List[int], elements: List[str]) -> str:
+        Format the filtering message showing what will be filtered.
+
+    parse_args() -> argparse.Namespace:
+        Parse command line arguments.
+
+    generate_output_path(input_path: str, output_path: Union[str, None]) -> Path:
+        Generate the output file path based on input path.
+
+    log_molecule_state(mol: MolGraph, msg: str = "") -> None:
+        Log information about the molecule's current state.
+
+    main() -> None:
+        Main function for the command-line interface.
+"""
+
 import argparse
 import logging
 import sys
@@ -14,12 +36,11 @@ from xyz2graph.logging import logger
 
 
 def parse_filter_arg(filter_str: str) -> Tuple[List[int], List[str]]:
-    """
-    Parse filter argument string into indices and elements.
+    """Parse filter argument string into indices and elements.
 
     Args:
         filter_str: Comma-separated values for indices and elements
-        (e.g., "1,2,H,O" removes atoms at indices 1,2 and all H,O atoms)
+            (e.g., "1,2,H,O" removes atoms at indices 1,2 and all H,O atoms)
 
     Returns:
         Tuple of (indices_list, elements_list)
@@ -87,7 +108,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         help="Atoms to filter out using comma-separated values for indices and/or elements. "
         "Make sure to use proper element capitalization (e.g., 'H' not 'h'). "
-        "Example: '1,2,H,O,5' removes atoms at indices 1,2,5 and all H,O atoms",
+        "Example: '1,2,H,O,5' removes atoms at indices 1,2,5 and all H,O atoms.",
     )
 
     return parser.parse_args()
@@ -101,8 +122,7 @@ def generate_output_path(input_path: str, output_path: Union[str, None]) -> Path
 
 
 def log_molecule_state(mol: MolGraph, msg: str = "") -> None:
-    """
-    Log information about the molecule's current state.
+    """Log information about the molecule's current state.
 
     Args:
         mol: MolGraph instance to analyze

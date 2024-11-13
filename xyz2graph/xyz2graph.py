@@ -872,29 +872,24 @@ class MolGraph:
         return go.Figure(data=data, layout=layout)
 
     def to_networkx(self) -> nx.Graph:
-        """Create a Plotly figure for 3D visualization of the molecular structure.
+        """Convert the current graph representation to a NetworkX graph.
 
-        Generates an interactive 3D visualization of the molecule using Plotly, with
-        configurable visual properties for atoms and bonds. Includes a menu for toggling
-        different label types and bond distance displays.
-
-        Args:
-            config (Optional[PlotConfig]): Plot configuration options controlling visual appearance
-                like atom sizes, colors, and bond widths. See PlotConfig class for full options.
-            title (Optional[str]): Title text displayed above the visualization. Defaults to None.
+        Creates a NetworkX graph from the stored adjacency list, adding node and edge attributes.
+        Node attributes include the chemical element and xyz coordinates, while edge attributes
+        store bond lengths.
 
         Returns:
-            go.Figure: Interactive 3D Plotly figure object containing the molecule visualization
-                with atoms as spheres and bonds as lines.
+            nx.Graph: NetworkX graph containing molecular structure with node attributes 'element'
+                and 'xyz' (coordinates), and edge attribute 'length' (bond length).
 
         Examples:
             >>> mol = MolGraph()
-            >>> mol.read_xyz('molecule.xyz')
-            >>> fig = mol.to_plotly(
-            ...     config={"atom_size": 10, "bond_width": 3},
-            ...     title="Water Molecule"
-            ... )
-            >>> fig.show()
+            >>> mol.read_xyz('molecule.xyz')  # Load molecular data
+            >>> G = mol.to_networkx()  # Convert to NetworkX graph
+            >>> print(G.nodes[0]['element'])  # Access node attributes
+            'C'
+            >>> print(G.edges[(0, 1)]['length'])  # Access edge attributes
+            1.54
         """
         logger.debug("Creating NetworkX graph")
 
@@ -990,7 +985,7 @@ class MolGraph:
         Examples:
             >>> mol = MolGraph()
             >>> mol.read_xyz('ethanol.xyz')
-            >>> mol.formula()
+            >>> print(mol.formula())
             'C2H6O'
         """
         if not self.elements:
