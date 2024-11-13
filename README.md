@@ -81,17 +81,17 @@ Example XYZ files can be found in the [`examples`](https://github.com/zotko/xyz2
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+I welcome contributions! Please see the [CONTRIBUTING.md](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) file for guidelines on how to make contributions to this project.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the ISC License - see the LICENSE file for details.
 
 ## Citation
 If you use xyz2graph in your research, please cite:
 
 ```bibtex
-@misc{xyz2graph,
+@misc{zotko2018xyz2graph,
   author       = {Zotko, Mykola},
   title        = {xyz2graph: Molecular Structure Visualization},
   year         = {2018},
