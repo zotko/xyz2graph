@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Package for reading of .xyz files and constructing of molecular graphs from atomic coordinates."
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT" }
+license = { text = "ISC License", file = "LICENSE" }
 authors = [
     { name = "Mykola Zotko", email = "dev.zotko@outlook.de" }
 ]
@@ -22,7 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: ISC License (ISCL)",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: Visualization",
@@ -46,6 +46,7 @@ Documentation = "https://zotko.github.io/xyz2graph"
 docs = [
     "mkdocs>=1.6.0",
     "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=1.12.0"
 ]
 dev = [
     "pytest>=7.0.0,<8.0.0",
@@ -58,16 +59,23 @@ dev = [
 
 [tool.ruff]
 target-version = "py38"
-line-length = 88
+line-length = 100
+src = ["xyz2graph"]
+include = ["test/test_*.py"]
+
+[tool.ruff.lint.per-file-ignores]
+"{__init__.py,tests/*,helpers.py,logging.py}" = ["D"]
 
 [tool.ruff.lint]
-select = ["E", "F", "B", "I", "W", "C", "UP", "N", "ANN", "T20", "PT"]
-ignore = ["ANN101", "N806", "T201", "C408"]
+select = ["D", "E", "F", "B", "I", "W", "C", "UP", "N", "ANN", "T20", "PT"]
+ignore = ["ANN101", "N806", "T201", "C408", "D401", "D417"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 force-single-line = false
 lines-after-imports = 2
-known-first-party = ["xyz2graph"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.mypy]
 python_version = "3.8"

@@ -2,14 +2,6 @@
 
 This guide will help you get started with xyz2graph.
 
-## Installation
-
-Install xyz2graph using pip:
-
-```bash
-pip install xyz2graph
-```
-
 ## Basic Usage
 
 ### Creating a Molecular Visualization
@@ -30,48 +22,22 @@ fig = mg.to_plotly()
 fig.show()
 ```
 
-### Using the Command Line
+### Advanced Reading Options
 
-For quick visualizations, you can use the command-line interface:
-
-```bash
-xyz2graph molecule.xyz
-```
-
-This will create an HTML file with the visualization in your current directory.
-
-## Customization
-
-### Changing Colors
-
-You can customize the appearance of your molecular visualization by changing element colors:
+Control how files are read and validated:
 
 ```python
-mg = MolGraph()
-mg.read_xyz('molecule.xyz')
+# Read raw coordinates (no header)
+mg.read_xyz('coords.xyz', xyz_start=0)
 
-# Change specific element colors
-mg.set_element_color('O', 'pink')
+# Read coordinates from custom start line
+mg.read_xyz('custom.xyz', xyz_start=3)
 
-# Set default color for unspecified elements
-mg.set_default_color('gray')
-
-# Create visualization with custom colors
-fig = mg.to_plotly()
-fig.show()
+# Validate coordinate count against header
+mg.read_xyz('molecule.xyz', validate=True)
 ```
 
-### Adjusting Atomic Radii
-
-Modify atomic radii to adjust the visual representation:
-
-```python
-# Change radius for specific elements
-mg.set_element_radius('C', 0.75)
-mg.set_element_radius('H', 0.25)
-```
-
-## Network Analysis
+### Network Analysis
 
 Convert your molecular structure to a NetworkX graph for analysis:
 
@@ -79,10 +45,73 @@ Convert your molecular structure to a NetworkX graph for analysis:
 # Convert to NetworkX graph
 G = mg.to_networkx()
 
-# Access molecular properties
-print(f"Number of atoms: {len(G.nodes)}")
-print(f"Number of bonds: {len(G.edges)}")
+# Calculate graph properties
+print(f"Graph density: {nx.density(G)}")
 ```
+
+### Visualization Settings
+
+You can customize the appearance of your molecular visualization:
+
+```python
+config = {
+    "atom_size": 7,
+    "atom_opacity": 0.8,
+    "atom_border_color": "lightgray",
+    "atom_border_width": 2,
+    "bond_color": "grey",
+    "bond_width": 2,
+    "show_grid": False,
+    "label_offset": 15,
+    "bond_label_color": "steelblue"
+}
+
+# Create visualization with custom settings
+fig = mg.to_plotly(config=config)
+fig.show()
+```
+
+### Structure Manipulation
+
+```python
+# Remove all hydrogen atoms
+mg.filter(elements=['H'], inplace=True)
+
+# Remove multiple element types
+mg.filter(elements=['H', 'O'], inplace=True)
+
+# Remove all hydrogen atoms and atoms at indices 1 and 5
+new_mg = mg.filter(elements=['H'], indices=[1,5])
+```
+
+## Using the Command Line
+
+For quick visualizations, you can use the command-line interface:
+
+```bash
+# Basic usage - saves visualization as HTML in the same directory
+xyz2graph molecule.xyz
+
+# Save visualization to specific path
+xyz2graph molecule.xyz --output viz.html
+
+# Open directly in browser without saving
+xyz2graph molecule.xyz --browser
+
+# Remove hydrogen atoms from visualization
+xyz2graph molecule.xyz --filter "H"
+
+# Remove specific atoms by index (0-based)
+xyz2graph molecule.xyz --filter "0,1,2"
+
+# Combine element and index filtering
+xyz2graph molecule.xyz --filter "H,O,1,2,5"
+```
+
+## Next Steps
+
+- See the [API documentation](python.md) for detailed reference
+- Learn about [command-line options](cli.md) for batch processing
 
 ## XYZ File Format
 
@@ -102,10 +131,6 @@ Where:
 - Second line: Comment or title
 - Following lines: Element and coordinates (x, y, z) in Angstroms
 
-## Next Steps
-
-- See the [API documentation](api/molgraph.md) for detailed reference
-- Learn about [command-line options](api/cli.md) for batch processing
 
 ## Common Issues
 
@@ -128,10 +153,10 @@ If you get a `ValueError` when reading an XYZ file:
 - If your file doesn't have the standard header (atom count and comment),
 use the `xyz_start` parameter to specify where coordinates begin:
   ```python
-  # Start reading from first line (no header)
+  # Start reading coordinates from first line (no header)
   mg.read_xyz("molecule.xyz", xyz_start=0)
 
-  # Start reading from line 3
+  # Start reading coordinates from line 3
   mg.read_xyz("molecule.xyz", xyz_start=3)
   ```
 

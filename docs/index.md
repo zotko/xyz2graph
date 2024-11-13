@@ -13,46 +13,28 @@
 
 Welcome to xyz2graph's documentation! This Python package provides tools for reading XYZ molecular structure files and creating interactive 3D visualizations.
 
-<div align="center">
- <img src="https://raw.githubusercontent.com/zotko/xyz2graph/main/.github/images/mol.gif" width="1024">
+<iframe src="assets/molecule_3d.html" width="100%" height="400px" frameborder="0"></iframe>
+
+<div class="bounce-container">
+  <div class="bouncing-emoji">👆 Try me!</div>
 </div>
 
 ## Key Features
-- Read and parse XYZ molecular structure files
-- Generate interactive 3D molecular visualizations using Plotly
-- Convert molecular structures to NetworkX graphs
+- Read and analyze XYZ molecular structure files
+- Generate interactive 3D visualizations with Plotly
+- Export to NetworkX graphs for advanced analysis
 - Command-line interface for quick visualizations
-
-## Requirements
-
-- Python 3.8+
-- NumPy
-- Plotly
-- NetworkX
 
 ## Installation
 ```bash
 pip install xyz2graph
 ```
 
-## Quick Example
-```python
-from xyz2graph import MolGraph
-
-mg = MolGraph()
-mg.read_xyz('molecule.xyz')
-fig = mg.to_plotly()
-fig.show()
-```
-
-## Quick Navigation
-- [Getting Started](getting-started.md)
-- API Documentation
-    - [MolGraph](api/molgraph.md)
-    - [Command Line](api/cli.md)
-
-## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Requirements
+- Python 3.8+
+- Plotly
+- NetworkX
+- NumPy
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/zotko/xyz2graph/blob/master/LICENSE) file for details.
+This project is licensed under the ISC License. See the [LICENSE](license.md) file for details.
