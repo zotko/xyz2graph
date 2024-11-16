@@ -179,7 +179,16 @@ def main() -> None:
         else:
             output_path = generate_output_path(args.xyz_file, args.output)
             logger.info(f"Saving visualization to: {output_path}")
-            write_html(fig, str(output_path))
+            write_html(
+                fig,
+                str(output_path),
+                config={
+                    "toImageButtonOptions": {
+                        "filename": Path(output_path).stem,
+                        "format": "svg",
+                    }
+                },
+            )  # Save as SVG due to issues with PNG saving
             print(f"Visualization saved to: {output_path}")
 
     except Exception as e:

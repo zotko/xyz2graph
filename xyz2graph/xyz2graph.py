@@ -842,7 +842,7 @@ class MolGraph:
             showbackground=False,
             showticklabels=False,
             zeroline=False,
-            titlefont=dict(color="white"),
+            title={"text": ""},  # Hide axis titles
             showspikes=False,
         )
 
