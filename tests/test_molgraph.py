@@ -4,7 +4,8 @@ from typing import List, Tuple
 import plotly.graph_objs as go
 import pytest
 
-from xyz2graph import DEFAULT_CPK_COLORS, DEFAULT_RADII, MolGraph
+from xyz2graph import MolGraph
+from xyz2graph.constants import _DEFAULT_CPK_COLORS, _DEFAULT_RADII
 
 
 class TestMolGraph:
@@ -82,7 +83,7 @@ class TestMolGraph:
         assert len(mol) == 3
         assert mol.elements == ["O", "H", "H"]
         assert len(mol.atomic_radii) == 3
-        assert mol.atomic_radii[0] == DEFAULT_RADII["O"]
+        assert mol.atomic_radii[0] == _DEFAULT_RADII["O"]
 
         # Format-specific assertions
         if format_type == "standard":
@@ -114,9 +115,9 @@ class TestMolGraph:
 
         # Check colors
         expected_colors = [
-            DEFAULT_CPK_COLORS["O"],
-            DEFAULT_CPK_COLORS["H"],
-            DEFAULT_CPK_COLORS["H"],
+            _DEFAULT_CPK_COLORS["O"],
+            _DEFAULT_CPK_COLORS["H"],
+            _DEFAULT_CPK_COLORS["H"],
         ]
         assert list(atom_trace.marker.color) == expected_colors
 

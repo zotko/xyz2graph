@@ -6,37 +6,46 @@ and converting to Plotly and NetworkX representations.
 
 Classes:
     PlotConfig: TypedDict for configuring molecular plot visualization.
+
+Attributes:
+            atom_size: Size of atom markers in the plot. Default is 7.
+            atom_opacity: Opacity of atom markers (0.0 to 1.0). Default is 0.8.
+            atom_border_color: Color string for atom marker borders. Default is "lightgray".
+            atom_border_width: Width of atom marker borders in pixels. Default is 2.
+            bond_color: Color string for bonds between atoms. Default is "grey".
+            bond_width: Width of bond lines in pixels. Default is 2.
+            show_grid: Whether to display the plot grid. Default is False.
+            label_offset: Vertical offset for labels in pixels. Default is 15.
+            bond_label_color: Color string for bond length labels. Default is "steelblue".
+
     MolGraph: Represents a molecular graph structure with methods for reading, analyzing, and
         visualizing molecular data.
 
-Constants:
-    DEFAULT_RADII: Default atomic radii for various elements.
-    DEFAULT_CPK_COLORS: Default CPK colors for various elements.
-    DEFAULT_PLOT_CONFIG: Default configuration for molecular plot visualization.
+Methods:
+            set_element_radius: Sets the reference radius for a specific element and updates
+                the adjacency list.
+            set_element_color: Sets the CPK color for a specific element.
+            set_default_color: Sets the default color for elements not in cpk_colors.
+            filter: Filters out atoms by indices and/or elements.
+            read_xyz: Reads molecular structure data from an XYZ file.
+            to_plotly: Creates a Plotly figure for 3D visualization of the molecule.
+            to_networkx: Converts the molecular structure to a NetworkX graph.
+            _generate_adjacency_list: Generates the adjacency list and matrix based
+                on atomic positions and radii.
+            bonds: Creates an iterator with all graph bonds.
+            edges: Creates an iterator with all graph bonds (alias for bonds method).
+            formula: Returns the molecular formula in standard Hill notation.
+            __len__: Returns the number of atoms in the molecule.
+            __getitem__: Returns the element and coordinates for the atom at the given position.
+            __iter__: Creates an iterator over all atoms in the molecule.
+            __repr__: Creates a simplified string representation of the molecular graph.
 
-Functions:
-    set_element_radius: Sets the reference radius for a specific element and updates the adjacency
-        list.
-    set_element_color: Sets the CPK color for a specific element.
-    set_default_color: Sets the default color for elements not in cpk_colors.
-    filter: Filters out atoms by indices and/or elements.
-    _parse_coordinates: Parses atomic coordinates from a list of coordinate strings.
-    read_xyz: Reads molecular structure data from an XYZ file.
-    _create_atom_trace: Creates a Plotly trace for atoms in the molecule.
-    _create_bond_trace: Creates a Plotly trace for bonds in the molecule.
-    _create_annotations: Creates annotations for atom and bond labels in the plot.
-    _create_menu_buttons: Creates menu buttons for toggling different label displays.
-    to_plotly: Creates a Plotly figure for 3D visualization of the molecule.
-    to_networkx: Converts the molecular structure to a NetworkX graph.
-    _generate_adjacency_list: Generates the adjacency list and matrix based on atomic positions
-        and radii.
-    bonds: Creates an iterator with all graph bonds.
-    edges: Creates an iterator with all graph bonds (alias for bonds method).
-    formula: Returns the molecular formula in standard Hill notation.
-    __len__: Returns the number of atoms in the molecule.
-    __getitem__: Returns the element and coordinates for the atom at the given position.
-    __iter__: Creates an iterator over all atoms in the molecule.
-    __repr__: Creates a simplified string representation of the molecular graph.
+        Private Methods:
+            _parse_coordinates: Parses atomic coordinates from a list of coordinate strings.
+            _create_atom_trace: Creates a Plotly trace for atoms in the molecule.
+            _create_bond_trace: Creates a Plotly trace for bonds in the molecule.
+            _create_annotations: Creates annotations for atom and bond labels in the plot.
+            _create_menu_buttons: Creates menu buttons for toggling different label displays.
 """
 
 import re
@@ -61,132 +70,10 @@ import numpy as np
 import plotly.graph_objs as go
 from numpy.typing import NDArray
 
+from .constants import _DEFAULT_CPK_COLORS, _DEFAULT_RADII
+from .geometry import Point3D
+from .labels import AtomLabel, BondLabel, LabelType, MolecularLabelManager
 from .logging import logger
-
-
-DEFAULT_RADII: Dict[str, float] = {
-    "Ac": 1.88,
-    "Ag": 1.59,
-    "Al": 1.35,
-    "Am": 1.51,
-    "As": 1.21,
-    "Au": 1.50,
-    "B": 0.83,
-    "Ba": 1.34,
-    "Be": 0.35,
-    "Bi": 1.54,
-    "Br": 1.21,
-    "C": 0.68,
-    "Ca": 0.99,
-    "Cd": 1.69,
-    "Ce": 1.83,
-    "Cl": 0.99,
-    "Co": 1.33,
-    "Cr": 1.35,
-    "Cs": 1.67,
-    "Cu": 1.52,
-    "D": 0.23,
-    "Dy": 1.75,
-    "Er": 1.73,
-    "Eu": 1.99,
-    "F": 0.64,
-    "Fe": 1.34,
-    "Ga": 1.22,
-    "Gd": 1.79,
-    "Ge": 1.17,
-    "H": 0.23,
-    "Hf": 1.57,
-    "Hg": 1.70,
-    "Ho": 1.74,
-    "I": 1.40,
-    "In": 1.63,
-    "Ir": 1.32,
-    "K": 1.33,
-    "La": 1.87,
-    "Li": 0.68,
-    "Lu": 1.72,
-    "Mg": 1.10,
-    "Mn": 1.35,
-    "Mo": 1.47,
-    "N": 0.68,
-    "Na": 0.97,
-    "Nb": 1.48,
-    "Nd": 1.81,
-    "Ni": 1.50,
-    "Np": 1.55,
-    "O": 0.68,
-    "Os": 1.37,
-    "P": 1.05,
-    "Pa": 1.61,
-    "Pb": 1.54,
-    "Pd": 1.50,
-    "Pm": 1.80,
-    "Po": 1.68,
-    "Pr": 1.82,
-    "Pt": 1.50,
-    "Pu": 1.53,
-    "Ra": 1.90,
-    "Rb": 1.47,
-    "Re": 1.35,
-    "Rh": 1.45,
-    "Ru": 1.40,
-    "S": 1.02,
-    "Sb": 1.46,
-    "Sc": 1.44,
-    "Se": 1.22,
-    "Si": 1.20,
-    "Sm": 1.80,
-    "Sn": 1.46,
-    "Sr": 1.12,
-    "Ta": 1.43,
-    "Tb": 1.76,
-    "Tc": 1.35,
-    "Te": 1.47,
-    "Th": 1.79,
-    "Ti": 1.47,
-    "Tl": 1.55,
-    "Tm": 1.72,
-    "U": 1.58,
-    "V": 1.33,
-    "W": 1.37,
-    "Y": 1.78,
-    "Yb": 1.94,
-    "Zn": 1.45,
-    "Zr": 1.56,
-}
-
-DEFAULT_CPK_COLORS: Dict[str, str] = {
-    "Ar": "cyan",
-    "B": "salmon",
-    "Ba": "darkgreen",
-    "Be": "darkgreen",
-    "Br": "darkred",
-    "C": "black",
-    "Ca": "darkgreen",
-    "Cl": "green",
-    "Cs": "violet",
-    "F": "green",
-    "Fe": "darkorange",
-    "Fr": "violet",
-    "H": "white",
-    "He": "cyan",
-    "I": "darkviolet",
-    "K": "violet",
-    "Kr": "cyan",
-    "Li": "violet",
-    "Mg": "darkgreen",
-    "N": "blue",
-    "Na": "violet",
-    "Ne": "cyan",
-    "O": "red",
-    "P": "orange",
-    "Ra": "darkgreen",
-    "Rb": "violet",
-    "S": "yellow",
-    "Sr": "darkgreen",
-    "Ti": "gray",
-    "Xe": "cyan",
-}
 
 
 class PlotConfig(TypedDict, total=False):
@@ -270,8 +157,8 @@ class MolGraph:
     indices: List[int] = field(default_factory=list)
 
     # Customizable parameters with defaults
-    default_radii: Dict[str, float] = field(default_factory=lambda: dict(DEFAULT_RADII))
-    cpk_colors: Dict[str, str] = field(default_factory=lambda: dict(DEFAULT_CPK_COLORS))
+    default_radii: Dict[str, float] = field(default_factory=lambda: dict(_DEFAULT_RADII))
+    cpk_colors: Dict[str, str] = field(default_factory=lambda: dict(_DEFAULT_CPK_COLORS))
     cpk_color_rest: str = field(default="pink")
 
     def set_element_radius(self, element: str, radius: float) -> None:
@@ -646,129 +533,65 @@ class MolGraph:
             name="bonds",
         )
 
-    def _create_annotations(
-        self,
-        plot_config: PlotConfig,
-        atom_label_type: Optional[str] = None,
-        show_distances: bool = False,
-    ) -> List[dict]:
-        """Create annotations for atom and bond labels in the molecular plot.
+    def _create_atom_labels(self, plot_config: PlotConfig) -> MolecularLabelManager:
+        """Creates atom labels for the molecule."""
+        labels = MolecularLabelManager()
 
-        Creates Plotly annotation dictionaries for displaying atom labels (either element
-        symbols or indices) and/or bond length labels. The annotations are positioned above
-        each atom or bond with configurable vertical offset.
+        for i, (element, (x, y, z)) in enumerate(self):
+            position = Point3D(x=x, y=y, z=z)
 
-        Args:
-            plot_config (PlotConfig): Plot configuration dictionary containing visual
-                parameters like label offsets and colors.
-            atom_label_type (Optional[str]): Type of atom labels to show. Must be one of:
-                None, "element", or "index". None means no atom labels.
-            show_distances (bool): Whether to show bond length labels centered on each bond.
-
-        Returns:
-            List[dict]: List of Plotly annotation dictionaries containing text, position,
-                and style information for atom and bond labels.
-
-        Raises:
-            ValueError: If atom_label_type is not one of: None, "element", or "index".
-        """
-        labels = []
-
-        if atom_label_type is not None:
-            if atom_label_type not in ("element", "index"):
-                raise ValueError('atom_label_type must be None, "element", or "index"')
-
-            for idx, (element, (x, y, z)) in enumerate(self):
-                text = element if atom_label_type == "element" else str(idx)
-                labels.append(
-                    dict(
-                        text=text,
-                        x=x,
-                        y=y,
-                        z=z,
-                        showarrow=False,
-                        yshift=plot_config["label_offset"],
-                    )
+            # Add element label
+            labels.add_label(
+                AtomLabel.from_atom(
+                    atom_index=i,
+                    element=element,
+                    position=position,
+                    label_type=LabelType.ATOM_ELEMENT,
+                    offset=plot_config["label_offset"],
                 )
+            )
 
-        if show_distances:
-            for (i, j), length in self.bond_lengths.items():
-                labels.append(
-                    dict(
-                        text=f"{length:.2f}",
-                        x=(self.x[i] + self.x[j]) / 2,
-                        y=(self.y[i] + self.y[j]) / 2,
-                        z=(self.z[i] + self.z[j]) / 2,
-                        showarrow=False,
-                        yshift=plot_config["label_offset"],
-                        font=dict(color=plot_config["bond_label_color"]),
-                    )
+            # Add index label
+            labels.add_label(
+                AtomLabel.from_atom(
+                    atom_index=i,
+                    element=element,
+                    position=position,
+                    label_type=LabelType.ATOM_INDEX,
+                    offset=plot_config["label_offset"],
                 )
+            )
 
         return labels
 
-    def _create_menu_buttons(self, plot_config: PlotConfig) -> List[dict]:
-        """Creates menu buttons for toggling different label displays."""
-        return [
-            dict(
-                label="Elements",
-                method="relayout",
-                args=[
-                    {
-                        "scene.annotations": self._create_annotations(
-                            plot_config, atom_label_type="element"
-                        )
-                    }
-                ],
-            ),
-            dict(
-                label="Elements & Distances",
-                method="relayout",
-                args=[
-                    {
-                        "scene.annotations": self._create_annotations(
-                            plot_config,
-                            atom_label_type="element",
-                            show_distances=True,
-                        )
-                    }
-                ],
-            ),
-            dict(
-                label="IDs",
-                method="relayout",
-                args=[
-                    {
-                        "scene.annotations": self._create_annotations(
-                            plot_config, atom_label_type="index"
-                        )
-                    }
-                ],
-            ),
-            dict(
-                label="IDs & Distances",
-                method="relayout",
-                args=[
-                    {
-                        "scene.annotations": self._create_annotations(
-                            plot_config, atom_label_type="index", show_distances=True
-                        )
-                    }
-                ],
-            ),
-            dict(
-                label="Distances",
-                method="relayout",
-                args=[
-                    {
-                        "scene.annotations": self._create_annotations(
-                            plot_config, show_distances=True
-                        )
-                    }
-                ],
-            ),
-            dict(label="Clear", method="relayout", args=[{"scene.annotations": []}]),
-        ]
+    def _create_bond_labels(self, plot_config: PlotConfig) -> MolecularLabelManager:
+        """Creates bond labels for the molecule.
+
+        Args:
+            plot_config: Configuration dictionary for plot visualization
+
+        Returns:
+            MolecularLabelManager: Manager containing bond labels
+        """
+        labels = MolecularLabelManager()
+
+        for (i, j), length in self.bond_lengths.items():
+            pos1 = Point3D(x=self.x[i], y=self.y[i], z=self.z[i])
+            pos2 = Point3D(x=self.x[j], y=self.y[j], z=self.z[j])
+
+            labels.add_label(
+                BondLabel.from_bond(
+                    atom1_index=i,
+                    atom2_index=j,
+                    atom1_pos=pos1,
+                    atom2_pos=pos2,
+                    bond_length=length,
+                    color=plot_config["bond_label_color"],
+                    offset=plot_config["label_offset"],
+                )
+            )
+
+        return labels
 
     def to_plotly(
         self,
@@ -830,11 +653,22 @@ class MolGraph:
         if config:
             plot_config.update(config)
 
+        # Create separate label managers
+        atom_labels = self._create_atom_labels(plot_config)
+        bond_labels = self._create_bond_labels(plot_config)
+
+        # Merge labels into a single manager
+        combined_labels = MolecularLabelManager()
+        for label in atom_labels._labels + bond_labels._labels:
+            combined_labels.add_label(label)
+
         # Create figure
-        data = [
-            self._create_atom_trace(plot_config),
-            self._create_bond_trace(plot_config),
-        ]
+        fig = go.Figure(
+            data=[self._create_atom_trace(plot_config), self._create_bond_trace(plot_config)]
+        )
+
+        # Update figure with combined labels and toggle buttons
+        combined_labels.update_figure_menu(fig)
 
         # Configure axis parameters
         axis_params = dict(
@@ -846,6 +680,26 @@ class MolGraph:
             showspikes=False,
         )
 
+        watermark_text = (
+            "created with "
+            '<a href="https://zotko.github.io/xyz2graph/" '
+            'style="color:#404040;">xyz2graph</a>'
+        )
+
+        watermark = dict(
+            text=watermark_text,
+            xref="paper",
+            yref="paper",
+            x=0.99,
+            y=0.01,
+            showarrow=False,
+            font=dict(size=10, color="gray"),
+            xanchor="right",
+            yanchor="bottom",
+        )
+
+        fig.add_annotation(watermark)
+
         # Build layout
         layout = dict(
             title=title,
@@ -853,23 +707,14 @@ class MolGraph:
                 xaxis=axis_params,
                 yaxis=axis_params,
                 zaxis=axis_params,
-                annotations=self._create_annotations(plot_config, atom_label_type="element"),
             ),
             margin=dict(r=0, l=0, b=0, t=0 if not title else 40),
             showlegend=False,
-            updatemenus=[
-                dict(
-                    buttons=self._create_menu_buttons(plot_config),
-                    direction="down",
-                    xanchor="left",
-                    yanchor="top",
-                    pad=dict(r=10, t=10),
-                )
-            ],
         )
+        fig.update_layout(layout)
 
         logger.debug("Plotly figure created successfully")
-        return go.Figure(data=data, layout=layout)
+        return fig
 
     def to_networkx(self) -> nx.Graph:
         """Convert the current graph representation to a NetworkX graph.
