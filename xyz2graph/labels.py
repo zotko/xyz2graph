@@ -1,62 +1,62 @@
 """Manage and visualize molecular structure labels using Plotly.
 
-This module defines classes and functions for managing and visualizing molecular
-structure labels using Plotly.
+This module provides classes and functions for managing and visualizing molecular structure
+labels in Plotly visualizations.
 
 Classes:
-    LabelType(Enum): Enum defining different types of molecular labels.
-
-    BaseLabel(ABC): Abstract base class for structure labels.
-
-Methods:
-            to_plotly_annotation: Convert label to Plotly annotation format.
-            get_label_type: Return the type of label.
-
-    AtomLabel(BaseLabel): Class representing atom labels in molecular structure.
-
-Methods:
-            from_atom: Create an atom label from atom data.
-            to_plotly_annotation: Convert label to Plotly annotation format.
-            get_label_type: Return the type of label.
-
-    BondLabel(BaseLabel): Class representing bond labels in molecular structure.
-
-Methods:
-            from_bond: Create a bond label from bond data.
-            to_plotly_annotation: Convert label to Plotly annotation format.
-            get_label_type: Return the type of label.
-
-    PlotlyButtonFactory: Factory class for creating Plotly button configurations.
-
-Methods:
-            create_toggle_button: Create a single toggle button configuration.
-
+    LabelType: Enum defining different types of molecular labels.
+    BaseLabel: Abstract base class for structure labels.
+    AtomLabel: Class representing atom labels in molecular structures.
+    BondLabel: Class representing bond labels in molecular structures.
+    ButtonFactory: Factory class for creating Plotly button configurations.
     MolecularLabelManager: Manager class for molecular structure labels.
-
-Methods:
-            add_label: Add a new label.
-            clear: Remove all labels.
-            get_labels_by_type: Get labels of a specific type.
-            to_plotly_annotations: Convert all labels to Plotly annotation format.
-            create_toggle_buttons: Create Plotly buttons for toggling label visibility in groups.
-            update_figure_menu: Update figure layout with grouped toggle buttons
-                and initial annotations.
-
-        Private Methods:
-            _get_label_indices_by_type: Get indices of labels of a specific type.
 """
 
 from abc import ABC, abstractmethod
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple, Type, TypedDict
 
 import plotly.graph_objects as go
 
 from .geometry import Point3D
 
 
+# Default layout configuration for buttons and annotations
+class _CommonLayout(TypedDict):
+    button_x: float
+    text_x: float
+
+
+class _LabelGroupLayout(TypedDict):
+    button_y: float
+    text_y: float
+    title: str
+
+
+class _LayoutConfig(TypedDict):
+    atom_labels: _LabelGroupLayout
+    bond_lengths: _LabelGroupLayout
+    common: _CommonLayout
+
+
+LAYOUT: _LayoutConfig = {
+    "atom_labels": {"button_y": 1.12, "text_y": 1.1, "title": "Atom Labels"},
+    "bond_lengths": {"button_y": 1.065, "text_y": 1.045, "title": "Bond Lengths"},
+    "common": {
+        "button_x": 0.07,
+        "text_x": 0,
+    },
+}
+
+
 class LabelType(Enum):
-    """Enum defining different types of molecular labels."""
+    """Enum defining different types of molecular labels.
+
+    Members:
+        ATOM_ELEMENT: Label showing atomic element symbol
+        ATOM_INDEX: Label showing atom index
+        BOND_LENGTH: Label showing bond length
+    """
 
     ATOM_ELEMENT = auto()
     ATOM_INDEX = auto()
@@ -67,37 +67,37 @@ class BaseLabel(ABC):
     """Abstract base class for structure labels.
 
     Attributes:
-        position (Point3D): The 3D position of the label.
-        text (str): The text content of the label.
-        color (Optional[str]): The color of the label text. Defaults to None.
-        offset (int): The offset for the label position. Defaults to 15.
-
-    Methods:
-        to_plotly_annotation() -> Dict[str, Any]:
-            Convert the label to Plotly annotation format.
-
-        get_label_type() -> LabelType:
-            Return the type of label. This method must be implemented by subclasses.
+        position: 3D coordinates where the label should be placed
+        text: Content to be displayed in the label
+        color: Optional color for the label text
+        offset: Vertical offset from the label position in pixels
     """
 
     def __init__(
         self, position: Point3D, text: str, color: Optional[str] = None, offset: int = 15
     ) -> None:
-        """Initialize the BaseLabel.
+        """Initialize a base label.
 
         Args:
-            position (Point3D): The 3D position of the label.
-            text (str): The text content of the label.
-            color (Optional[str], optional): The color of the label text. Defaults to None.
-            offset (int, optional): The offset for the label position. Defaults to 15.
+            position: 3D coordinates where the label should be placed
+            text: Content to be displayed in the label
+            color: Optional color for the label text. Defaults to None.
+            offset: Vertical offset from the label position in pixels. Defaults to 15.
         """
         self.position = position
         self.text = text
         self.color = color
         self.offset = offset
 
-    def to_plotly_annotation(self) -> Dict[str, Any]:
-        """Convert label to Plotly annotation format."""
+    def to_plotly_annotation(self, visible: bool = False) -> Dict[str, Any]:
+        """Convert the label to a Plotly annotation dictionary.
+
+        Args:
+            visible: Whether the annotation should be visible. Defaults to False.
+
+        Returns:
+            Dictionary containing Plotly annotation parameters
+        """
         return {
             "text": self.text,
             "x": self.position.x,
@@ -105,17 +105,22 @@ class BaseLabel(ABC):
             "z": self.position.z,
             "showarrow": False,
             "yshift": self.offset,
+            "visible": visible,
             **({"font": {"color": self.color}} if self.color else {}),
         }
 
     @abstractmethod
     def get_label_type(self) -> LabelType:
-        """Return the type of label."""
+        """Return the type of this label.
+
+        Returns:
+            LabelType indicating the category of this label
+        """
         pass
 
 
 class AtomLabel(BaseLabel):
-    """Class representing atom labels in molecular structure."""
+    """Class representing atom labels in molecular structures."""
 
     def __init__(
         self,
@@ -127,16 +132,16 @@ class AtomLabel(BaseLabel):
         color: Optional[str] = None,
         offset: int = 15,
     ) -> None:
-        """Initialize the AtomLabel.
+        """Initialize an atom label.
 
         Args:
-            position (Point3D): The 3D position of the label.
-            text (str): The text content of the label.
-            atom_index (int): The index of the atom.
-            element (str): The chemical element symbol.
-            label_type (LabelType): The type of atom label.
-            color (Optional[str], optional): The color of the label text. Defaults to None.
-            offset (int, optional): The offset for the label position. Defaults to 15.
+            position: 3D coordinates where the label should be placed
+            text: Content to be displayed in the label
+            atom_index: Index of the atom being labeled
+            element: Chemical element symbol of the atom
+            label_type: Type of atom label (element symbol or index)
+            color: Optional color for the label text. Defaults to None.
+            offset: Vertical offset from the label position in pixels. Defaults to 15.
         """
         super().__init__(position, text, color, offset)
         self.atom_index = atom_index
@@ -144,7 +149,11 @@ class AtomLabel(BaseLabel):
         self._label_type = label_type
 
     def get_label_type(self) -> LabelType:
-        """Return the type of label for this atom."""
+        """Return the type of this atom label.
+
+        Returns:
+            LabelType.ATOM_ELEMENT or LabelType.ATOM_INDEX
+        """
         return self._label_type
 
     @classmethod
@@ -154,9 +163,22 @@ class AtomLabel(BaseLabel):
         element: str,
         position: Point3D,
         label_type: LabelType,
+        color: Optional[str] = None,
         offset: int = 15,
     ) -> "AtomLabel":
-        """Create an atom label from atom data."""
+        """Create an atom label from atom data.
+
+        Args:
+            atom_index: Index of the atom being labeled
+            element: Chemical element symbol of the atom
+            position: 3D coordinates where the label should be placed
+            label_type: Type of atom label (element symbol or index)
+            color: Optional color for the label text. Defaults to None.
+            offset: Vertical offset from the label position in pixels. Defaults to 15.
+
+        Returns:
+            New AtomLabel instance
+        """
         text = str(atom_index) if label_type == LabelType.ATOM_INDEX else element
         return cls(
             position=position,
@@ -164,12 +186,13 @@ class AtomLabel(BaseLabel):
             atom_index=atom_index,
             element=element,
             label_type=label_type,
+            color=color,
             offset=offset,
         )
 
 
 class BondLabel(BaseLabel):
-    """Class representing bond labels in molecular structure."""
+    """Class representing bond labels in molecular structures."""
 
     def __init__(
         self,
@@ -177,18 +200,18 @@ class BondLabel(BaseLabel):
         bond_length: float,
         atom1_index: int,
         atom2_index: int,
-        color: str = "steelblue",
+        color: Optional[str] = None,
         offset: int = 15,
     ) -> None:
-        """Initialize the BondLabel.
+        """Initialize a bond label.
 
         Args:
-            position (Point3D): The 3D position of the label.
-            bond_length (float): The length of the bond.
-            atom1_index (int): The index of the first atom.
-            atom2_index (int): The index of the second atom.
-            color (str, optional): The color of the label text. Defaults to "steelblue".
-            offset (int, optional): The offset for the label position. Defaults to 15.
+            position: 3D coordinates where the label should be placed
+            bond_length: Length of the bond in Angstroms
+            atom1_index: Index of the first atom in the bond
+            atom2_index: Index of the second atom in the bond
+            color: Optional color for the label text. Defaults to None.
+            offset: Vertical offset from the label position in pixels. Defaults to 15.
         """
         super().__init__(position, f"{bond_length:.2f}", color, offset)
         self.atom1_index = atom1_index
@@ -196,7 +219,11 @@ class BondLabel(BaseLabel):
         self.bond_length = bond_length
 
     def get_label_type(self) -> LabelType:
-        """Return the type of label for this bond."""
+        """Return the type of this bond label.
+
+        Returns:
+            LabelType.BOND_LENGTH
+        """
         return LabelType.BOND_LENGTH
 
     @classmethod
@@ -207,10 +234,23 @@ class BondLabel(BaseLabel):
         atom1_pos: Point3D,
         atom2_pos: Point3D,
         bond_length: float,
-        color: str = "steelblue",
+        color: Optional[str] = None,
         offset: int = 15,
     ) -> "BondLabel":
-        """Create a bond label from bond data."""
+        """Create a bond label from bond data.
+
+        Args:
+            atom1_index: Index of the first atom in the bond
+            atom2_index: Index of the second atom in the bond
+            atom1_pos: 3D coordinates of the first atom
+            atom2_pos: 3D coordinates of the second atom
+            bond_length: Length of the bond in Angstroms
+            color: Optional color for the label text. Defaults to None.
+            offset: Vertical offset from the label position in pixels. Defaults to 15.
+
+        Returns:
+            New BondLabel instance
+        """
         position = Point3D.midpoint(atom1_pos, atom2_pos)
         return cls(
             position=position,
@@ -222,14 +262,23 @@ class BondLabel(BaseLabel):
         )
 
 
-class PlotlyButtonFactory:
+class ButtonFactory:
     """Factory class for creating Plotly button configurations."""
 
     @staticmethod
     def create_toggle_button(
         label: str, visible_indices: List[int], all_indices: List[int]
     ) -> Dict[str, Any]:
-        """Create a single toggle button configuration."""
+        """Create a single toggle button configuration.
+
+        Args:
+            label: Text to display on the button
+            visible_indices: Indices of annotations to make visible
+            all_indices: All possible annotation indices in the figure
+
+        Returns:
+            Dictionary containing Plotly button configuration
+        """
         return {
             "label": label,
             "method": "update",
@@ -246,132 +295,164 @@ class PlotlyButtonFactory:
 
 
 class MolecularLabelManager:
-    """Manager class for molecular structure labels with improved organization."""
+    """Manager class for molecular structure labels.
+
+    Handles creation, organization, and visualization of molecular structure labels in Plotly
+    figures. Supports atom labels (element symbols and indices) and bond length labels with
+    toggle buttons for controlling visibility.
+    """
 
     def __init__(self) -> None:
-        """Initialize an empty MolecularLabelManager."""
+        """Initialize an empty label manager."""
         self._labels: List[BaseLabel] = []
 
     def add_label(self, label: BaseLabel) -> None:
-        """Add a new label."""
+        """Add a new label to the manager.
+
+        Args:
+            label: BaseLabel instance to add
+        """
         self._labels.append(label)
 
     def clear(self) -> None:
-        """Remove all labels."""
+        """Remove all labels from the manager."""
         self._labels.clear()
 
     def get_labels_by_type(self, label_type: LabelType) -> List[BaseLabel]:
-        """Get labels of a specific type."""
+        """Get all labels of a specific type.
+
+        Args:
+            label_type: Type of labels to retrieve
+
+        Returns:
+            List of labels matching the specified type
+        """
         return [label for label in self._labels if label.get_label_type() == label_type]
 
-    def to_plotly_annotations(self) -> List[Dict[str, Any]]:
-        """Convert all labels to Plotly annotation format."""
-        return [label.to_plotly_annotation() for label in self._labels]
+    def to_plotly_annotations(self, visible: bool = False) -> List[Dict[str, Any]]:
+        """Convert all labels to Plotly annotation format.
+
+        Args:
+            visible: Whether the annotations should be visible. Defaults to False.
+
+        Returns:
+            List of Plotly annotation dictionaries
+        """
+        return [label.to_plotly_annotation(visible=visible) for label in self._labels]
 
     def _get_label_indices_by_type(self, label_type: LabelType) -> List[int]:
-        """Get indices of labels of a specific type."""
+        """Get indices of all labels of a specific type.
+
+        Args:
+            label_type: Type of labels to find
+
+        Returns:
+            List of indices where labels match the specified type
+        """
         return [i for i, label in enumerate(self._labels) if label.get_label_type() == label_type]
 
-    def create_toggle_buttons(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-        """Create Plotly buttons for toggling label visibility in groups."""
-        element_indices = self._get_label_indices_by_type(LabelType.ATOM_ELEMENT)
-        index_indices = self._get_label_indices_by_type(LabelType.ATOM_INDEX)
-        bond_indices = self._get_label_indices_by_type(LabelType.BOND_LENGTH)
+    def create_buttons(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """Create Plotly buttons for toggling label visibility.
+
+        Returns:
+            Tuple containing:
+                - List of button group configurations
+                - List of group title annotations
+        """
+
+        def create_button_group(
+            y_position: float, buttons_config: List[Dict[str, Any]], active_index: int = 0
+        ) -> Dict[str, Any]:
+            """Helper function to create a button group configuration."""
+            return {
+                "buttons": buttons_config,
+                "direction": "right",
+                "pad": {"r": 10, "t": 10},
+                "showactive": True,
+                "active": active_index,
+                "x": LAYOUT["common"]["button_x"],
+                "y": y_position,
+                "xanchor": "left",
+                "yanchor": "top",
+                "type": "buttons",
+            }
+
+        def create_group_annotation(title: str, y_position: float) -> Dict[str, Any]:
+            """Helper function to create a group annotation."""
+            return {
+                "text": title,
+                "x": LAYOUT["common"]["text_x"],
+                "xref": "paper",
+                "y": y_position,
+                "yref": "paper",
+                "align": "left",
+                "showarrow": False,
+            }
 
         buttons = []
         annotations = []
 
-        # Configuration constants
-        BUTTON_LAYERS = {"distances": 1.12, "atoms": 1.065}
+        # Handle Atom Labels
+        element_indices = self._get_label_indices_by_type(LabelType.ATOM_ELEMENT)
+        index_indices = self._get_label_indices_by_type(LabelType.ATOM_INDEX)
 
-        # Create Bond Lengths buttons
-        if bond_indices:
-            buttons.append(
-                {
-                    "buttons": [
-                        PlotlyButtonFactory.create_toggle_button(
-                            "Show" if idx == 0 else "Hide",
-                            bond_indices if idx == 0 else [],
-                            bond_indices,
-                        )
-                        for idx in range(2)
-                    ],
-                    "direction": "right",
-                    "pad": {"r": 10, "t": 10},
-                    "showactive": True,
-                    "active": 1,
-                    "x": 0.07,
-                    "y": BUTTON_LAYERS["distances"],
-                    "xanchor": "left",
-                    "yanchor": "top",
-                    "type": "buttons",
-                }
-            )
-
-            annotations.append(
-                {
-                    "text": "Bond Lengths",
-                    "x": 0,
-                    "xref": "paper",
-                    "y": 1.1,
-                    "yref": "paper",
-                    "align": "left",
-                    "showarrow": False,
-                }
-            )
-
-        # Create Atom Labels buttons
         if element_indices and index_indices:
             all_atom_indices = element_indices + index_indices
+            atom_buttons = [
+                ButtonFactory.create_toggle_button("Element", element_indices, all_atom_indices),
+                ButtonFactory.create_toggle_button("ID", index_indices, all_atom_indices),
+                ButtonFactory.create_toggle_button("Hide", [], all_atom_indices),
+            ]
+
             buttons.append(
-                {
-                    "buttons": [
-                        PlotlyButtonFactory.create_toggle_button(
-                            "Element", element_indices, all_atom_indices
-                        ),
-                        PlotlyButtonFactory.create_toggle_button(
-                            "ID", index_indices, all_atom_indices
-                        ),
-                        PlotlyButtonFactory.create_toggle_button("Hide", [], all_atom_indices),
-                    ],
-                    "direction": "right",
-                    "pad": {"r": 10, "t": 10},
-                    "showactive": True,
-                    "x": 0.07,
-                    "y": BUTTON_LAYERS["atoms"],
-                    "xanchor": "left",
-                    "yanchor": "top",
-                    "type": "buttons",
-                }
+                create_button_group(LAYOUT["atom_labels"]["button_y"], atom_buttons, active_index=2)
             )
 
             annotations.append(
-                {
-                    "text": "Atom Labels",
-                    "x": 0,
-                    "xref": "paper",
-                    "y": 1.045,
-                    "yref": "paper",
-                    "align": "left",
-                    "showarrow": False,
-                }
+                create_group_annotation(
+                    LAYOUT["atom_labels"]["title"], LAYOUT["atom_labels"]["text_y"]
+                )
+            )
+
+        # Handle Bond Lengths
+        bond_indices = self._get_label_indices_by_type(LabelType.BOND_LENGTH)
+
+        if bond_indices:
+            bond_buttons = [
+                ButtonFactory.create_toggle_button("Show", bond_indices, bond_indices),
+                ButtonFactory.create_toggle_button("Hide", [], bond_indices),
+            ]
+
+            buttons.append(
+                create_button_group(
+                    LAYOUT["bond_lengths"]["button_y"],
+                    bond_buttons,
+                    active_index=1,
+                )
+            )
+
+            annotations.append(
+                create_group_annotation(
+                    LAYOUT["bond_lengths"]["title"], LAYOUT["bond_lengths"]["text_y"]
+                )
             )
 
         return buttons, annotations
 
     def update_figure_menu(self, fig: go.Figure) -> None:
-        """Update figure layout with grouped toggle buttons and initial annotations."""
-        annotations = self.to_plotly_annotations()
+        """Update figure layout with toggle buttons and initial annotations.
 
-        # Set initial visibility
-        for i, label in enumerate(self._labels):
-            annotations[i]["visible"] = (
-                isinstance(label, AtomLabel) and label.get_label_type() == LabelType.ATOM_ELEMENT
-            )
+        Sets initial visibility of labels (atom elements visible by default) and adds
+        button groups for controlling label visibility.
+
+        Args:
+            fig: Plotly figure to update
+        """
+        annotations = self.to_plotly_annotations(visible=False)
 
         fig.update_layout(scene=dict(annotations=annotations))
 
         # Add button groups and their annotations
-        button_groups, group_annotations = self.create_toggle_buttons()
+        button_groups, group_annotations = self.create_buttons()
         if button_groups:
             fig.update_layout(updatemenus=button_groups, annotations=group_annotations)
