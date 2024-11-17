@@ -14,7 +14,6 @@ Attributes:
             atom_border_width: Width of atom marker borders in pixels. Default is 2.
             bond_color: Color string for bonds between atoms. Default is "grey".
             bond_width: Width of bond lines in pixels. Default is 2.
-            show_grid: Whether to display the plot grid. Default is False.
             label_offset: Vertical offset for labels in pixels. Default is 15.
             bond_label_color: Color string for bond length labels. Default is "steelblue".
 
@@ -70,10 +69,12 @@ import numpy as np
 import plotly.graph_objs as go
 from numpy.typing import NDArray
 
+from .buttons import ButtonFactory
 from .constants import _DEFAULT_CPK_COLORS, _DEFAULT_RADII
 from .geometry import Point3D
-from .labels import AtomLabel, BondLabel, LabelType, MolecularLabelManager
+from .labels import AtomLabel, BondLabel, LabelManager, LabelType
 from .logging import logger
+from .objects import AtomObject, BondObject, TraceManager
 
 
 class PlotConfig(TypedDict, total=False):
@@ -86,7 +87,6 @@ class PlotConfig(TypedDict, total=False):
         atom_border_width: Width of atom marker borders in pixels. Default is 2.
         bond_color: Color string for bonds between atoms. Default is "grey".
         bond_width: Width of bond lines in pixels. Default is 2.
-        show_grid: Whether to display the plot grid. Default is False.
         label_offset: Vertical offset for labels in pixels. Default is 15.
         bond_label_color: Color string for bond length labels. Default is "steelblue".
     """
@@ -97,7 +97,6 @@ class PlotConfig(TypedDict, total=False):
     atom_border_width: int
     bond_color: str
     bond_width: int
-    show_grid: bool
     label_offset: int
     bond_label_color: str
 
@@ -109,9 +108,8 @@ DEFAULT_PLOT_CONFIG: PlotConfig = {
     "atom_border_width": 2,
     "bond_color": "grey",
     "bond_width": 2,
-    "show_grid": False,
     "label_offset": 15,
-    "bond_label_color": "steelblue",
+    "bond_label_color": "black",
 }
 
 
@@ -485,57 +483,56 @@ class MolGraph:
             raise
 
     def _create_atom_trace(self, plot_config: PlotConfig) -> go.Scatter3d:
-        """Creates a Plotly trace for atoms in the molecule."""
-        colors = [self.cpk_colors.get(element, self.cpk_color_rest) for element in self.elements]
+        """Creates a Plotly trace for atoms in the molecule using AtomTrace.
 
-        hover_text = [
-            f"{i}. {elem} ({x:.2f}, {y:.2f}, {z:.2f})"
-            for i, (elem, x, y, z) in enumerate(zip(self.elements, self.x, self.y, self.z))
-        ]
+        Args:
+            plot_config: Configuration dictionary for plot visualization
 
-        return go.Scatter3d(
-            x=self.x,
-            y=self.y,
-            z=self.z,
-            mode="markers",
-            marker=dict(
-                color=colors,
-                line=dict(
-                    color=plot_config["atom_border_color"],
-                    width=plot_config["atom_border_width"],
-                ),
-                size=plot_config["atom_size"],
-                opacity=plot_config["atom_opacity"],
-                symbol="circle",
-            ),
-            text=self.elements,
-            hovertext=hover_text,
-            hoverinfo="text",
-            name="atoms",
+        Returns:
+            go.Scatter3d: Plotly trace for atom visualization
+        """
+        # Convert atom positions to Point3D objects
+        positions = [Point3D(x=x, y=y, z=z) for x, y, z in zip(self.x, self.y, self.z)]
+
+        # Create AtomTrace instance
+        atom_trace = AtomObject(
+            position=positions,
+            elements=self.elements,
+            cpk_colors=self.cpk_colors,
+            default_color=self.cpk_color_rest,
+            size=plot_config["atom_size"],
+            opacity=plot_config["atom_opacity"],
+            border_color=plot_config["atom_border_color"],
+            border_width=plot_config["atom_border_width"],
         )
+
+        return atom_trace
 
     def _create_bond_trace(self, plot_config: PlotConfig) -> go.Scatter3d:
-        """Creates a Plotly trace for bonds in the molecule."""
-        # Create line segments for each bond (use None to separate segments)
-        xs, ys, zs = [], [], []
-        for i, j in self.edges():
-            xs.extend([self.x[i], self.x[j], None])
-            ys.extend([self.y[i], self.y[j], None])
-            zs.extend([self.z[i], self.z[j], None])
+        """Creates a Plotly trace for bonds in the molecule using BondTrace.
 
-        return go.Scatter3d(
-            x=xs,
-            y=ys,
-            z=zs,
-            mode="lines",
-            line=dict(color=plot_config["bond_color"], width=plot_config["bond_width"]),
-            hoverinfo="none",
-            name="bonds",
+        Args:
+            plot_config: Configuration dictionary for plot visualization
+
+        Returns:
+            go.Scatter3d: Plotly trace for bond visualization
+        """
+        # Convert atom positions to Point3D objects
+        positions = [Point3D(x=x, y=y, z=z) for x, y, z in zip(self.x, self.y, self.z)]
+
+        # Create BondTrace instance
+        bond_trace = BondObject(
+            position=positions,
+            adjacency_list=self.adj_list,
+            color=plot_config["bond_color"],
+            width=plot_config["bond_width"],
         )
 
-    def _create_atom_labels(self, plot_config: PlotConfig) -> MolecularLabelManager:
+        return bond_trace
+
+    def _create_atom_labels(self, plot_config: PlotConfig) -> LabelManager:
         """Creates atom labels for the molecule."""
-        labels = MolecularLabelManager()
+        labels = LabelManager()
 
         for i, (element, (x, y, z)) in enumerate(self):
             position = Point3D(x=x, y=y, z=z)
@@ -564,7 +561,7 @@ class MolGraph:
 
         return labels
 
-    def _create_bond_labels(self, plot_config: PlotConfig) -> MolecularLabelManager:
+    def _create_bond_labels(self, plot_config: PlotConfig) -> LabelManager:
         """Creates bond labels for the molecule.
 
         Args:
@@ -573,7 +570,7 @@ class MolGraph:
         Returns:
             MolecularLabelManager: Manager containing bond labels
         """
-        labels = MolecularLabelManager()
+        labels = LabelManager()
 
         for (i, j), length in self.bond_lengths.items():
             pos1 = Point3D(x=self.x[i], y=self.y[i], z=self.z[i])
@@ -598,51 +595,7 @@ class MolGraph:
         config: Optional[PlotConfig] = None,
         title: Optional[str] = None,
     ) -> go.Figure:
-        """Creates an interactive 3D visualization of the molecular structure.
-
-        Generates a Plotly figure displaying atoms as spheres and bonds as lines, with
-        configurable visual properties and interactive features for exploring the molecule's
-        geometry.
-
-        Args:
-            config (Optional[PlotConfig]): Dictionary of visualization settings:
-
-                - atom_size (int): Size of atom markers (default: 7)
-                - atom_opacity (float): Opacity of atoms from 0.0-1.0 (default: 0.8)
-                - atom_border_color (str): Color of atom borders (default: "lightgray")
-                - atom_border_width (int): Width of atom borders (default: 2)
-                - bond_color (str): Color of bonds between atoms (default: "grey")
-                - bond_width (int): Width of bond lines (default: 2)
-                - show_grid (bool): Whether to display axis grid (default: False)
-                - label_offset (int): Vertical offset for labels (default: 15)
-                - bond_label_color (str): Color of bond length labels (default: "steelblue")
-
-            title (Optional[str]): Title displayed above visualization (default: None)
-
-        Returns:
-            go.Figure: Plotly figure object containing:
-
-                - 3D scatter plot of atoms colored by element
-                - Line segments representing bonds
-                - Interactive menu for toggling labels:
-
-                    - Element symbols
-                    - Atom indices
-                    - Bond lengths
-                    - Combinations of the above
-
-                - Mouse controls for rotation, zoom, and pan
-
-        Examples:
-            >>> fig = mg.to_plotly(config={
-            ...     "atom_size": 12,
-            ...     "atom_opacity": 0.9,
-            ...     "bond_color": "black",
-            ...     "show_grid": True,
-            ...     "label_offset": 20
-            ... })
-            >>> fig.show()
-        """
+        """Creates an interactive 3D visualization of the molecular structure."""
         logger.debug("Creating Plotly figure")
 
         if not self.elements:
@@ -653,33 +606,43 @@ class MolGraph:
         if config:
             plot_config.update(config)
 
+        # Initialize managers
+        trace_manager = TraceManager()
+
+        # Add atom and bond traces
+        atom_trace = self._create_atom_trace(plot_config)
+        bond_trace = self._create_bond_trace(plot_config)
+        trace_manager.add_trace(atom_trace)
+        trace_manager.add_trace(bond_trace)
+
         # Create separate label managers
         atom_labels = self._create_atom_labels(plot_config)
         bond_labels = self._create_bond_labels(plot_config)
 
         # Merge labels into a single manager
-        combined_labels = MolecularLabelManager()
+        combined_labels = LabelManager()
         for label in atom_labels._labels + bond_labels._labels:
             combined_labels.add_label(label)
 
         # Create figure
-        fig = go.Figure(
-            data=[self._create_atom_trace(plot_config), self._create_bond_trace(plot_config)]
-        )
+        fig = go.Figure()
 
-        # Update figure with combined labels and toggle buttons
-        combined_labels.update_figure_menu(fig)
+        # Add traces and labels to figure
+        trace_manager.update_figure(fig)
+        combined_labels.update_figure(fig)
 
-        # Configure axis parameters
-        axis_params = dict(
-            showgrid=plot_config["show_grid"],
-            showbackground=False,
-            showticklabels=False,
-            zeroline=False,
-            title={"text": ""},  # Hide axis titles
-            showspikes=False,
-        )
+        # Get menu items from both managers
+        trace_buttons, trace_annotations = trace_manager.get_menu_items()
+        label_buttons, label_annotations = combined_labels.get_menu_items()
 
+        # Create background toggle button
+        background_button, background_annotation = ButtonFactory.create_background_toggle()
+
+        # Combine all menu items
+        all_buttons = trace_buttons + label_buttons + [background_button]
+        all_annotations = trace_annotations + label_annotations + [background_annotation]
+
+        # Add watermark
         watermark_text = (
             "created with "
             '<a href="https://zotko.github.io/xyz2graph/" '
@@ -698,7 +661,16 @@ class MolGraph:
             yanchor="bottom",
         )
 
-        fig.add_annotation(watermark)
+        all_annotations.append(watermark)
+
+        # Configure axis parameters
+        axis_params = dict(
+            showbackground=True,
+            showticklabels=False,
+            zeroline=False,
+            title={"text": ""},  # Hide axis titles
+            showspikes=False,
+        )
 
         # Build layout
         layout = dict(
@@ -710,6 +682,8 @@ class MolGraph:
             ),
             margin=dict(r=0, l=0, b=0, t=0 if not title else 40),
             showlegend=False,
+            updatemenus=all_buttons,
+            annotations=all_annotations,
         )
         fig.update_layout(layout)
 

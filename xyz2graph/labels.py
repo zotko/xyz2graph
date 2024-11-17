@@ -9,44 +9,18 @@ Classes:
     AtomLabel: Class representing atom labels in molecular structures.
     BondLabel: Class representing bond labels in molecular structures.
     ButtonFactory: Factory class for creating Plotly button configurations.
-    MolecularLabelManager: Manager class for molecular structure labels.
+    LabelManager: Manager class for molecular structure labels.
 """
 
 from abc import ABC, abstractmethod
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Tuple, Type, TypedDict
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 import plotly.graph_objects as go
 
+from xyz2graph.layout_config import LAYOUT
+
 from .geometry import Point3D
-
-
-# Default layout configuration for buttons and annotations
-class _CommonLayout(TypedDict):
-    button_x: float
-    text_x: float
-
-
-class _LabelGroupLayout(TypedDict):
-    button_y: float
-    text_y: float
-    title: str
-
-
-class _LayoutConfig(TypedDict):
-    atom_labels: _LabelGroupLayout
-    bond_lengths: _LabelGroupLayout
-    common: _CommonLayout
-
-
-LAYOUT: _LayoutConfig = {
-    "atom_labels": {"button_y": 1.12, "text_y": 1.1, "title": "Atom Labels"},
-    "bond_lengths": {"button_y": 1.065, "text_y": 1.045, "title": "Bond Lengths"},
-    "common": {
-        "button_x": 0.07,
-        "text_x": 0,
-    },
-}
 
 
 class LabelType(Enum):
@@ -283,7 +257,7 @@ class ButtonFactory:
             "label": label,
             "method": "update",
             "args": [
-                {},
+                {},  # Empty dict because we're not updating any trace data
                 {
                     **{
                         f"scene.annotations[{i}].visible": (i in visible_indices)
@@ -294,7 +268,7 @@ class ButtonFactory:
         }
 
 
-class MolecularLabelManager:
+class LabelManager:
     """Manager class for molecular structure labels.
 
     Handles creation, organization, and visualization of molecular structure labels in Plotly
@@ -439,20 +413,21 @@ class MolecularLabelManager:
 
         return buttons, annotations
 
-    def update_figure_menu(self, fig: go.Figure) -> None:
-        """Update figure layout with toggle buttons and initial annotations.
-
-        Sets initial visibility of labels (atom elements visible by default) and adds
-        button groups for controlling label visibility.
+    def update_figure(self, fig: go.Figure) -> None:
+        """Add label annotations to figure.
 
         Args:
             fig: Plotly figure to update
         """
         annotations = self.to_plotly_annotations(visible=False)
-
         fig.update_layout(scene=dict(annotations=annotations))
 
-        # Add button groups and their annotations
-        button_groups, group_annotations = self.create_buttons()
-        if button_groups:
-            fig.update_layout(updatemenus=button_groups, annotations=group_annotations)
+    def get_menu_items(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """Get button groups and annotations for label controls.
+
+        Returns:
+            Tuple containing:
+                - List of button group configurations
+                - List of group title annotations
+        """
+        return self.create_buttons()
