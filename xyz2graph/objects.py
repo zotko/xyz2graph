@@ -2,6 +2,7 @@
 
 This module provides classes for managing and visualizing different types of molecular structure
 traces in Plotly visualizations, following a similar pattern to the labels system.
+<<<<<<< HEAD
 
 Classes:
     TraceType: Enum defining different types of molecular traces
@@ -10,11 +11,17 @@ Classes:
     BondTrace: Class for bond visualization
     ButtonFactory: Factory class for creating Plotly button configurations
     TraceManager: Manager class for molecular structure traces
+=======
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
 """
 
 from abc import ABC, abstractmethod
 from enum import Enum, auto
+<<<<<<< HEAD
 from typing import Any, Dict, List, Optional, Set, Tuple
+=======
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Type
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
 
 import plotly.graph_objects as go
 
@@ -23,6 +30,7 @@ from xyz2graph.layout_config import LAYOUT
 from .geometry import Point3D
 
 
+<<<<<<< HEAD
 class ObjectType(Enum):
     """Enum defining different types of molecular traces.
 
@@ -30,6 +38,15 @@ class ObjectType(Enum):
         ATOMS: Spheres representing atoms
         BONDS: Lines representing bonds
     """
+=======
+# Only import types for type checking to avoid circular imports
+if TYPE_CHECKING:
+    from .xyz2graph import MolGraph
+
+
+class ObjectType(Enum):
+    """Enum defining different types of molecular traces."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
 
     ATOMS = auto()
     BONDS = auto()
@@ -41,6 +58,7 @@ class BaseObject(ABC):
     def __init__(
         self, position: List[Point3D], color: Optional[str] = None, visible: bool = True
     ) -> None:
+<<<<<<< HEAD
         """Initialize a base trace.
 
         Args:
@@ -48,40 +66,56 @@ class BaseObject(ABC):
             color: Optional color for the trace
             visible: Whether the trace should be visible initially
         """
+=======
+        """Initialize a base trace."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         self.position = position
         self.color = color
         self.visible = visible
 
     def to_plotly_trace(self) -> go.Scatter3d:
+<<<<<<< HEAD
         """Convert the trace to a Plotly trace object.
 
         Returns:
             Plotly Scatter3d trace
         """
+=======
+        """Convert the trace to a Plotly trace object."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         return self._create_object()
 
     @abstractmethod
     def _create_object(self) -> go.Scatter3d:
+<<<<<<< HEAD
         """Create the specific Plotly trace implementation.
 
         Returns:
             Plotly Scatter3d trace
         """
+=======
+        """Create the specific Plotly trace implementation."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         pass
 
     @abstractmethod
     def get_object_type(self) -> ObjectType:
+<<<<<<< HEAD
         """Return the type of this trace.
 
         Returns:
             TraceType indicating the category of this trace
         """
+=======
+        """Return the type of this trace."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         pass
 
 
 class AtomObject(BaseObject):
     """Class representing atom traces in molecular structures."""
 
+<<<<<<< HEAD
     def __init__(
         self,
         position: List[Point3D],
@@ -127,6 +161,15 @@ class AtomObject(BaseObject):
         Returns:
             New AtomTrace instance
         """
+=======
+    @classmethod
+    def from_mol_graph(
+        cls: Type["AtomObject"],
+        mol_graph: "MolGraph",
+        config: Optional[Dict[str, Any]] = None,
+    ) -> "AtomObject":
+        """Create an atom trace from molecular graph data."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         coordinates = [
             Point3D(x=x, y=y, z=z) for x, y, z in zip(mol_graph.x, mol_graph.y, mol_graph.z)
         ]
@@ -142,6 +185,31 @@ class AtomObject(BaseObject):
             border_width=config.get("atom_border_width", 2) if config else 2,
         )
 
+<<<<<<< HEAD
+=======
+    def __init__(
+        self,
+        position: List[Point3D],
+        elements: List[str],
+        cpk_colors: Dict[str, str],
+        default_color: str = "pink",
+        size: int = 7,
+        opacity: float = 0.8,
+        border_color: str = "lightgray",
+        border_width: int = 2,
+        visible: bool = True,
+    ) -> None:
+        """Initialize an atom trace."""
+        super().__init__(position, None, visible)
+        self.elements = elements
+        self.cpk_colors = cpk_colors
+        self.default_color = default_color
+        self.size = size
+        self.opacity = opacity
+        self.border_color = border_color
+        self.border_width = border_width
+
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
     def _create_object(self) -> go.Scatter3d:
         """Create a Plotly trace for atoms."""
         colors = [self.cpk_colors.get(element, self.default_color) for element in self.elements]
@@ -178,17 +246,22 @@ class AtomObject(BaseObject):
         )
 
     def get_object_type(self) -> ObjectType:
+<<<<<<< HEAD
         """Return the type of this trace.
 
         Returns:
             TraceType.ATOMS
         """
+=======
+        """Return the type of this trace."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         return ObjectType.ATOMS
 
 
 class BondObject(BaseObject):
     """Class representing bond traces in molecular structures."""
 
+<<<<<<< HEAD
     def __init__(
         self,
         position: List[Point3D],
@@ -221,6 +294,15 @@ class BondObject(BaseObject):
         Returns:
             New BondTrace instance
         """
+=======
+    @classmethod
+    def from_mol_graph(
+        cls: Type["BondObject"],
+        mol_graph: "MolGraph",
+        config: Optional[Dict[str, Any]] = None,
+    ) -> "BondObject":
+        """Create a bond trace from molecular graph data."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         coordinates = [
             Point3D(x=x, y=y, z=z) for x, y, z in zip(mol_graph.x, mol_graph.y, mol_graph.z)
         ]
@@ -232,6 +314,22 @@ class BondObject(BaseObject):
             width=config.get("bond_width", 2) if config else 2,
         )
 
+<<<<<<< HEAD
+=======
+    def __init__(
+        self,
+        position: List[Point3D],
+        adjacency_list: Dict[int, Set[int]],
+        color: str = "grey",
+        width: int = 2,
+        visible: bool = True,
+    ) -> None:
+        """Initialize a bond trace."""
+        super().__init__(position, color, visible)
+        self.adjacency_list = adjacency_list
+        self.width = width
+
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
     def _create_object(self) -> go.Scatter3d:
         """Create a Plotly trace for bonds."""
         xs, ys, zs = [], [], []
@@ -267,11 +365,15 @@ class BondObject(BaseObject):
         )
 
     def get_object_type(self) -> ObjectType:
+<<<<<<< HEAD
         """Return the type of this trace.
 
         Returns:
             TraceType.BONDS
         """
+=======
+        """Return the type of this trace."""
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         return ObjectType.BONDS
 
 

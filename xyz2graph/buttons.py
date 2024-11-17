@@ -8,7 +8,11 @@ Classes:
     ButtonFactory: Factory class for creating different types of Plotly button configurations.
 """
 
+<<<<<<< HEAD
 from typing import Any, Dict, List, TypedDict
+=======
+from typing import Any, Dict, List, Tuple, TypedDict
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
 
 from .layout_config import LAYOUT
 
@@ -59,7 +63,11 @@ class ButtonFactory:
         buttons_config: List[Dict[str, Any]],
         active_index: int = 0,
         button_config: ButtonConfig = DEFAULT_BUTTON_CONFIG,
+<<<<<<< HEAD
     ) -> tuple[Dict[str, Any], Dict[str, Any]]:
+=======
+    ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         """Create a button group with title annotation.
 
         Args:
@@ -100,7 +108,11 @@ class ButtonFactory:
         return button_group, title_annotation
 
     @staticmethod
+<<<<<<< HEAD
     def create_background_toggle() -> tuple[Dict[str, Any], Dict[str, Any]]:
+=======
+    def create_background_toggle() -> Tuple[Dict[str, Any], Dict[str, Any]]:
+>>>>>>> 3b9582a (feat: add show/hide toggles for atoms, bonds and background)
         """Create a background visibility toggle button group.
 
         Returns:
