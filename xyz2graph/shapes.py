@@ -17,7 +17,7 @@ from .geometry import Point3D
 
 # Only import types for type checking to avoid circular imports
 if TYPE_CHECKING:
-    from .xyz2graph import MolGraph
+    from .graph import MolGraph
 
 
 class ObjectType(Enum):
@@ -27,7 +27,7 @@ class ObjectType(Enum):
     BONDS = auto()
 
 
-class BaseObject(ABC):
+class BaseShape(ABC):
     """Abstract base class for structure traces."""
 
     def __init__(
@@ -40,28 +40,28 @@ class BaseObject(ABC):
 
     def to_plotly_trace(self) -> go.Scatter3d:
         """Convert the trace to a Plotly trace object."""
-        return self._create_object()
+        return self._create_trace()
 
     @abstractmethod
-    def _create_object(self) -> go.Scatter3d:
+    def _create_trace(self) -> go.Scatter3d:
         """Create the specific Plotly trace implementation."""
         pass
 
     @abstractmethod
-    def get_object_type(self) -> ObjectType:
+    def get_shape_type(self) -> ObjectType:
         """Return the type of this trace."""
         pass
 
 
-class AtomObject(BaseObject):
+class Atom(BaseShape):
     """Class representing atom traces in molecular structures."""
 
     @classmethod
     def from_mol_graph(
-        cls: Type["AtomObject"],
+        cls: Type["Atom"],
         mol_graph: "MolGraph",
         config: Optional[Dict[str, Any]] = None,
-    ) -> "AtomObject":
+    ) -> "Atom":
         """Create an atom trace from molecular graph data."""
         coordinates = [
             Point3D(x=x, y=y, z=z) for x, y, z in zip(mol_graph.x, mol_graph.y, mol_graph.z)
@@ -100,7 +100,7 @@ class AtomObject(BaseObject):
         self.border_color = border_color
         self.border_width = border_width
 
-    def _create_object(self) -> go.Scatter3d:
+    def _create_trace(self) -> go.Scatter3d:
         """Create a Plotly trace for atoms."""
         colors = [self.cpk_colors.get(element, self.default_color) for element in self.elements]
 
@@ -135,20 +135,20 @@ class AtomObject(BaseObject):
             visible=self.visible,
         )
 
-    def get_object_type(self) -> ObjectType:
+    def get_shape_type(self) -> ObjectType:
         """Return the type of this trace."""
         return ObjectType.ATOMS
 
 
-class BondObject(BaseObject):
+class Bond(BaseShape):
     """Class representing bond traces in molecular structures."""
 
     @classmethod
     def from_mol_graph(
-        cls: Type["BondObject"],
+        cls: Type["Bond"],
         mol_graph: "MolGraph",
         config: Optional[Dict[str, Any]] = None,
-    ) -> "BondObject":
+    ) -> "Bond":
         """Create a bond trace from molecular graph data."""
         coordinates = [
             Point3D(x=x, y=y, z=z) for x, y, z in zip(mol_graph.x, mol_graph.y, mol_graph.z)
@@ -174,7 +174,7 @@ class BondObject(BaseObject):
         self.adjacency_list = adjacency_list
         self.width = width
 
-    def _create_object(self) -> go.Scatter3d:
+    def _create_trace(self) -> go.Scatter3d:
         """Create a Plotly trace for bonds."""
         xs, ys, zs = [], [], []
         processed_bonds = set()
@@ -208,7 +208,7 @@ class BondObject(BaseObject):
             visible=self.visible,
         )
 
-    def get_object_type(self) -> ObjectType:
+    def get_shape_type(self) -> ObjectType:
         """Return the type of this trace."""
         return ObjectType.BONDS
 
@@ -240,9 +240,9 @@ class TraceManager:
 
     def __init__(self) -> None:
         """Initialize an empty trace manager."""
-        self._traces: List[BaseObject] = []
+        self._traces: List[BaseShape] = []
 
-    def add_trace(self, trace: BaseObject) -> None:
+    def add_trace(self, trace: BaseShape) -> None:
         """Add a new trace to the manager.
 
         Args:
@@ -254,7 +254,7 @@ class TraceManager:
         """Remove all traces from the manager."""
         self._traces.clear()
 
-    def get_traces_by_type(self, trace_type: ObjectType) -> List[BaseObject]:
+    def get_traces_by_type(self, trace_type: ObjectType) -> List[BaseShape]:
         """Get all traces of a specific type.
 
         Args:
@@ -263,7 +263,7 @@ class TraceManager:
         Returns:
             List of traces matching the specified type
         """
-        return [trace for trace in self._traces if trace.get_object_type() == trace_type]
+        return [trace for trace in self._traces if trace.get_shape_type() == trace_type]
 
     def to_plotly_traces(self) -> List[go.Scatter3d]:
         """Convert all traces to Plotly format.
@@ -282,7 +282,7 @@ class TraceManager:
         Returns:
             List of indices where traces match the specified type
         """
-        return [i for i, trace in enumerate(self._traces) if trace.get_object_type() == trace_type]
+        return [i for i, trace in enumerate(self._traces) if trace.get_shape_type() == trace_type]
 
     def create_buttons(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Create Plotly buttons for toggling trace visibility.

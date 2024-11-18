@@ -20,7 +20,7 @@ import plotly.graph_objects as go
 
 from xyz2graph.layout_config import LAYOUT
 
-from .geometry import Point3D
+from .graph import Point3D
 
 
 class LabelType(Enum):
