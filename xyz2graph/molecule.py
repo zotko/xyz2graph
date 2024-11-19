@@ -1,0 +1,81 @@
+"""Classes for representing atoms and bonds in a molecular structure.
+
+This module provides fundamental data structures for molecular modeling
+"""
+
+from dataclasses import dataclass, field
+from typing import FrozenSet, Tuple
+
+import numpy as np
+
+from xyz2graph.geometry import Point3D
+
+
+@dataclass
+class Atom:
+    """Represents an atom in a molecular structure."""
+
+    element: str
+    position: Point3D
+    index: int
+    radius: float = field(default=0.0)
+
+    @property
+    def x(self) -> float:
+        """Get x coordinate."""
+        return self.position.x
+
+    @property
+    def y(self) -> float:
+        """Get y coordinate."""
+        return self.position.y
+
+    @property
+    def z(self) -> float:
+        """Get z coordinate."""
+        return self.position.z
+
+    @property
+    def xyz(self) -> Tuple[float, float, float]:
+        """Get atom coordinates as tuple."""
+        return (self.x, self.y, self.z)
+
+
+@dataclass
+class Bond:
+    """Represents a chemical bond between two atoms."""
+
+    atom1: Atom
+    atom2: Atom
+    length: float = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Calculate bond length after initialization."""
+        dx = self.atom1.x - self.atom2.x
+        dy = self.atom1.y - self.atom2.y
+        dz = self.atom1.z - self.atom2.z
+        self.length = round(np.sqrt(dx * dx + dy * dy + dz * dz), 5)
+
+    @property
+    def atoms(self) -> FrozenSet[Atom]:
+        """Get the atoms involved in the bond as an order-independent set."""
+        return frozenset([self.atom1, self.atom2])
+
+    @property
+    def indices(self) -> FrozenSet[int]:
+        """Get indices of bonded atoms."""
+        return frozenset([self.atom1.index, self.atom2.index])
+
+    def __contains__(self, atom: Atom) -> bool:
+        """Check if an atom is part of this bond."""
+        return atom in self.atoms
+
+    def __eq__(self, other: object) -> bool:
+        """Two bonds are equal if they connect the same atoms."""
+        if not isinstance(other, Bond):
+            return NotImplemented
+        return self.atoms == other.atoms
+
+    def __hash__(self) -> int:
+        """Hash based on the atoms in the bond."""
+        return hash(self.atoms)

@@ -4,7 +4,8 @@ from typing import List
 import numpy as np
 import pytest
 from xyz2graph.geometry import Point3D
-from xyz2graph.graph import Atom, MolGraph
+from xyz2graph.graph import MolGraph
+from xyz2graph.molecule import Atom
 
 
 WATER_XYZ = """3
@@ -40,9 +41,9 @@ def test_read_xyz(tmp_path: Path) -> None:
 def test_molecular_geometry(water_molecule: MolGraph) -> None:
     """Test molecular geometry properties."""
     mol = water_molecule
-    assert np.allclose(mol.atoms[0].coords, (0.0, 0.0, 0.0))
-    assert np.allclose(mol.atoms[1].coords, (0.757, 0.586, 0.0))
-    assert np.allclose(mol.atoms[2].coords, (-0.757, 0.586, 0.0))
+    assert np.allclose(mol.atoms[0].xyz, (0.0, 0.0, 0.0))
+    assert np.allclose(mol.atoms[1].xyz, (0.757, 0.586, 0.0))
+    assert np.allclose(mol.atoms[2].xyz, (-0.757, 0.586, 0.0))
     assert len(mol.bonds) == 2
 
 

@@ -18,7 +18,6 @@ from typing import (
     Sequence,
     Set,
     Tuple,
-    TypedDict,
     Union,
 )
 
@@ -28,115 +27,11 @@ import plotly.graph_objs as go
 from numpy.typing import NDArray
 
 from xyz2graph.geometry import Point3D
+from xyz2graph.molecule import Atom, Bond
+from xyz2graph.visualization import VisualizationConfig, create_visualization
 
 from .constants import _DEFAULT_CPK_COLORS, _DEFAULT_RADII
 from .logging import logger
-
-
-class PlotConfig(TypedDict, total=False):
-    """Configuration dictionary for molecular plot visualization.
-
-    Attributes:
-        atom_size: Size of atom markers in the plot. Default is 7.
-        atom_opacity: Opacity of atom markers (0.0 to 1.0). Default is 0.8.
-        atom_border_color: Color string for atom marker borders. Default is "lightgray".
-        atom_border_width: Width of atom marker borders in pixels. Default is 2.
-        bond_color: Color string for bonds between atoms. Default is "grey".
-        bond_width: Width of bond lines in pixels. Default is 2.
-        label_offset: Vertical offset for labels in pixels. Default is 15.
-        bond_label_color: Color string for bond length labels. Default is "steelblue".
-    """
-
-    atom_size: int
-    atom_opacity: float
-    atom_border_color: str
-    atom_border_width: int
-    bond_color: str
-    bond_width: int
-    label_offset: int
-    bond_label_color: str
-
-
-DEFAULT_PLOT_CONFIG: PlotConfig = {
-    "atom_size": 7,
-    "atom_opacity": 0.8,
-    "atom_border_color": "lightgray",
-    "atom_border_width": 2,
-    "bond_color": "grey",
-    "bond_width": 2,
-    "label_offset": 15,
-    "bond_label_color": "black",
-}
-
-
-@dataclass
-class Atom:
-    """Represents an atom in a molecular structure."""
-
-    element: str
-    position: Point3D
-    index: int
-    radius: float = field(default=0.0)
-
-    @property
-    def x(self) -> float:
-        """Get x coordinate."""
-        return self.position.x
-
-    @property
-    def y(self) -> float:
-        """Get y coordinate."""
-        return self.position.y
-
-    @property
-    def z(self) -> float:
-        """Get z coordinate."""
-        return self.position.z
-
-    @property
-    def coords(self) -> Tuple[float, float, float]:
-        """Get atom coordinates as tuple."""
-        return (self.x, self.y, self.z)
-
-
-@dataclass
-class Bond:
-    """Represents a chemical bond between two atoms."""
-
-    atom1: Atom
-    atom2: Atom
-    length: float = field(init=False)
-
-    def __post_init__(self) -> None:
-        """Calculate bond length after initialization."""
-        dx = self.atom1.x - self.atom2.x
-        dy = self.atom1.y - self.atom2.y
-        dz = self.atom1.z - self.atom2.z
-        self.length = round(np.sqrt(dx * dx + dy * dy + dz * dz), 5)
-
-    @property
-    def atoms(self) -> FrozenSet[Atom]:
-        """Get the atoms involved in the bond as an order-independent set."""
-        return frozenset([self.atom1, self.atom2])
-
-    @property
-    def indices(self) -> FrozenSet[int]:
-        """Get indices of bonded atoms."""
-        return frozenset([self.atom1.index, self.atom2.index])
-
-    def __contains__(self, atom: Atom) -> bool:
-        """Check if an atom is part of this bond."""
-        return atom in self.atoms
-
-    def __eq__(self, other: object) -> bool:
-        """Two bonds are equal if they connect the same atoms."""
-        if not isinstance(other, Bond):
-            return NotImplemented
-        return self.atoms == other.atoms
-
-    def __hash__(self) -> int:
-        """Hash based on the atoms in the bond."""
-        return hash(self.atoms)
 
 
 @dataclass
@@ -183,7 +78,7 @@ class MolGraph:
         return [atom.z for atom in self.atoms]
 
     @property
-    def coordinates(self) -> NDArray[np.float64]:
+    def xyz(self) -> NDArray[np.float64]:
         """Get coordinates as a Nx3 numpy array."""
         return np.array([[atom.x, atom.y, atom.z] for atom in self.atoms])
 
@@ -235,8 +130,7 @@ class MolGraph:
             NDArray[np.float64]: A square matrix where entry (i,j) is the
             distance between atoms i and j.
         """
-        coords = self.coordinates
-        distances = coords[:, np.newaxis, :] - coords
+        distances = self.xyz[:, np.newaxis, :] - self.xyz
         return np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
 
     def _generate_bonds(self) -> None:
@@ -422,10 +316,19 @@ class MolGraph:
         return G
 
     # Define dummy method to_plotly()
-    def to_plotly(self) -> go.Figure:
-        """Convert to Plotly figure."""
+    def to_plotly(self, config: Optional[VisualizationConfig] = None) -> go.Figure:
+        """Convert molecular structure to a Plotly figure.
+
+        Args:
+            config: Optional visualization configuration. If None, uses defaults.
+
+        Returns:
+            go.Figure: Plotly figure object with interactive molecular visualization
+        """
         logger.debug("Creating Plotly figure")
-        return go.Figure()
+
+        # Method 1: Using create_visualization helper function
+        return create_visualization(self, config)
 
     def formula(self) -> str:
         """Return molecular formula in Hill notation."""
