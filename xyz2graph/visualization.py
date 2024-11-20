@@ -92,7 +92,6 @@ class LegendConfig(TypedDict):
     y: float
     xanchor: str
     yanchor: str
-    itemclick: bool
 
 
 # Scene configuration
@@ -168,7 +167,7 @@ DEFAULT_SCENE_CONFIG = SceneConfig(
     showspikes=False,
     background_color="white",
     axis_visible=True,
-    legend=LegendConfig(x=0.99, y=0.96, xanchor="right", yanchor="top", itemclick=False),
+    legend=LegendConfig(x=0.99, y=0.96, xanchor="right", yanchor="top"),
 )
 
 DEFAULT_STYLE = StyleConfig(
@@ -181,8 +180,8 @@ DEFAULT_CONFIG = VisualizationConfig(
 
 WATERMARK = {
     "text": (
-        'created with <a href="https://zotko.github.io/xyz2graph/"',
-        ' style="color:#404040;">xyz2graph</a>',
+        'created with <a href="https://zotko.github.io/xyz2graph/"'
+        ' style="color:#404040;">xyz2graph</a>'
     ),
     "xref": "paper",
     "yref": "paper",
@@ -367,35 +366,57 @@ class AtomComponent(VisualizationComponent):
         """Get atom colors."""
         return [self.colors.get(atom.element, "pink") for atom in self.atoms]
 
-    def to_trace(self, config: AtomConfig = DEFAULT_ATOM_CONFIG) -> go.Scatter3d:
-        """Convert atoms to Plotly trace.
+    def to_trace(self, config: AtomConfig = DEFAULT_ATOM_CONFIG) -> List[go.Scatter3d]:
+        """Convert atoms to Plotly traces, grouped by element.
 
         Args:
             config: Atom visualization configuration.
 
         Returns:
-            Scatter3d trace representing atoms.
+            List of Scatter3d traces, one per unique element type.
         """
-        x, y, z = self._get_coordinates()
+        # Group atoms by element
+        element_groups: Dict[str, List[Atom]] = {}
+        for atom in self.atoms:
+            if atom.element not in element_groups:
+                element_groups[atom.element] = []
+            element_groups[atom.element].append(atom)
 
-        return go.Scatter3d(
-            x=x,
-            y=y,
-            z=z,
-            mode="markers",
-            marker=dict(
-                size=config["size"],
-                color=self._get_colors(),
-                opacity=config["opacity"],
-                line=dict(
-                    color=config["border_color"],
-                    width=config["border_width"],
+        traces = []
+        for element, atoms in element_groups.items():
+            # Get coordinates for this element group
+            x = [atom.x for atom in atoms]
+            y = [atom.y for atom in atoms]
+            z = [atom.z for atom in atoms]
+
+            # Create hover text for this group
+            hover_text = [
+                f"{atom.index}. {atom.element} ({atom.x:.2f}, {atom.y:.2f}, {atom.z:.2f})"
+                for atom in atoms
+            ]
+
+            # Create trace for this element
+            trace = go.Scatter3d(
+                x=x,
+                y=y,
+                z=z,
+                mode="markers",
+                marker=dict(
+                    size=config["size"],
+                    color=self.colors.get(element, "pink"),
+                    opacity=config["opacity"],
+                    line=dict(
+                        color=config["border_color"],
+                        width=config["border_width"],
+                    ),
                 ),
-            ),
-            hovertext=self._create_hover_text(),
-            hoverinfo="text",
-            name="atoms",
-        )
+                hovertext=hover_text,
+                hoverinfo="text",
+                name=element,
+            )
+            traces.append(trace)
+
+        return traces
 
 
 @dataclass
@@ -520,33 +541,40 @@ class ButtonFactory:
             },
         ]
 
-    def create_atom_trace_buttons(self) -> List[Dict[str, Any]]:
-        """Create buttons for controlling atom trace visibility."""
+    def create_atom_trace_buttons(self, atom_trace_indices: List[int]) -> List[Dict[str, Any]]:
+        """Create buttons for controlling all atom traces visibility together.
+
+        Args:
+            atom_trace_indices: List of trace indices for all atom elements
+
+        Returns:
+            Button configurations for controlling all atoms visibility together
+        """
         return [
             {
                 "label": "Show",
                 "method": "restyle",
-                "args": [{"visible": [True]}, [0]],
+                "args": [{"visible": True}, atom_trace_indices],
             },
             {
                 "label": "Hide",
                 "method": "restyle",
-                "args": [{"visible": [False]}, [0]],
+                "args": [{"visible": False}, atom_trace_indices],
             },
         ]
 
-    def create_bond_trace_buttons(self) -> List[Dict[str, Any]]:
+    def create_bond_trace_buttons(self, bond_trace_indices: List[int]) -> List[Dict[str, Any]]:
         """Create buttons for controlling bond trace visibility."""
         return [
             {
                 "label": "Show",
                 "method": "restyle",
-                "args": [{"visible": [True]}, [1]],
+                "args": [{"visible": True}, bond_trace_indices],
             },
             {
                 "label": "Hide",
                 "method": "restyle",
-                "args": [{"visible": [False]}, [1]],
+                "args": [{"visible": False}, bond_trace_indices],
             },
         ]
 
@@ -629,6 +657,10 @@ class VisualizationControls:
         self.n_bonds = n_bonds
         self.button_factory = ButtonFactory(buttons_config)
 
+        # Indices for managing traces and annotations
+        self.atom_trace_indices: List[int] = []
+        self.bond_trace_indices: List[int] = []
+
         # Indices for managing annotations
         self.element_indices: List[int] = []
         self.index_indices: List[int] = []
@@ -642,6 +674,13 @@ class VisualizationControls:
         self.index_indices = index_indices
         self.bond_indices = bond_indices
 
+    def update_trace_indices(
+        self, atom_trace_indices: List[int], bond_trace_indices: List[int]
+    ) -> None:
+        """Update the trace indices for proper button targeting."""
+        self.atom_trace_indices = atom_trace_indices
+        self.bond_trace_indices = bond_trace_indices
+
     def create_all_controls(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Create all control buttons and their annotations.
 
@@ -652,7 +691,7 @@ class VisualizationControls:
         annotations = []
 
         # Atom trace controls
-        atom_trace_buttons = self.button_factory.create_atom_trace_buttons()
+        atom_trace_buttons = self.button_factory.create_atom_trace_buttons(self.atom_trace_indices)
         button_group, annotation = self.button_factory.create_button_group(
             "atoms", atom_trace_buttons
         )
@@ -674,7 +713,9 @@ class VisualizationControls:
 
         # Bond trace controls
         if self.n_bonds > 0:
-            bond_trace_buttons = self.button_factory.create_bond_trace_buttons()
+            bond_trace_buttons = self.button_factory.create_bond_trace_buttons(
+                self.bond_trace_indices
+            )
             button_group, annotation = self.button_factory.create_button_group(
                 "bonds", bond_trace_buttons
             )
@@ -808,55 +849,27 @@ class VisualizationManager:
 
         return {axis: axis_config.copy() for axis in ["xaxis", "yaxis", "zaxis"]}
 
-    def _create_legend_traces(self) -> List[go.Scatter3d]:
-        """Create legend traces for atom elements, sorted alphabetically."""
-        unique_elements = sorted({atom.element for atom in self.atom_component.atoms})
-
-        legend_traces = []
-        for element in unique_elements:
-            legend_traces.append(
-                go.Scatter3d(
-                    x=[None],
-                    y=[None],
-                    z=[None],
-                    mode="markers",
-                    name=element,
-                    marker=dict(
-                        size=self.config_manager.atoms["size"] * 1.5,
-                        color=self.atom_component.colors.get(element, "pink"),
-                        opacity=self.config_manager.atoms["opacity"],
-                        line=dict(
-                            color=self.config_manager.atoms["border_color"],
-                            width=self.config_manager.atoms["border_width"],
-                        ),
-                    ),
-                    showlegend=True,
-                )
-            )
-        return legend_traces
-
     def create_figure(self) -> go.Figure:
         """Create a complete interactive figure for molecular visualization."""
         fig = go.Figure()
 
         # Add main traces with configuration
-        atom_trace = self.atom_component.to_trace(config=self.config_manager.atoms)
-        atom_trace.showlegend = False
-        fig.add_trace(atom_trace)
+        atom_traces = self.atom_component.to_trace(config=self.config_manager.atoms)
+        for trace in atom_traces:
+            fig.add_trace(trace)
 
         bond_trace = self.bond_component.to_trace(config=self.config_manager.bonds)
         bond_trace.showlegend = False
         fig.add_trace(bond_trace)
 
-        # Add legend traces
-        for legend_trace in self._create_legend_traces():
-            fig.add_trace(legend_trace)
-
-        # Rest of the method remains the same...
         all_annotations, element_indices, index_indices, bond_indices = self._create_annotations()
 
         self.controls.update_annotation_indices(
             element_indices=element_indices, index_indices=index_indices, bond_indices=bond_indices
+        )
+        self.controls.update_trace_indices(
+            atom_trace_indices=list(range(len(atom_traces))),
+            bond_trace_indices=[len(atom_traces)],
         )
 
         buttons, control_annotations = self.controls.create_all_controls()

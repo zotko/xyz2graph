@@ -127,11 +127,31 @@ class MolGraph:
         """Get matrix of interatomic distances.
 
         Returns:
-            NDArray[np.float64]: A square matrix where entry (i,j) is the
-            distance between atoms i and j.
+            NDArray[np.float64]: A square matrix where entry (i,j)
+                is the distance between atoms i and j.
         """
-        distances = self.xyz[:, np.newaxis, :] - self.xyz
-        return np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
+        n_atoms = len(self.atoms)
+        MEMORY_THRESHOLD = 10_000  # Switch to loop method above 10k atoms
+
+        try:
+            if n_atoms < MEMORY_THRESHOLD:
+                # Fast broadcasting method for small/medium molecules
+                distances = self.xyz[:, np.newaxis, :] - self.xyz
+                return np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
+            else:
+                logger.info(
+                    f"Large molecule ({n_atoms} atoms) detected. Using memory-efficient method."
+                )
+        except MemoryError:
+            logger.info("Memory allocation failed. Switching to memory-efficient method.")
+
+        # Memory efficient loop method for large molecules or if broadcasting fails
+        distance_matrix = np.zeros((n_atoms, n_atoms), dtype=np.float64)
+        for i in range(n_atoms):
+            diff = self.xyz[i] - self.xyz
+            distance_matrix[i] = np.sqrt(np.sum(diff * diff, axis=1))
+
+        return distance_matrix
 
     def _generate_bonds(self) -> None:
         """Generate bonds based on atomic distances."""
