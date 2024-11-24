@@ -26,7 +26,6 @@ import numpy as np
 import plotly.graph_objs as go
 from numpy.typing import NDArray
 
-from xyz2graph.geometry import Point3D
 from xyz2graph.molecule import Atom, Bond
 from xyz2graph.visualization import VisualizationConfig, create_visualization
 
@@ -260,7 +259,9 @@ class MolGraph:
 
             atom = Atom(
                 element=element,
-                position=Point3D(x=float(x), y=float(y), z=float(z)),
+                x=float(x),
+                y=float(y),
+                z=float(z),
                 index=i,
                 radius=self.default_radii[element],
             )

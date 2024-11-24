@@ -3,7 +3,6 @@ from typing import List
 
 import numpy as np
 import pytest
-from xyz2graph.geometry import Point3D
 from xyz2graph.graph import MolGraph
 from xyz2graph.molecule import Atom
 
@@ -151,6 +150,5 @@ def test_formula(elements: List[str], expected_formula: str) -> None:
     """Test molecular formula generation."""
     mol = MolGraph()
     for i, el in enumerate(elements):
-        pos = Point3D(x=float(i), y=0.0, z=0.0)
-        mol.atoms.append(Atom(element=el, position=pos, index=i))
+        mol.atoms.append(Atom(element=el, x=float(i), y=0.0, z=0.0, index=i))
     assert mol.formula() == expected_formula

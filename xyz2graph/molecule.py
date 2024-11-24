@@ -4,11 +4,10 @@ This module provides fundamental data structures for molecular modeling
 """
 
 from dataclasses import dataclass, field
-from typing import FrozenSet, Tuple
+from typing import FrozenSet, cast
 
 import numpy as np
-
-from xyz2graph.geometry import Point3D
+from numpy.typing import NDArray
 
 
 @dataclass
@@ -16,29 +15,20 @@ class Atom:
     """Represents an atom in a molecular structure."""
 
     element: str
-    position: Point3D
+    x: float
+    y: float
+    z: float
     index: int
     radius: float = field(default=0.0)
 
     @property
-    def x(self) -> float:
-        """Get x coordinate."""
-        return self.position.x
+    def xyz(self) -> NDArray[np.float64]:
+        """Get atom coordinates as numpy array."""
+        return np.array([self.x, self.y, self.z], dtype=np.float64)
 
-    @property
-    def y(self) -> float:
-        """Get y coordinate."""
-        return self.position.y
-
-    @property
-    def z(self) -> float:
-        """Get z coordinate."""
-        return self.position.z
-
-    @property
-    def xyz(self) -> Tuple[float, float, float]:
-        """Get atom coordinates as tuple."""
-        return (self.x, self.y, self.z)
+    def distance_to(self, other: "Atom") -> float:
+        """Calculate distance to another atom."""
+        return cast(float, np.linalg.norm(self.xyz - other.xyz).item())
 
 
 @dataclass
