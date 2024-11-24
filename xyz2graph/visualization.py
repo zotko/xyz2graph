@@ -5,14 +5,12 @@ visualizations of molecular structures. It includes support for atoms,
 bonds, labels, and interactive controls.
 """
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
     List,
-    Mapping,
     Optional,
     Tuple,
     TypedDict,
@@ -28,7 +26,6 @@ if TYPE_CHECKING:
     from .graph import MolGraph
 
 
-# Button-related configurations
 class ButtonAppearance(TypedDict):
     """Common appearance settings for all buttons."""
 
@@ -43,9 +40,11 @@ class ButtonAppearance(TypedDict):
 
 
 class ButtonPosition(TypedDict):
-    """Position and title for a button group."""
+    """Position configuration for a button group."""
 
+    button_x: float
     button_y: float
+    label_x: float
     label_y: float
     title: str
 
@@ -54,8 +53,7 @@ class ButtonsConfig(TypedDict):
     """Complete button configuration."""
 
     appearance: ButtonAppearance
-    position: Dict[str, float]  # Common x positions
-    groups: Mapping[str, ButtonPosition]  # Combines traces, labels, and background
+    groups: Dict[str, ButtonPosition]
 
 
 class AtomConfig(TypedDict):
@@ -73,6 +71,7 @@ class BondConfig(TypedDict):
 
     color: str
     width: int
+    text_size: int
 
 
 class LegendConfig(TypedDict):
@@ -85,7 +84,17 @@ class LegendConfig(TypedDict):
     itemsizing: str
 
 
-# Scene configuration
+class WatermarkConfig(TypedDict):
+    """Watermark configuration."""
+
+    text: str
+    x: float
+    y: float
+    font_size: int
+    font_color: str
+    show: bool
+
+
 class SceneConfig(TypedDict):
     """3D scene configuration."""
 
@@ -105,6 +114,9 @@ class StyleConfig(TypedDict):
     atoms: AtomConfig
     bonds: BondConfig
     title: str
+    watermark: WatermarkConfig
+    coordinate_round_digits: int
+    markdown_round_digits: int
 
 
 class VisualizationConfig(TypedDict):
@@ -127,28 +139,66 @@ DEFAULT_BUTTON_APPEARANCE = ButtonAppearance(
     title_font_size=12,
 )
 
-DEFAULT_BUTTON_POSITION = {"button_x": 0.04, "label_x": 0.0}
+DEFAULT_BUTTON_X = 0.04
+DEFAULT_LABEL_X = 0.0
 
 DEFAULT_BUTTON_GROUPS: Dict[str, ButtonPosition] = {
-    "atoms": {"button_y": 1.0, "label_y": 0.99, "title": "Atoms"},
-    "bonds": {"button_y": 0.95, "label_y": 0.94, "title": "Bonds"},
-    "grid": {"button_y": 0.90, "label_y": 0.89, "title": "Grid"},
+    "atoms": {
+        "button_x": DEFAULT_BUTTON_X,
+        "button_y": 1.0,
+        "label_x": DEFAULT_LABEL_X,
+        "label_y": 0.99,
+        "title": "Atoms",
+    },
+    "bonds": {
+        "button_x": DEFAULT_BUTTON_X,
+        "button_y": 0.95,
+        "label_x": DEFAULT_LABEL_X,
+        "label_y": 0.94,
+        "title": "Bonds",
+    },
+    "grid": {
+        "button_x": DEFAULT_BUTTON_X,
+        "button_y": 0.90,
+        "label_x": DEFAULT_LABEL_X,
+        "label_y": 0.89,
+        "title": "Grid",
+    },
 }
 
 DEFAULT_BUTTONS = ButtonsConfig(
     appearance=DEFAULT_BUTTON_APPEARANCE,
-    position=DEFAULT_BUTTON_POSITION,
     groups=DEFAULT_BUTTON_GROUPS,
 )
 
 DEFAULT_ATOM_CONFIG = AtomConfig(
-    size=5, opacity=0.9, border_color="lightgray", border_width=2, hover_font_size=12
+    size=5,
+    opacity=0.9,
+    border_color="lightgray",
+    border_width=2,
+    hover_font_size=12,
 )
 
-DEFAULT_BOND_CONFIG = BondConfig(color="grey", width=2)
+DEFAULT_BOND_CONFIG = BondConfig(
+    color="grey",
+    width=2,
+    text_size=10,
+)
 
 DEFAULT_LEGEND_CONFIG = LegendConfig(
     x=0.99, y=0.96, xanchor="right", yanchor="top", itemsizing="constant"
+)
+
+DEFAULT_WATERMARK_CONFIG = WatermarkConfig(
+    text=(
+        'created with <a href="https://zotko.github.io/xyz2graph/"'
+        'style="color:#404040;">xyz2graph</a>'
+    ),
+    x=0.99,
+    y=0.01,
+    font_size=10,
+    font_color="gray",
+    show=True,
 )
 
 DEFAULT_SCENE_CONFIG = SceneConfig(
@@ -161,30 +211,33 @@ DEFAULT_SCENE_CONFIG = SceneConfig(
     legend=DEFAULT_LEGEND_CONFIG,
 )
 
-DEFAULT_STYLE = StyleConfig(atoms=DEFAULT_ATOM_CONFIG, bonds=DEFAULT_BOND_CONFIG, title="")
+DEFAULT_STYLE = StyleConfig(
+    atoms=DEFAULT_ATOM_CONFIG,
+    bonds=DEFAULT_BOND_CONFIG,
+    title="",
+    watermark=DEFAULT_WATERMARK_CONFIG,
+    coordinate_round_digits=3,
+    markdown_round_digits=2,
+)
 
 DEFAULT_CONFIG = VisualizationConfig(
     style=DEFAULT_STYLE, scene=DEFAULT_SCENE_CONFIG, buttons=DEFAULT_BUTTONS
 )
 
-WATERMARK = {
-    "text": (
-        'created with <a href="https://zotko.github.io/xyz2graph/"'
-        ' style="color:#404040;">xyz2graph</a>'
-    ),
-    "xref": "paper",
-    "yref": "paper",
-    "x": 0.99,
-    "y": 0.01,
-    "showarrow": False,
-    "font": {"size": 10, "color": "gray"},
-    "xanchor": "right",
-    "yanchor": "bottom",
-}
-
 
 class ConfigurationManager:
-    """Provides access to different configuration aspects."""
+    """Manages and provides access to visualization configuration components.
+
+    This class serves as a central configuration manager that provides structured
+    access to different aspects of the visualization configuration including:
+    - Style settings (atoms, bonds, title, watermark)
+    - Scene settings (background, axes, legend)
+    - Button controls configuration
+    - Atom and bond-specific visualization parameters
+
+    The configuration is initialized with either custom settings or defaults,
+    and provides property-based access to each configuration component.
+    """
 
     def __init__(self, config: Optional[VisualizationConfig] = None) -> None:
         """Initialize configuration manager.
@@ -196,78 +249,102 @@ class ConfigurationManager:
 
     @property
     def style(self) -> StyleConfig:
-        """Get style configuration."""
+        """Get the style configuration settings.
+
+        Returns:
+            StyleConfig: Configuration for visual styling including atoms,
+                bonds, title, and watermark settings.
+        """
         return self.config["style"]
 
     @property
     def scene(self) -> SceneConfig:
-        """Get scene configuration."""
+        """Get the scene configuration settings.
+
+        Returns:
+            SceneConfig: Configuration for 3D scene including background,
+                axes, and legend settings.
+        """
         return self.config["scene"]
 
     @property
     def buttons(self) -> ButtonsConfig:
-        """Get buttons configuration."""
+        """Get the buttons configuration settings.
+
+        Returns:
+            ButtonsConfig: Configuration for interactive control buttons
+                including appearance and positioning.
+        """
         return self.config["buttons"]
 
     @property
     def atoms(self) -> AtomConfig:
-        """Get atom visualization configuration."""
+        """Get the atom visualization configuration.
+
+        Returns:
+            AtomConfig: Configuration specific to atom visualization
+                including size, opacity, and border settings.
+        """
         return self.style["atoms"]
 
     @property
     def bonds(self) -> BondConfig:
-        """Get bond visualization configuration."""
-        return self.style["bonds"]
-
-
-class VisualizationComponent(ABC):
-    """Base class for visualization components."""
-
-    @abstractmethod
-    def to_trace(self) -> go.Scatter3d:
-        """Convert component to Plotly trace.
+        """Get the bond visualization configuration.
 
         Returns:
-            Plotly Scatter3d trace object.
+            BondConfig: Configuration specific to bond visualization
+                including color, width, and text settings.
         """
-        pass
+        return self.style["bonds"]
+
+    @property
+    def watermark(self) -> WatermarkConfig:
+        """Get the watermark configuration.
+
+        Returns:
+            WatermarkConfig: Configuration for the visualization watermark
+                including text, position, and appearance settings.
+        """
+        return self.style["watermark"]
 
 
 @dataclass
 class AtomShape:
-    """A class for managing atom shapes in the visualization.
-
-    Handles the conversion of atomic data into Plotly visualization traces,
-    including grouping atoms by element and applying visual styling.
-    """
+    """A class for managing atom shapes in the visualization."""
 
     atoms: List[Atom]
     colors: Dict[str, str]
 
-    def to_trace(self, config: AtomConfig = DEFAULT_ATOM_CONFIG) -> List[go.Scatter3d]:
-        """Convert atoms to Plotly traces.
+    def to_trace(self, config: AtomConfig, coordinate_round_digits: int) -> List[go.Scatter3d]:
+        """Convert atoms to Plotly visualization traces.
+
+        This method processes atoms into Plotly Scatter3d traces for visualization,
+        grouping atoms by element and applying the specified visual styling.
+        Each element gets its own trace with appropriate coloring and hover text.
 
         Args:
-            config: Configuration for atom visualization appearance.
+            config (AtomConfig): Configuration for atom appearance including size,
+                opacity, and border settings.
+            coordinate_round_digits (int): Number of decimal places to round
+                coordinate values.
 
         Returns:
-            List of Plotly Scatter3d traces representing the atoms.
+            List[go.Scatter3d]: List of Plotly traces, one for each unique
+                element present in the atoms list. Each trace contains the 3D
+                coordinates, styling, and hover information for all atoms of
+                that element.
         """
-        # Group atoms by element
         element_groups: Dict[str, List[Atom]] = {}
         for atom in self.atoms:
             element_groups.setdefault(atom.element, []).append(atom)
 
-        # Sort elements alphabetically
         sorted_elements = sorted(element_groups.keys())
 
         traces = []
         for element in sorted_elements:
             atoms = element_groups[element]
-            # Convert to numpy arrays for efficient operations
             coords = np.array([[atom.x, atom.y, atom.z] for atom in atoms])
-            # Round coordinates to 3 decimal places
-            coords = np.round(coords, 3)
+            coords = np.round(coords, coordinate_round_digits)
 
             traces.append(
                 go.Scatter3d(
@@ -284,7 +361,8 @@ class AtomShape:
                         line=dict(color=config["border_color"], width=config["border_width"]),
                     ),
                     hovertext=[
-                        f"{atom.index}. {atom.element} ({x:.3f}, {y:.3f}, {z:.3f})"
+                        f"{atom.index}. {atom.element} ({x:.{coordinate_round_digits}f}, "
+                        f"{y:.{coordinate_round_digits}f}, {z:.{coordinate_round_digits}f})"
                         for atom, (x, y, z) in zip(atoms, coords)
                     ],
                     hoverinfo="text",
@@ -304,14 +382,28 @@ class BondShape:
 
     bonds: List[Bond]
 
-    def to_trace(self, config: BondConfig = DEFAULT_BOND_CONFIG) -> List[go.Scatter3d]:
-        """Convert bonds to Plotly traces.
+    def to_trace(
+        self, config: BondConfig, coordinate_round_digits: int, markdown_round_digits: int
+    ) -> List[go.Scatter3d]:
+        """Convert bonds to Plotly visualization traces.
+
+        Processes molecular bonds into Plotly Scatter3d traces, grouping bonds by
+        type (e.g., C-C, C-O) and creating both line traces for the bonds and
+        text traces for the bond lengths.
 
         Args:
-            config: Configuration for bond visualization appearance.
+            config (BondConfig): Configuration for bond visualization appearance,
+                including color, width, and text settings.
+            coordinate_round_digits (int): Number of decimal places to round
+                coordinate values in the visualization.
+            markdown_round_digits (int): Number of decimal places to round
+                bond length values displayed in the visualization.
 
         Returns:
-            List of Plotly Scatter3d traces representing the bonds.
+            List[go.Scatter3d]: List of Plotly traces where:
+                - Even-indexed traces represent bond lines
+                - Odd-indexed traces represent bond length labels
+                Each bond type (e.g., C-C, C-O) gets its own pair of traces.
         """
         # Group bonds by type
         bond_groups: Dict[str, List[Bond]] = {}
@@ -320,34 +412,25 @@ class BondShape:
             bond_type = f"{elements[0]}-{elements[1]}"
             bond_groups.setdefault(bond_type, []).append(bond)
 
-        # Sort bond types alphabetically
         sorted_bond_types = sorted(bond_groups.keys())
 
         traces = []
         for bond_type in sorted_bond_types:
             bonds = bond_groups[bond_type]
-            # Create numpy arrays for start and end points
+
             start_points = np.array([[bond.atom1.x, bond.atom1.y, bond.atom1.z] for bond in bonds])
             end_points = np.array([[bond.atom2.x, bond.atom2.y, bond.atom2.z] for bond in bonds])
+            midpoints = np.round((start_points + end_points) / 2, coordinate_round_digits)
 
-            # Round coordinates to 3 decimal places
-            start_points = np.round(start_points, 3)
-            end_points = np.round(end_points, 3)
+            lengths = np.round(
+                np.sqrt(np.sum((end_points - start_points) ** 2, axis=1)), markdown_round_digits
+            )
 
-            # Calculate midpoints efficiently and round
-            midpoints = np.round((start_points + end_points) / 2, 3)
-
-            # Calculate lengths efficiently and round
-            lengths = np.round(np.sqrt(np.sum((end_points - start_points) ** 2, axis=1)), 3)
-            label_texts = [f"{length:.2f}" for length in lengths]
-
-            # Create bond line coordinates with None separators
             bond_coordinates = np.zeros((len(bonds) * 3, 3))
-            bond_coordinates[::3] = start_points
-            bond_coordinates[1::3] = end_points
+            bond_coordinates[::3] = np.round(start_points, coordinate_round_digits)
+            bond_coordinates[1::3] = np.round(end_points, coordinate_round_digits)
             bond_coordinates[2::3] = np.nan
 
-            # Add bond lines trace (coordinates are already rounded)
             traces.append(
                 go.Scatter3d(
                     x=bond_coordinates[:, 0],
@@ -362,20 +445,19 @@ class BondShape:
                 )
             )
 
-            # Add labels trace (midpoints are already rounded)
             traces.append(
                 go.Scatter3d(
                     x=midpoints[:, 0],
                     y=midpoints[:, 1],
                     z=midpoints[:, 2],
                     mode="text",
-                    text=label_texts,
+                    text=[f"{length:.{markdown_round_digits}f}" for length in lengths],
                     textposition="top center",
                     hoverinfo="skip",
                     name=f"{bond_type} lengths",
                     legendgroup=bond_type,
                     showlegend=False,
-                    textfont=dict(size=10),
+                    textfont=dict(size=config["text_size"]),
                     visible=False,
                 )
             )
@@ -482,9 +564,8 @@ class ButtonFactory:
         Returns:
             Tuple of button group configuration and title annotation.
         """
-        group_position = self.config["groups"][group_name]
+        group_config = self.config["groups"][group_name]
         appearance = self.config["appearance"]
-        position = self.config["position"]
 
         button_group = {
             "buttons": buttons,
@@ -492,8 +573,8 @@ class ButtonFactory:
             "pad": {"r": appearance["pad_r"], "t": appearance["pad_t"]},
             "showactive": appearance["showactive"],
             "active": active_index,
-            "x": position["button_x"],
-            "y": group_position["button_y"],
+            "x": group_config["button_x"],
+            "y": group_config["button_y"],
             "xanchor": appearance["xanchor"],
             "yanchor": appearance["yanchor"],
             "type": "buttons",
@@ -501,13 +582,13 @@ class ButtonFactory:
         }
 
         title_annotation = {
-            "text": group_position["title"],
-            "x": position["label_x"],
-            "y": group_position["label_y"],
+            "text": group_config["title"],
+            "x": group_config["label_x"],
+            "y": group_config["label_y"],
             "yref": "paper",
             "align": "left",
             "showarrow": False,
-            "font": {"size": appearance["title_font_size"]},  # Updated to use title font size
+            "font": {"size": appearance["title_font_size"]},
         }
 
         return button_group, title_annotation
@@ -595,7 +676,17 @@ class VisualizationManager:
         )
 
     def _create_axis_config(self) -> Dict[str, Dict[str, Any]]:
-        """Create axis configuration for all three axes."""
+        """Create the configuration dictionary for scene axes.
+
+        Generates a configuration dictionary for the x, y, and z axes of the 3D
+        scene, applying settings from the scene configuration including grid,
+        background, and visibility settings.
+
+        Returns:
+            Dict[str, Dict[str, Any]]: Dictionary containing identical
+                configuration for all three axes (xaxis, yaxis, zaxis) with
+                settings for background, grid, ticks, and visibility.
+        """
         axis_config = {
             "showbackground": self.config_manager.scene["showbackground"],
             "showticklabels": self.config_manager.scene["showticklabels"],
@@ -603,7 +694,7 @@ class VisualizationManager:
             "showspikes": self.config_manager.scene["showspikes"],
             "visible": self.config_manager.scene["axis_visible"],
             "title": {"text": ""},
-            "showgrid": self.config_manager.scene["showbackground"],  # Added
+            "showgrid": self.config_manager.scene["showbackground"],
             "gridcolor": "lightgray"
             if self.config_manager.scene["showbackground"]
             else "white",  # Added
@@ -623,14 +714,21 @@ class VisualizationManager:
         fig = go.Figure()
 
         # Add atom traces
-        atom_traces = self.atom_component.to_trace(config=self.config_manager.atoms)
+        atom_traces = self.atom_component.to_trace(
+            config=self.config_manager.atoms,
+            coordinate_round_digits=self.config_manager.style["coordinate_round_digits"],
+        )
         atom_trace_indices = []
         for trace in atom_traces:
             fig.add_trace(trace)
             atom_trace_indices.append(len(fig.data) - 1)
 
         # Add bond traces
-        bond_traces = self.bond_component.to_trace(config=self.config_manager.bonds)
+        bond_traces = self.bond_component.to_trace(
+            config=self.config_manager.bonds,
+            coordinate_round_digits=self.config_manager.style["coordinate_round_digits"],
+            markdown_round_digits=self.config_manager.style["markdown_round_digits"],
+        )
         bond_trace_indices = []
         for trace in bond_traces:
             fig.add_trace(trace)
@@ -640,10 +738,24 @@ class VisualizationManager:
         self.controls.update_trace_indices(atom_trace_indices, bond_trace_indices)
 
         # Create buttons and annotations
-        buttons, control_annotations = self.controls.create_all_controls()
+        buttons, annotations = self.controls.create_all_controls()
 
-        # Configure axes
-        axis_config = self._create_axis_config()
+        if self.config_manager.watermark["show"]:
+            watermark = {
+                "text": self.config_manager.watermark["text"],
+                "xref": "paper",
+                "yref": "paper",
+                "x": self.config_manager.watermark["x"],
+                "y": self.config_manager.watermark["y"],
+                "showarrow": False,
+                "font": {
+                    "size": self.config_manager.watermark["font_size"],
+                    "color": self.config_manager.watermark["font_color"],
+                },
+                "xanchor": "right",
+                "yanchor": "bottom",
+            }
+            annotations.append(watermark)
 
         # Calculate top margin based on title presence
         top_margin = 40 if self.config_manager.style["title"] else 0
@@ -652,10 +764,10 @@ class VisualizationManager:
         fig.update_layout(
             title=self.config_manager.style["title"],
             scene={
-                **axis_config,
+                **self._create_axis_config(),
             },
             updatemenus=buttons,
-            annotations=control_annotations + [WATERMARK],
+            annotations=annotations,
             margin=dict(r=0, l=0, b=0, t=top_margin),
             legend=self.config_manager.scene["legend"],
         )
