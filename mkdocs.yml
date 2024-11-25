@@ -48,8 +48,8 @@ markdown_extensions:
   - admonition
   - pymdownx.details
 
-extra_templates:
-  - assets/demo.html
+not_in_nav: |
+  - /demo.html
 
 plugins:
   - search
