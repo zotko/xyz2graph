@@ -37,6 +37,7 @@ nav:
   - Python API: python.md
   - Command Line: cli.md
   - Demo: demo.html
+  - License: license.md
 
 
 markdown_extensions:

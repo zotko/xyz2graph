@@ -78,9 +78,6 @@ Full documentation is available at [https://zotko.github.io/xyz2graph](https://z
 
 Contributions are welcome! Please see the [CONTRIBUTING.md](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) file for guidelines.
 
-## License
-
-This project is licensed under the ISC License. See the [LICENSE.md](https://github.com/zotko/xyz2graph/tree/main/LICENSE.md) file for details.
 
 ## Citation
 If you use xyz2graph in your research, please cite:
