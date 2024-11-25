@@ -3,7 +3,7 @@ import warnings
 import networkx as nx
 import plotly.graph_objs as go
 
-from .xyz2graph import MolGraph
+from .graph import MolGraph
 
 
 def to_networkx_graph(graph: MolGraph) -> nx.Graph:

@@ -5,29 +5,27 @@
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://zotko.github.io/xyz2graph)
 
-[![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph)](https://pepy.tech/projects/xyz2graph)
+[![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
 [![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/network/members)
 
 [!["Buy Me A Coffee"](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/mykola_zotko)
 [![Stand With Ukraine](https://img.shields.io/badge/Stand%20With-Ukraine-FFD500?style=flat&labelColor=005BBB)](https://stand-with-ukraine.pp.ua)
 
-A lightweight Python package for reading XYZ files and creating interactive molecular visualizations. Convert molecular structures into 3D visualizations using Plotly or analyze them as NetworkX graphs.
+A Python package for converting XYZ molecular files into interactive 3D visualizations and NetworkX graphs.
 
 <div align="center">
  <img src="https://raw.githubusercontent.com/zotko/xyz2graph/main/.github/images/mol.gif" width="1024">
 </div>
+✨ [Try it live!](https://zotko.github.io/xyz2graph/demo)
 
 ## Features
 
-- Read and parse XYZ molecular structure files
-- Generate interactive 3D molecular visualizations using Plotly
-- Convert molecular structures to NetworkX graphs for analysis
-- Command-line interface for quick visualizations
+- Interactive 3D molecular visualization using Plotly
+- NetworkX graph conversion for analysis
+- Command-line interface
 
-## Documentation
 
-Full documentation is available at [https://zotko.github.io/xyz2graph](https://zotko.github.io/xyz2graph)
 
 ## Installation
 
@@ -39,13 +37,10 @@ pip install xyz2graph
 ## Requirements
 
 - Python 3.8+
-- NumPy
-- Plotly
-- NetworkX
+- Dependencies: NumPy, Plotly, NetworkX
 
-## Usage
 
-### Basic Usage
+## Quick Start
 
 ```python
 from xyz2graph import MolGraph
@@ -62,8 +57,7 @@ fig.show()
 G = mg.to_networkx()
 ```
 
-### Command Line
-
+## Command Line
 ```bash
 # Save visualization as HTML
 xyz2graph molecule.xyz
@@ -75,17 +69,17 @@ xyz2graph molecule.xyz --output visualization.html
 xyz2graph molecule.xyz --browser
 ```
 
-## Examples
+## Documentation
 
-Example XYZ files can be found in the [`examples`](https://github.com/zotko/xyz2graph/tree/main/examples/) directory.
+Full documentation is available at [https://zotko.github.io/xyz2graph](https://zotko.github.io/xyz2graph)
 
 ## Contributing
 
-I welcome contributions! Please see the [CONTRIBUTING.md](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) file for guidelines on how to make contributions to this project.
+Contributions are welcome! Please see the [CONTRIBUTING.md](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) file for guidelines.
 
 ## License
 
-This project is licensed under the ISC License - see the LICENSE file for details.
+This project is licensed under the ISC License. See the [LICENSE.md](https://github.com/zotko/xyz2graph/tree/main/LICENSE.md) file for details.
 
 ## Citation
 If you use xyz2graph in your research, please cite:
