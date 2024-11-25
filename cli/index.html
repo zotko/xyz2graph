@@ -14,7 +14,7 @@
         <link rel="prev" href="../python/">
       
       
-        <link rel="next" href="../license/">
+        <link rel="next" href="../demo.html">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -49,8 +49,6 @@
     
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
-    
-      <link rel="stylesheet" href="../stylesheets/extra.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -414,11 +412,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../license/" class="md-nav__link">
+      <a href="../demo.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    License
+    Demo
   </span>
   
 
@@ -500,7 +498,7 @@
 
 <h1 id="command-line-interface">Command Line Interface</h1>
 <h2 id="usage">Usage</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>xyz2graph<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>-o<span class="w"> </span>OUTPUT<span class="o">]</span><span class="w"> </span><span class="o">[</span>-b<span class="o">]</span><span class="w"> </span><span class="o">[</span>--debug<span class="o">]</span><span class="w"> </span><span class="o">[</span>-f<span class="w"> </span>FILTER<span class="o">]</span><span class="w"> </span>xyz_file
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>xyz2graph<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>-o<span class="w"> </span>OUTPUT<span class="o">]</span><span class="w"> </span><span class="o">[</span>-b<span class="o">]</span><span class="w"> </span><span class="o">[</span>--debug<span class="o">]</span><span class="w"> </span><span class="o">[</span>-r<span class="w"> </span>REMOVE<span class="o">]</span><span class="w"> </span>xyz_file
 </code></pre></div>
 <h2 id="options">Options</h2>
 <p><strong>xyz_file</strong><br />
@@ -509,8 +507,8 @@ Input XYZ file path containing molecular coordinates (required).</p>
 Custom output path for the HTML visualization. Defaults to input filename with .html extension.</p>
 <p><strong>-b, --browser</strong><br />
 Launch visualization directly in default web browser instead of saving to file.</p>
-<p><strong>-f, --filter</strong><br />
-Filter out specific atoms using comma-separated indices or element symbols (e.g., "1,2,H,O,5" removes atoms
+<p><strong>-r, --remove</strong><br />
+Remove specific atoms using comma-separated indices or element symbols (e.g., "1,2,H,O,5" removes atoms
 at positions 1,2,5 and all H,O atoms). Element symbols must be properly capitalized.</p>
 <p><strong>--debug</strong><br />
 Enable verbose logging for troubleshooting and development.</p>
@@ -527,10 +525,10 @@ Display command-line options and usage information.</p>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--browser
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Remove hydrogens and oxygens from visualization</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;H,O&quot;</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--remove<span class="w"> </span><span class="s2">&quot;H,O&quot;</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
 <a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># Remove specific atoms by index and element</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;1,2,H,O,5&quot;</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>xyz2graph<span class="w"> </span>molecule.xyz<span class="w"> </span>--remove<span class="w"> </span><span class="s2">&quot;1,2,H,O,5&quot;</span>
 </code></pre></div>
 
 
@@ -578,13 +576,13 @@ Display command-line options and usage information.</p>
         
         
           
-          <a href="../license/" class="md-footer__link md-footer__link--next" aria-label="Next: License">
+          <a href="../demo.html" class="md-footer__link md-footer__link--next" aria-label="Next: Demo">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                License
+                Demo
               </div>
             </div>
             <div class="md-footer__button md-icon">
