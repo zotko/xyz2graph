@@ -83,7 +83,7 @@ def test_distance_matrix(water_molecule: MolGraph) -> None:
     assert np.allclose(dist_mat[1, 2], 2 * 0.757)  # H-H distance
 
 
-def test_filtering(water_molecule: MolGraph) -> None:
+def test_remove(water_molecule: MolGraph) -> None:
     """Test atom filtering functionality."""
     # Filter hydrogens
     o_only = water_molecule.remove(elements=["H"])
@@ -134,16 +134,6 @@ def test_invalid_xyz_content(tmp_path: Path) -> None:
             mol.read_xyz(xyz_file)
 
 
-def test_memory_efficient_distance_matrix() -> None:
-    """Test memory-efficient distance matrix calculation."""
-    mol = MolGraph()
-    mol.atoms = [Atom("H", 0, 0, 0, 0), Atom("H", 1, 0, 0, 1), Atom("H", 0, 1, 0, 2)]
-
-    regular = mol.distance_matrix(use_low_memory=False)
-    efficient = mol.distance_matrix(use_low_memory=True)
-    assert np.allclose(regular, efficient)
-
-
 def test_atom_indexing() -> None:
     """Test atom indexing and iteration."""
     mol = MolGraph()
@@ -154,10 +144,6 @@ def test_atom_indexing() -> None:
     assert mol[1] == atoms[1]
     with pytest.raises(IndexError):
         _ = mol[2]
-
-    for element, coords in mol:
-        assert isinstance(element, str)
-        assert len(coords) == 3
 
 
 def test_remove_invalid_cases() -> None:

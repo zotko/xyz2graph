@@ -12,11 +12,9 @@ from pathlib import Path
 from typing import (
     Dict,
     FrozenSet,
-    Iterator,
     List,
     Optional,
     Set,
-    Tuple,
     Union,
 )
 
@@ -40,18 +38,20 @@ class MolGraph:
     geometry, and visualize the molecular structure using Plotly.
 
     Args:
-        atoms (List[Atom]): List of Atom objects representing molecular structure.
-        bonds (List[Bond]): List of Bond objects representing molecular connectivity.
-        comment (str): Comment or description of the molecular structure.
-        default_radii (Dict[str, float]): Default atomic radii for each element.
-        cpk_colors (Dict[str, str]): CPK color scheme mapping elements to colors.
-        cpk_color_rest (str): Default color for elements not in cpk_colors.
+        atoms: List of Atom objects representing molecular structure
+        bonds: List of Bond objects representing molecular connectivity
+        comment: Comment or description of the molecular structure
+        default_radii: Default atomic radii for each element
+        cpk_colors: CPK color scheme mapping elements to colors
+        cpk_color_rest: Default color for elements not in cpk_colors
 
-    Examples:
-        >>> mg = MolGraph()
-        >>> mg.read_xyz('molecule.xyz')
-        >>> print(mg.formula())
-        'C2H6O'
+    Attributes:
+        atoms (List[Atom]): List containing all atoms in the molecule
+        bonds (List[Bond]): List containing all bonds in the molecule
+        comment (str): Description or metadata about the molecule
+        default_radii (Dict[str, float]): Mapping of elements to their default atomic radii
+        cpk_colors (Dict[str, str]): Mapping of elements to their CPK color codes
+        cpk_color_rest (str): Default color for elements not in cpk_colors scheme
     """
 
     atoms: List[Atom] = field(default_factory=list)
@@ -164,31 +164,31 @@ class MolGraph:
             matrix[i, j] = matrix[j, i] = 1
         return matrix
 
-    def distance_matrix(self, use_low_memory: bool = False) -> NDArray[np.float64]:
-        """Get matrix of interatomic distances.
+    def distance_matrix(self) -> NDArray[np.float64]:
+        """Calculates the matrix of interatomic distances using optimized memory handling.
 
-        Args:
-            use_low_memory: If True, uses loop-based method to minimize memory usage
+        Attempts to use fast vectorized calculation first, then falls back to a memory-efficient
+        loop-based method if memory constraints are encountered.
 
         Returns:
-            NDArray[np.float64]: Square matrix where entry (i,j) is distance between atoms i and j.
+            NDArray[np.float64]: A square matrix where entry (i,j) represents the
+                Euclidean distance between atoms i and j in Angstroms.
+
+        Note:
+            The resulting matrix is symmetric with zeros on the diagonal.
         """
-        n_atoms = len(self.atoms)
-
-        if not use_low_memory:
-            try:
-                distances = self.xyz[:, np.newaxis, :] - self.xyz
-                return np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
-            except MemoryError:
-                logger.info("Memory allocation failed. Switching to memory-efficient method.")
-                use_low_memory = True
-
-        # Memory efficient loop method
-        distance_matrix = np.zeros((n_atoms, n_atoms), dtype=np.float64)
-        for i in range(n_atoms):
-            diff = self.xyz[i] - self.xyz
-            distance_matrix[i] = np.sqrt(np.sum(diff * diff, axis=1))
-        return distance_matrix
+        try:
+            distances = self.xyz[:, np.newaxis, :] - self.xyz
+            return np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
+        except MemoryError:
+            n_atoms = len(self.atoms)
+            logger.info("Using memory-efficient method for distance calculation")
+            # Fall back to loop-based method
+            distance_matrix = np.zeros((n_atoms, n_atoms), dtype=np.float64)
+            for i in range(n_atoms):
+                diff = self.xyz[i] - self.xyz
+                distance_matrix[i] = np.sqrt(np.sum(diff * diff, axis=1))
+            return distance_matrix
 
     def _generate_bonds(self) -> None:
         """Generate bonds based on atomic distances.
@@ -385,7 +385,7 @@ class MolGraph:
         """Generate molecular formula in Hill notation.
 
         Returns:
-            str: Molecular formula with C and H first, followed by other elements alphabetically.
+            str: Molecular formula in Hill notation.
         """
         if not self.atoms:
             return ""
@@ -430,12 +430,3 @@ class MolGraph:
             IndexError: If index is out of range.
         """
         return self.atoms[index]
-
-    def __iter__(self) -> Iterator[Tuple[str, Tuple[float, float, float]]]:
-        """Create iterator over atoms.
-
-        Returns:
-            Iterator[Tuple[str, Tuple[float, float, float]]]: Iterator
-                yielding (element, coordinates) tuples.
-        """
-        return ((atom.element, (atom.x, atom.y, atom.z)) for atom in self.atoms)

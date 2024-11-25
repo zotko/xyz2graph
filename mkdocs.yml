@@ -31,15 +31,12 @@ theme:
     - navigation.footer
     - content.code.copy
 
-extra_css:
-  - stylesheets/extra.css
-
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
   - Python API: python.md
   - Command Line: cli.md
-  - License: license.md
+  - Demo: demo.html
 
 
 markdown_extensions:
@@ -53,6 +50,7 @@ markdown_extensions:
 
 plugins:
   - search
+  - include-markdown
   - mkdocstrings:
       handlers:
         python:

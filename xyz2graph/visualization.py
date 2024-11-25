@@ -6,6 +6,7 @@ bonds, labels, and interactive controls.
 """
 
 from dataclasses import dataclass
+from textwrap import shorten
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -95,6 +96,36 @@ class WatermarkConfig(TypedDict):
     show: bool
 
 
+class FormulaConfig(TypedDict):
+    """Formula annotation configuration."""
+
+    x: float
+    y: float
+    font_size: int
+    font_color: str
+    xanchor: str
+    yanchor: str
+
+
+class CommentConfig(TypedDict):
+    """Comment annotation configuration."""
+
+    x: float
+    y: float
+    font_size: int
+    font_color: str
+    xanchor: str
+    yanchor: str
+    max_length: int
+
+
+class InformationConfig(TypedDict):
+    """Information display configuration."""
+
+    formula: FormulaConfig
+    comment: CommentConfig
+
+
 class SceneConfig(TypedDict):
     """3D scene configuration."""
 
@@ -113,8 +144,8 @@ class StyleConfig(TypedDict):
 
     atoms: AtomConfig
     bonds: BondConfig
-    title: str
     watermark: WatermarkConfig
+    information: InformationConfig
     coordinate_round_digits: int
     markdown_round_digits: int
 
@@ -201,6 +232,30 @@ DEFAULT_WATERMARK_CONFIG = WatermarkConfig(
     show=True,
 )
 
+DEFAULT_FORMULA_CONFIG = FormulaConfig(
+    x=0.00,
+    y=0.03,
+    font_size=12,
+    font_color="black",
+    xanchor="left",
+    yanchor="bottom",
+)
+
+DEFAULT_COMMENT_CONFIG = CommentConfig(
+    x=0.00,
+    y=0.01,
+    font_size=10,
+    font_color="black",
+    xanchor="left",
+    yanchor="bottom",
+    max_length=100,
+)
+
+DEFAULT_INFORMATION_CONFIG = InformationConfig(
+    formula=DEFAULT_FORMULA_CONFIG,
+    comment=DEFAULT_COMMENT_CONFIG,
+)
+
 DEFAULT_SCENE_CONFIG = SceneConfig(
     showbackground=True,
     showticklabels=False,
@@ -214,8 +269,8 @@ DEFAULT_SCENE_CONFIG = SceneConfig(
 DEFAULT_STYLE = StyleConfig(
     atoms=DEFAULT_ATOM_CONFIG,
     bonds=DEFAULT_BOND_CONFIG,
-    title="",
     watermark=DEFAULT_WATERMARK_CONFIG,
+    information=DEFAULT_INFORMATION_CONFIG,
     coordinate_round_digits=3,
     markdown_round_digits=2,
 )
@@ -230,7 +285,7 @@ class ConfigurationManager:
 
     This class serves as a central configuration manager that provides structured
     access to different aspects of the visualization configuration including:
-    - Style settings (atoms, bonds, title, watermark)
+    - Style settings (atoms, bonds, information, watermark)
     - Scene settings (background, axes, legend)
     - Button controls configuration
     - Atom and bond-specific visualization parameters
@@ -666,6 +721,7 @@ class VisualizationManager:
             mol_graph: Molecular graph to visualize.
             config: Optional custom visualization configuration.
         """
+        self.mol_graph = mol_graph
         self.config_manager = ConfigurationManager(config)
         self.atom_component = AtomShape(atoms=mol_graph.atoms, colors=mol_graph.cpk_colors)
         self.bond_component = BondShape(bonds=mol_graph.bonds)
@@ -705,6 +761,45 @@ class VisualizationManager:
 
         return {axis: axis_config.copy() for axis in ["xaxis", "yaxis", "zaxis"]}
 
+    def _create_annotation(
+        self,
+        text: str,
+        x: float,
+        y: float,
+        font_size: int,
+        font_color: str,
+        xanchor: str = "left",
+        yanchor: str = "bottom",
+    ) -> Dict[str, Any]:
+        """Create a standardized annotation dictionary.
+
+        Args:
+            text: Text content for the annotation
+            x: X-position (0-1 range)
+            y: Y-position (0-1 range)
+            font_size: Size of the font
+            font_color: Color of the font
+            xanchor: Horizontal anchor point ("left" or "right")
+            yanchor: Vertical anchor point ("bottom" or "top")
+
+        Returns:
+            Dict[str, Any]: Annotation configuration dictionary
+        """
+        return {
+            "text": text,
+            "xref": "paper",
+            "yref": "paper",
+            "x": x,
+            "y": y,
+            "showarrow": False,
+            "font": {
+                "size": font_size,
+                "color": font_color,
+            },
+            "xanchor": xanchor,
+            "yanchor": yanchor,
+        }
+
     def create_figure(self) -> go.Figure:
         """Create the Plotly figure for visualization.
 
@@ -737,38 +832,75 @@ class VisualizationManager:
         # Update control indices
         self.controls.update_trace_indices(atom_trace_indices, bond_trace_indices)
 
-        # Create buttons and annotations
-        buttons, annotations = self.controls.create_all_controls()
+        # Create buttons and control annotations
+        buttons, control_annotations = self.controls.create_all_controls()
 
-        if self.config_manager.watermark["show"]:
-            watermark = {
-                "text": self.config_manager.watermark["text"],
-                "xref": "paper",
-                "yref": "paper",
-                "x": self.config_manager.watermark["x"],
-                "y": self.config_manager.watermark["y"],
-                "showarrow": False,
-                "font": {
-                    "size": self.config_manager.watermark["font_size"],
-                    "color": self.config_manager.watermark["font_color"],
-                },
-                "xanchor": "right",
-                "yanchor": "bottom",
-            }
-            annotations.append(watermark)
+        # Create information annotations
+        information_annotations = []
+        info_config = self.config_manager.style["information"]
 
-        # Calculate top margin based on title presence
-        top_margin = 40 if self.config_manager.style["title"] else 0
+        # Add formula annotation if present
+        formula = self.mol_graph.formula()
+        if formula:
+            formula_config = info_config["formula"]
+            information_annotations.append(
+                self._create_annotation(
+                    text=formula,
+                    x=formula_config["x"],
+                    y=formula_config["y"],
+                    font_size=formula_config["font_size"],
+                    font_color=formula_config["font_color"],
+                    xanchor=formula_config["xanchor"],
+                    yanchor=formula_config["yanchor"],
+                )
+            )
+
+        # Add comment annotation if present
+        comment = shorten(
+            self.mol_graph.comment.strip(),
+            width=info_config["comment"]["max_length"],
+            placeholder="...",
+        )
+        if comment:
+            comment_config = info_config["comment"]
+            information_annotations.append(
+                self._create_annotation(
+                    text=comment,
+                    x=comment_config["x"],
+                    y=comment_config["y"],
+                    font_size=comment_config["font_size"],
+                    font_color=comment_config["font_color"],
+                    xanchor=comment_config["xanchor"],
+                    yanchor=comment_config["yanchor"],
+                )
+            )
+
+        # Add watermark if enabled
+        watermark_config = self.config_manager.watermark
+        if watermark_config["show"]:
+            information_annotations.append(
+                self._create_annotation(
+                    text=watermark_config["text"],
+                    x=watermark_config["x"],
+                    y=watermark_config["y"],
+                    font_size=watermark_config["font_size"],
+                    font_color=watermark_config["font_color"],
+                    xanchor="right",
+                    yanchor="bottom",
+                )
+            )
+
+        # Combine all annotations
+        all_annotations = control_annotations + information_annotations
 
         # Update layout with all configurations
         fig.update_layout(
-            title=self.config_manager.style["title"],
             scene={
                 **self._create_axis_config(),
             },
             updatemenus=buttons,
-            annotations=annotations,
-            margin=dict(r=0, l=0, b=0, t=top_margin),
+            annotations=all_annotations,
+            margin=dict(r=0, l=0, b=0, t=0),
             legend=self.config_manager.scene["legend"],
         )
 

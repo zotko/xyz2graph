@@ -49,7 +49,15 @@ def parse_remove_arg(remove_str: str) -> Tuple[List[int], List[str]]:
 
 
 def format_remove_message(indices: List[int], elements: List[str]) -> str:
-    """Format the message showing which atoms will be removed."""
+    """Format the message showing which atoms will be removed.
+
+    Args:
+        indices: List of atom indices to remove
+        elements: List of element symbols to remove
+
+    Returns:
+        str: Formatted message describing atoms to be removed
+    """
     messages = []
     if indices:
         messages.append(f"Removing atoms at indices: {', '.join(map(str, indices))}")
@@ -109,17 +117,28 @@ def log_molecule_state(mol: MolGraph, msg: str = "") -> None:
     Args:
         mol: MolGraph instance to analyze
         msg: Optional message prefix
+
+    Returns:
+        None: Logs molecule formula and optionally detailed atom info if debug enabled
     """
     logger.info(f"{msg + ': ' if msg else ''}{mol.formula()}")
 
     if logger.level <= logging.DEBUG:
         # Log detailed atom information in debug mode
-        for i, (element, (x, y, z)) in enumerate(mol):
-            logger.debug(f"{mol.indices[i]}. {element} ({x:.3f}, {y:.3f}, {z:.3f})")
+        for atom in mol.atoms:
+            logger.debug(f"{atom.index}. {atom.element} ({atom.x:.3f}, {atom.y:.3f}, {atom.z:.3f})")
 
 
 def main() -> None:
-    """Main function for the command-line interface."""
+    """Log information about the molecule's current state.
+
+    Args:
+        mol: MolGraph instance to analyze
+        msg: Optional message prefix
+
+    Returns:
+        None: Logs molecule formula and optionally detailed atom info if debug enabled
+    """
     args = parse_args()
 
     if args.debug:
