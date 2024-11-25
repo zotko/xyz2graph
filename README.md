@@ -18,7 +18,7 @@ A Python package for converting XYZ molecular files into interactive 3D visualiz
  <img src="https://raw.githubusercontent.com/zotko/xyz2graph/main/.github/images/mol.gif" width="1024">
 </div>
 
-✨ [Try it live!](https://zotko.github.io/xyz2graph/demo)
+<a href="https://zotko.github.io/xyz2graph/demo" target="_blank">Try it live 🚀</a>
 
 ## Features
 

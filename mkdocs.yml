@@ -36,7 +36,6 @@ nav:
   - Getting Started: getting-started.md
   - Python API: python.md
   - Command Line: cli.md
-  - Demo: demo.html
   - License: license.md
 
 
@@ -48,6 +47,9 @@ markdown_extensions:
   - pymdownx.superfences
   - admonition
   - pymdownx.details
+
+extra_templates:
+  - assets/demo.html
 
 plugins:
   - search
