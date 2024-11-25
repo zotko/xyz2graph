@@ -172,10 +172,10 @@ DEFAULT_BUTTONS = ButtonsConfig(
 )
 
 DEFAULT_ATOM_CONFIG = AtomConfig(
-    size=5,
+    size=6,
     opacity=0.9,
-    border_color="lightgray",
-    border_width=2,
+    border_color="black",
+    border_width=4,
     hover_font_size=12,
 )
 

@@ -1,25 +1,5 @@
 #!/usr/bin/env python3
-"""Command-line interface for generating 3D molecular visualizations from XYZ files.
-
-Functions:
-    parse_filter_arg(filter_str: str) -> Tuple[List[int], List[str]]:
-        Parse filter argument string into indices and elements.
-
-    format_filter_message(indices: List[int], elements: List[str]) -> str:
-        Format the filtering message showing what will be filtered.
-
-    parse_args() -> argparse.Namespace:
-        Parse command line arguments.
-
-    generate_output_path(input_path: str, output_path: Union[str, None]) -> Path:
-        Generate the output file path based on input path.
-
-    log_molecule_state(mol: MolGraph, msg: str = "") -> None:
-        Log information about the molecule's current state.
-
-    main() -> None:
-        Main function for the command-line interface.
-"""
+"""Command-line interface for generating 3D molecular visualizations from XYZ files."""
 
 import argparse
 import logging
@@ -35,11 +15,11 @@ from xyz2graph import MolGraph
 from xyz2graph.logging import logger
 
 
-def parse_filter_arg(filter_str: str) -> Tuple[List[int], List[str]]:
-    """Parse filter argument string into indices and elements.
+def parse_remove_arg(remove_str: str) -> Tuple[List[int], List[str]]:
+    """Parse remove argument string into indices and elements.
 
     Args:
-        filter_str: Comma-separated values for indices and elements
+        remove_str: Comma-separated values for indices and elements
             (e.g., "1,2,H,O" removes atoms at indices 1,2 and all H,O atoms)
 
     Returns:
@@ -51,7 +31,7 @@ def parse_filter_arg(filter_str: str) -> Tuple[List[int], List[str]]:
     indices = []
     elements = []
 
-    for item in filter_str.split(","):
+    for item in remove_str.split(","):
         item = item.strip()
         if not item:
             continue
@@ -63,18 +43,18 @@ def parse_filter_arg(filter_str: str) -> Tuple[List[int], List[str]]:
             if item.isalpha():
                 elements.append(item)
             else:
-                logger.warning(f"Ignoring invalid filter value: {item}")
+                logger.warning(f"Ignoring invalid value: {item}")
 
     return indices, elements
 
 
-def format_filter_message(indices: List[int], elements: List[str]) -> str:
-    """Format the filtering message showing what will be filtered."""
+def format_remove_message(indices: List[int], elements: List[str]) -> str:
+    """Format the message showing which atoms will be removed."""
     messages = []
     if indices:
-        messages.append(f"Filtering indices: {', '.join(map(str, indices))}")
+        messages.append(f"Removing atoms at indices: {', '.join(map(str, indices))}")
     if elements:
-        messages.append(f"Filtering elements: {', '.join(elements)}")
+        messages.append(f"Removing elements: {', '.join(elements)}")
     return "; ".join(messages)
 
 
@@ -101,12 +81,14 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Enable debug logging",
     )
-    # Unified filter argument
-    parser.add_argument(
-        "-f",
-        "--filter",
+
+    # Add remove argument group for clarity
+    remove_group = parser.add_mutually_exclusive_group()
+    remove_group.add_argument(
+        "-r",
+        "--remove",
         type=str,
-        help="Atoms to filter out using comma-separated values for indices and/or elements. "
+        help="Atoms to remove using comma-separated values for indices and/or elements. "
         "Make sure to use proper element capitalization (e.g., 'H' not 'h'). "
         "Example: '1,2,H,O,5' removes atoms at indices 1,2,5 and all H,O atoms.",
     )
@@ -151,13 +133,13 @@ def main() -> None:
         mg.read_xyz(args.xyz_file)
         log_molecule_state(mg, "Initial molecule")
 
-        # Apply filters if specified
-        if args.filter:
-            indices, elements = parse_filter_arg(args.filter)
+        # Handle atom removal
+        if args.remove:
+            indices, elements = parse_remove_arg(args.remove)
             if indices or elements:
-                logger.info(format_filter_message(indices, elements))
-                mg.filter(indices=indices or None, elements=elements or None, inplace=True)
-                log_molecule_state(mg, "Filtered molecule")
+                logger.info(format_remove_message(indices, elements))
+                mg.remove(indices=indices or None, elements=elements or None, inplace=True)
+                log_molecule_state(mg, "Modified molecule")
 
     except (FileNotFoundError, ValueError, IndexError) as e:
         logger.error(f"Error processing molecule: {e}")

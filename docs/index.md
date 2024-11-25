@@ -4,7 +4,7 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
 
-[![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph)](https://pepy.tech/projects/xyz2graph)
+[![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
 [![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/network/members)
 
@@ -13,7 +13,7 @@
 
 Welcome to xyz2graph's documentation! This Python package provides tools for reading XYZ molecular structure files and creating interactive 3D visualizations.
 
-<iframe src="assets/molecule_3d.html" width="100%" height="400px" frameborder="0"></iframe>
+<iframe src="assets/molecule_3d.html" width="100%" height="500px" frameborder="0"></iframe>
 
 <div class="bounce-container">
   <div class="bouncing-emoji">👆 Try me!</div>

@@ -75,10 +75,6 @@ xyz2graph molecule.xyz --output visualization.html
 xyz2graph molecule.xyz --browser
 ```
 
-## Examples
-
-Example XYZ files can be found in the [`examples`](https://github.com/zotko/xyz2graph/tree/main/examples/) directory.
-
 ## Contributing
 
 I welcome contributions! Please see the [CONTRIBUTING.md](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) file for guidelines on how to make contributions to this project.

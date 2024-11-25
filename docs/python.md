@@ -1,3 +1,3 @@
 # Python API
 
-::: xyz2graph.xyz2graph.MolGraph
+::: xyz2graph.graph.MolGraph

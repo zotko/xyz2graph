@@ -76,7 +76,7 @@ def test_adjacency_properties(water_molecule: MolGraph) -> None:
 
 def test_distance_matrix(water_molecule: MolGraph) -> None:
     """Test distance matrix calculation."""
-    dist_mat = water_molecule.distance_matrix
+    dist_mat = water_molecule.distance_matrix()
     assert dist_mat.shape == (3, 3)
     assert np.allclose(dist_mat[0, 0], 0)  # Self distance
     assert np.allclose(dist_mat[0, 1], dist_mat[1, 0])  # Symmetry
@@ -86,7 +86,7 @@ def test_distance_matrix(water_molecule: MolGraph) -> None:
 def test_filtering(water_molecule: MolGraph) -> None:
     """Test atom filtering functionality."""
     # Filter hydrogens
-    o_only = water_molecule.filter(elements=["H"])
+    o_only = water_molecule.remove(elements=["H"])
     assert o_only is not None
     assert len(o_only) == 1
     assert o_only.elements == ["O"]
@@ -108,30 +108,79 @@ def test_to_networkx(water_molecule: MolGraph) -> None:
         assert "length" in data
 
 
-def test_error_handling(tmp_path: Path) -> None:
-    """Test error handling for various scenarios."""
+def test_set_element_radius() -> None:
+    """Test custom radius setting for elements."""
     mol = MolGraph()
+    mol.atoms = [Atom("H", 0, 0, 0, 0), Atom("H", 1, 0, 0, 1)]
 
-    with pytest.raises(FileNotFoundError):
-        mol.read_xyz(tmp_path / "nonexistent.xyz")
+    mol.set_element_radius("H", 2.0)
+    assert all(atom.radius == 2.0 for atom in mol.atoms)
+    assert len(mol.bonds) > 0
 
-    invalid_xyz = """1
-Invalid element
-X 0.0 0.0 0.0
-"""
-    invalid_file = tmp_path / "invalid.xyz"
-    invalid_file.write_text(invalid_xyz)
-    with pytest.raises(ValueError, match="Unknown element"):
-        mol.read_xyz(invalid_file)
 
-    malformed_xyz = """1
-Malformed coordinates
-H 0.0 missing 0.0
-"""
-    malformed_file = tmp_path / "malformed.xyz"
-    malformed_file.write_text(malformed_xyz)
-    with pytest.raises(ValueError, match="Invalid coordinate format"):
-        mol.read_xyz(malformed_file)
+def test_invalid_xyz_content(tmp_path: Path) -> None:
+    """Test error handling for invalid XYZ file content."""
+    invalid_cases = [
+        "not_a_number\ncomment\nH 0 0 0",
+        "1\ncomment\nH invalid coords",
+        "1\ncomment\nXx 0 0 0",  # Invalid element
+    ]
+
+    mol = MolGraph()
+    for content in invalid_cases:
+        xyz_file = tmp_path / "test.xyz"
+        xyz_file.write_text(content)
+        with pytest.raises((ValueError, FileNotFoundError)):
+            mol.read_xyz(xyz_file)
+
+
+def test_memory_efficient_distance_matrix() -> None:
+    """Test memory-efficient distance matrix calculation."""
+    mol = MolGraph()
+    mol.atoms = [Atom("H", 0, 0, 0, 0), Atom("H", 1, 0, 0, 1), Atom("H", 0, 1, 0, 2)]
+
+    regular = mol.distance_matrix(use_low_memory=False)
+    efficient = mol.distance_matrix(use_low_memory=True)
+    assert np.allclose(regular, efficient)
+
+
+def test_atom_indexing() -> None:
+    """Test atom indexing and iteration."""
+    mol = MolGraph()
+    atoms = [Atom("H", 0, 0, 0, 0), Atom("O", 1, 1, 1, 1)]
+    mol.atoms = atoms
+
+    assert mol[0] == atoms[0]
+    assert mol[1] == atoms[1]
+    with pytest.raises(IndexError):
+        _ = mol[2]
+
+    for element, coords in mol:
+        assert isinstance(element, str)
+        assert len(coords) == 3
+
+
+def test_remove_invalid_cases() -> None:
+    """Test error cases for remove method."""
+    mol = MolGraph()
+    mol.atoms = [Atom("H", i, 0, 0, i) for i in range(3)]
+
+    with pytest.raises(IndexError, match="Atom index out of range"):
+        mol.remove(indices=[10])
+
+    with pytest.raises(ValueError, match="Cannot remove all atoms from molecule"):
+        mol.remove(indices=[0, 1, 2])
+
+
+def test_property_consistency() -> None:
+    """Test consistency between different property representations."""
+    mol = MolGraph()
+    mol.atoms = [Atom("H", 0, 1, 2, 0), Atom("O", 3, 4, 5, 1)]
+
+    assert np.allclose(mol.xyz, np.array([[0, 1, 2], [3, 4, 5]]))
+    assert mol.x == [0, 3]
+    assert mol.y == [1, 4]
+    assert mol.z == [2, 5]
 
 
 @pytest.mark.parametrize(

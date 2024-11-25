@@ -19,7 +19,7 @@ class Atom:
     y: float
     z: float
     index: int
-    radius: float = field(default=0.0)
+    radius: float = 0.0
 
     @property
     def xyz(self) -> NDArray[np.float64]:
@@ -59,13 +59,3 @@ class Bond:
     def __contains__(self, atom: Atom) -> bool:
         """Check if an atom is part of this bond."""
         return atom in self.atoms
-
-    def __eq__(self, other: object) -> bool:
-        """Two bonds are equal if they connect the same atoms."""
-        if not isinstance(other, Bond):
-            return NotImplemented
-        return self.atoms == other.atoms
-
-    def __hash__(self) -> int:
-        """Hash based on the atoms in the bond."""
-        return hash(self.atoms)

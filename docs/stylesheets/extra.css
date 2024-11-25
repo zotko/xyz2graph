@@ -29,3 +29,10 @@
 [data-md-color-scheme="slate"] .bouncing-emoji {
     color: var(--md-primary-fg-color);
 }
+
+iframe {
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto;
+    display: block;
+}
