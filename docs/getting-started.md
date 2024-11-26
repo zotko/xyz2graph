@@ -27,6 +27,8 @@ fig.show()
 Convert your molecular structure to a NetworkX graph for analysis:
 
 ```python
+import networkx as nx
+
 # Convert to NetworkX graph
 G = mg.to_networkx()
 
@@ -36,15 +38,18 @@ print(f"Graph density: {nx.density(G)}")
 
 ### Structure Manipulation
 
+Remove atoms for better visualization.
+
 ```python
-# Remove all hydrogen atoms
+# Remove all hydrogen atoms, modifying the original structure
 mg.remove(elements=['H'], inplace=True)
 
-# Remove multiple element types
+# Remove both hydrogen and oxygen atoms, modifying the original structure
 mg.remove(elements=['H', 'O'], inplace=True)
 
-# Remove all hydrogen atoms and atoms at indices 1 and 5
-new_mg = mg.remove(elements=['H'], indices=[1,5])
+# Create a new molecule by removing hydrogens and specific atoms
+# The original molecule remains unchanged since inplace=False (default)
+new_mg = mg.remove(elements=['H'], indices=[1, 5])
 ```
 
 ## Using the Command Line
@@ -56,19 +61,19 @@ For quick visualizations, you can use the command-line interface:
 xyz2graph molecule.xyz
 
 # Save visualization to specific path
-xyz2graph molecule.xyz --output viz.html
+xyz2graph molecule.xyz -o viz.html
 
 # Open directly in browser without saving
-xyz2graph molecule.xyz --browser
+xyz2graph molecule.xyz -b
 
 # Remove hydrogen atoms from visualization
-xyz2graph molecule.xyz --remove "H"
+xyz2graph molecule.xyz -r "H"
 
 # Remove specific atoms by index (0-based)
-xyz2graph molecule.xyz --remove "0,1,2"
+xyz2graph molecule.xyz -r "0,1,2"
 
 # Combine element and index removal
-xyz2graph molecule.xyz --remove "H,O,1,2,5"
+xyz2graph molecule.xyz -r "H,O,1,2,5"
 ```
 
 ## Next Steps

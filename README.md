@@ -53,9 +53,6 @@ mg.read_xyz('molecule.xyz')
 # Generate interactive 3D visualization
 fig = mg.to_plotly()
 fig.show()
-
-# Convert to NetworkX graph
-G = mg.to_networkx()
 ```
 
 ## Command Line
@@ -64,7 +61,7 @@ G = mg.to_networkx()
 xyz2graph molecule.xyz
 
 # Specify output file
-xyz2graph molecule.xyz --output visualization.html
+xyz2graph molecule.xyz --output viz.html
 
 # Open directly in browser
 xyz2graph molecule.xyz --browser

@@ -34,14 +34,14 @@ Display command-line options and usage information.
 xyz2graph molecule.xyz
 
 # Save visualization with a specific name
-xyz2graph molecule.xyz --output my-molecule.html
+xyz2graph molecule.xyz -o viz.html
 
 # Open directly in browser without saving
-xyz2graph molecule.xyz --browser
+xyz2graph molecule.xyz -b
 
 # Remove hydrogens and oxygens from visualization
-xyz2graph molecule.xyz --remove "H,O"
+xyz2graph molecule.xyz -r "H,O"
 
 # Remove specific atoms by index and element
-xyz2graph molecule.xyz --remove "1,2,H,O,5"
+xyz2graph molecule.xyz -r "1,2,H,O,5"
 ```

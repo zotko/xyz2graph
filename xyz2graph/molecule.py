@@ -30,6 +30,10 @@ class Atom:
         """Calculate distance to another atom."""
         return cast(float, np.linalg.norm(self.xyz - other.xyz).item())
 
+    def __repr__(self) -> str:
+        """Return string representation of atom."""
+        return f"{self.index}. {self.element} ({self.x}, {self.y}, {self.z})"
+
 
 @dataclass
 class Bond:
