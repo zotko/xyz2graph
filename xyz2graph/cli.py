@@ -11,8 +11,8 @@ from typing import List, Tuple, Union
 import plotly.offline as offline
 from plotly.io import write_html
 
-from xyz2graph import MolGraph
-from xyz2graph.logging import logger
+from .graph import MolGraph
+from .logging import logger
 
 
 def parse_remove_arg(remove_str: str) -> Tuple[List[int], List[str]]:
@@ -89,8 +89,6 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Enable debug logging",
     )
-
-    # Add remove argument group for clarity
     remove_group = parser.add_mutually_exclusive_group()
     remove_group.add_argument(
         "-r",
@@ -124,7 +122,6 @@ def log_molecule_state(mol: MolGraph, msg: str = "") -> None:
     logger.info(f"{msg + ': ' if msg else ''}{mol.formula()}")
 
     if logger.level <= logging.DEBUG:
-        # Log detailed atom information in debug mode
         for atom in mol.atoms:
             logger.debug(f"{atom.index}. {atom.element} ({atom.x:.3f}, {atom.y:.3f}, {atom.z:.3f})")
 
