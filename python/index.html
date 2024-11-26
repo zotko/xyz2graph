@@ -1578,7 +1578,7 @@ to sets of bonded atom indices.</p>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            NDArray[np.int_]: A square matrix where entry (i,j) is 1 if atoms i and j</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            are bonded and 0 otherwise.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">                are bonded and 0 otherwise.</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)</span>
@@ -2336,17 +2336,8 @@ to sets of bonded atom indices.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>NDArray[np.int_]: A square matrix where entry (i,j) is 1 if atoms i and j</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int_">int_</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>are bonded and 0 otherwise.</p>
+                <p>NDArray[np.int_]: A square matrix where entry (i,j) is 1 if atoms i and j
+are bonded and 0 otherwise.</p>
               </div>
             </td>
           </tr>
