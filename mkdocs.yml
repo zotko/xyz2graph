@@ -61,3 +61,8 @@ plugins:
             docstring_style: google
             show_root_heading: true
             filters: ["!^_"]
+
+extra:
+  analytics:
+    provider: google
+    property: G-EHBM6DDHST
