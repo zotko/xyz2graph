@@ -1,6 +1,8 @@
 site_name: xyz2graph
 site_description: Convert molecular .xyz files into graph representations and 3D visualizations
 repo_url: https://github.com/zotko/xyz2graph
+site_url: https://zotko.github.io/xyz2graph/
+
 theme:
   name: material
   palette:

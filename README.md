@@ -26,20 +26,16 @@ A Python package for converting XYZ molecular files into interactive 3D visualiz
 - NetworkX graph conversion for analysis
 - Command-line interface
 
-
-
 ## Installation
 
 ```bash
 pip install xyz2graph
 ```
 
-
 ## Requirements
 
 - Python 3.8+
 - Dependencies: NumPy, Plotly, NetworkX
-
 
 ## Quick Start
 
@@ -50,12 +46,16 @@ from xyz2graph import MolGraph
 mg = MolGraph()
 mg.read_xyz('molecule.xyz')
 
+# Convert to NetworkX graph
+G = mg.to_networkx()
+
 # Generate interactive 3D visualization
 fig = mg.to_plotly()
 fig.show()
 ```
 
 ## Command Line
+
 ```bash
 # Save visualization as HTML
 xyz2graph molecule.xyz
@@ -67,16 +67,21 @@ xyz2graph molecule.xyz --output viz.html
 xyz2graph molecule.xyz --browser
 ```
 
+## Help & Discussion
+
+🪲 [Report a bug](https://github.com/zotko/xyz2graph/issues)  
+✨ [Request a feature](https://github.com/zotko/xyz2graph/discussions)
+
 ## Documentation
 
-Full documentation is available at [https://zotko.github.io/xyz2graph](https://zotko.github.io/xyz2graph)
+Read the [documentation](https://zotko.github.io/xyz2graph) for guides, API reference, and examples.
 
 ## Contributing
 
-Contributions are welcome! Please see the [CONTRIBUTING.md](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) file for guidelines.
-
+Contributions are welcome! Please see the [Contributing Guide](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) for guidelines.
 
 ## Citation
+
 If you use xyz2graph in your research, please cite:
 
 ```bibtex
