@@ -11,7 +11,7 @@
 
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 
-A Python package for converting XYZ molecular files into interactive 3D visualizations and NetworkX graphs.
+A Python package to convert XYZ molecular files into NetworkX graphs with interactive 3D visualization using Plotly.
 
 <div align="center">
  <img src="https://raw.githubusercontent.com/zotko/xyz2graph/main/.github/images/mol.gif" width="1024">
@@ -66,14 +66,14 @@ xyz2graph molecule.xyz --output viz.html
 xyz2graph molecule.xyz --browser
 ```
 
+## Documentation
+
+Read the [documentation](https://zotko.github.io/xyz2graph) for guides, API reference, and examples.
+
 ## Help & Discussion
 
 🪲 [Report a bug](https://github.com/zotko/xyz2graph/issues)  
 ✨ [Request a feature](https://github.com/zotko/xyz2graph/discussions)
-
-## Documentation
-
-Read the [documentation](https://zotko.github.io/xyz2graph) for guides, API reference, and examples.
 
 ## Contributing
 
