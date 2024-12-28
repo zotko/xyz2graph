@@ -1,5 +1,5 @@
 site_name: xyz2graph
-site_description: Convert molecular .xyz files into graph representations and 3D visualizations
+site_description: A Python package to convert XYZ molecular files into NetworkX graphs with interactive 3D visualization using Plotly.
 repo_url: https://github.com/zotko/xyz2graph
 site_url: https://zotko.github.io/xyz2graph/
 
@@ -39,7 +39,6 @@ nav:
   - Python API: python.md
   - Command Line: cli.md
   - License: license.md
-
 
 markdown_extensions:
   - pymdownx.highlight:
