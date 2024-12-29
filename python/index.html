@@ -1444,7 +1444,12 @@ to sets of bonded atom indices.</p>
 <span class="normal"><a href="#__codelineno-0-459">459</a></span>
 <span class="normal"><a href="#__codelineno-0-460">460</a></span>
 <span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="nd">@dataclass</span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="nd">@dataclass</span>
 <a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="k">class</span> <span class="nc">MolGraph</span><span class="p">:</span>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a molecular graph structure.</span>
 <a id="__codelineno-0-35" name="__codelineno-0-35"></a>
@@ -1799,82 +1804,87 @@ to sets of bonded atom indices.</p>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="k">def</span> <span class="nf">to_networkx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert molecular structure to NetworkX graph.</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            nx.Graph: NetworkX graph with atoms as nodes and bonds as edges.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating NetworkX graph&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        Creates a NetworkX graph representation of the molecular structure where atoms are nodes</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        and bonds are edges. Each node (atom) index corresponds to the atom&#39;s original index in</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        the molecular structure and contains element type and 3D coordinates as attributes. Each</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        edge (bond) connects two atoms using their indices and stores the bond length.</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="c1"># Add nodes with attributes</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="c1"># Add edges with attributes</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">bond</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="k">return</span> <span class="n">G</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>    <span class="c1"># Define dummy method to_plotly()</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="k">def</span> <span class="nf">to_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisualizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert molecular structure to Plotly figure.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            config (VisualizationConfig, optional): Visualization configuration parameters.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            go.Figure: Interactive molecular visualization as Plotly figure.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating Plotly figure&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>        <span class="k">return</span> <span class="n">create_visualization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of atoms in the molecule.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            int: Total number of atoms.</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atom</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get atom at specified index.</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            index (int): Zero-based index of the atom.</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        Node attributes:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            - element (str): Chemical element symbol of the atom</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            - xyz (tuple): 3D coordinates of the atom as (x, y, z) floats</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        Edge attributes:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            - length (float): Bond length between the two connected atoms in Angstroms</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            nx.Graph: NetworkX undirected graph where:</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">                - Nodes are atoms with their indices as node identifiers</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">                - Edges are bonds between atoms</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">                - Node and edge attributes contain chemical properties</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating NetworkX graph&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="c1"># Add nodes with attributes</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>            <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>        <span class="c1"># Add edges with attributes</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>            <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">bond</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="k">return</span> <span class="n">G</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="k">def</span> <span class="nf">to_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisualizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert molecular structure to Plotly figure.</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">            config (VisualizationConfig, optional): Visualization configuration parameters.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">            go.Figure: Interactive molecular visualization as Plotly figure.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating Plotly figure&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="k">return</span> <span class="n">create_visualization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            Atom: Atom object at the specified index.</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of atoms in the molecule.</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            IndexError: If index is out of range.</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            int: Total number of atoms.</span>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a simplified string representation of the molecular graph.</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atom</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get atom at specified index.</span>
 <a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        Generates a string representation showing the molecular formula in Hill notation</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        along with basic structural information about the number of atoms and bonds.</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">            index (int): Zero-based index of the atom.</span>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            str: A string in the format &quot;MolGraph(formula: num_atoms atoms, num_bonds bonds)&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">                or &quot;MolGraph(empty)&quot; for an empty molecule.</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            &gt;&gt;&gt; mol = MolGraph()  # empty molecule</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">            &gt;&gt;&gt; repr(mol)</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">            &#39;MolGraph(empty)&#39;</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            &gt;&gt;&gt; mol = MolGraph(atoms=[...])  # molecule with CH4 structure</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">            &gt;&gt;&gt; repr(mol)</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            &#39;MolGraph(CH4: 5 atoms, 4 bonds)&#39;</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="k">return</span> <span class="s2">&quot;MolGraph(empty)&quot;</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;MolGraph(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">formula</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span><span class="si">}</span><span class="s2"> atoms, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span><span class="si">}</span><span class="s2"> bonds)&quot;</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            Atom: Atom object at the specified index.</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            IndexError: If index is out of range.</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a simplified string representation of the molecular graph.</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        Generates a string representation showing the molecular formula in Hill notation</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        along with basic structural information about the number of atoms and bonds.</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">            str: A string in the format &quot;MolGraph(formula: num_atoms atoms, num_bonds bonds)&quot;</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">                or &quot;MolGraph(empty)&quot; for an empty molecule.</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="k">return</span> <span class="s2">&quot;MolGraph(empty)&quot;</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;MolGraph(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">formula</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span><span class="si">}</span><span class="s2"> atoms, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span><span class="si">}</span><span class="s2"> bonds)&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -3120,7 +3130,26 @@ Euclidean distance between atoms i and j in Angstroms.</p>
     <div class="doc doc-contents ">
 
         <p>Convert molecular structure to NetworkX graph.</p>
+<p>Creates a NetworkX graph representation of the molecular structure where atoms are nodes
+and bonds are edges. Each node (atom) index corresponds to the atom's original index in
+the molecular structure and contains element type and 3D coordinates as attributes. Each
+edge (bond) connects two atoms using their indices and stores the bond length.</p>
 
+
+<details class="node-attributes" open>
+  <summary>Node attributes</summary>
+  <ul>
+<li>element (str): Chemical element symbol of the atom</li>
+<li>xyz (tuple): 3D coordinates of the atom as (x, y, z) floats</li>
+</ul>
+</details>
+
+<details class="edge-attributes" open>
+  <summary>Edge attributes</summary>
+  <ul>
+<li>length (float): Bond length between the two connected atoms in Angstroms</li>
+</ul>
+</details>
 
     <p><span class="doc-section-title">Returns:</span></p>
     <table>
@@ -3137,7 +3166,10 @@ Euclidean distance between atoms i and j in Angstroms.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>nx.Graph: NetworkX graph with atoms as nodes and bonds as edges.</p>
+                <p>nx.Graph: NetworkX undirected graph where:
+- Nodes are atoms with their indices as node identifiers
+- Edges are bonds between atoms
+- Node and edge attributes contain chemical properties</p>
               </div>
             </td>
           </tr>
@@ -3164,25 +3196,55 @@ Euclidean distance between atoms i and j in Angstroms.</p>
 <span class="normal"><a href="#__codelineno-0-399">399</a></span>
 <span class="normal"><a href="#__codelineno-0-400">400</a></span>
 <span class="normal"><a href="#__codelineno-0-401">401</a></span>
-<span class="normal"><a href="#__codelineno-0-402">402</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="k">def</span> <span class="nf">to_networkx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-402">402</a></span>
+<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+<span class="normal"><a href="#__codelineno-0-404">404</a></span>
+<span class="normal"><a href="#__codelineno-0-405">405</a></span>
+<span class="normal"><a href="#__codelineno-0-406">406</a></span>
+<span class="normal"><a href="#__codelineno-0-407">407</a></span>
+<span class="normal"><a href="#__codelineno-0-408">408</a></span>
+<span class="normal"><a href="#__codelineno-0-409">409</a></span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span>
+<span class="normal"><a href="#__codelineno-0-412">412</a></span>
+<span class="normal"><a href="#__codelineno-0-413">413</a></span>
+<span class="normal"><a href="#__codelineno-0-414">414</a></span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
+<span class="normal"><a href="#__codelineno-0-417">417</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="k">def</span> <span class="nf">to_networkx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert molecular structure to NetworkX graph.</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        nx.Graph: NetworkX graph with atoms as nodes and bonds as edges.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating NetworkX graph&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    Creates a NetworkX graph representation of the molecular structure where atoms are nodes</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    and bonds are edges. Each node (atom) index corresponds to the atom&#39;s original index in</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    the molecular structure and contains element type and 3D coordinates as attributes. Each</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    edge (bond) connects two atoms using their indices and stores the bond length.</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="c1"># Add nodes with attributes</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="c1"># Add edges with attributes</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">bond</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="k">return</span> <span class="n">G</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    Node attributes:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        - element (str): Chemical element symbol of the atom</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        - xyz (tuple): 3D coordinates of the atom as (x, y, z) floats</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">    Edge attributes:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        - length (float): Bond length between the two connected atoms in Angstroms</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        nx.Graph: NetworkX undirected graph where:</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            - Nodes are atoms with their indices as node identifiers</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            - Edges are bonds between atoms</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            - Node and edge attributes contain chemical properties</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating NetworkX graph&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>    <span class="c1"># Add nodes with attributes</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>    <span class="c1"># Add edges with attributes</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">bond</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="k">return</span> <span class="n">G</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3262,29 +3324,29 @@ Euclidean distance between atoms i and j in Angstroms.</p>
 
             <details class="quote">
               <summary>Source code in <code>xyz2graph/graph.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-405">405</a></span>
-<span class="normal"><a href="#__codelineno-0-406">406</a></span>
-<span class="normal"><a href="#__codelineno-0-407">407</a></span>
-<span class="normal"><a href="#__codelineno-0-408">408</a></span>
-<span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span>
-<span class="normal"><a href="#__codelineno-0-413">413</a></span>
-<span class="normal"><a href="#__codelineno-0-414">414</a></span>
-<span class="normal"><a href="#__codelineno-0-415">415</a></span>
-<span class="normal"><a href="#__codelineno-0-416">416</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="k">def</span> <span class="nf">to_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisualizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert molecular structure to Plotly figure.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        config (VisualizationConfig, optional): Visualization configuration parameters.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        go.Figure: Interactive molecular visualization as Plotly figure.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating Plotly figure&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>    <span class="k">return</span> <span class="n">create_visualization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-419">419</a></span>
+<span class="normal"><a href="#__codelineno-0-420">420</a></span>
+<span class="normal"><a href="#__codelineno-0-421">421</a></span>
+<span class="normal"><a href="#__codelineno-0-422">422</a></span>
+<span class="normal"><a href="#__codelineno-0-423">423</a></span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
+<span class="normal"><a href="#__codelineno-0-425">425</a></span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span>
+<span class="normal"><a href="#__codelineno-0-427">427</a></span>
+<span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="k">def</span> <span class="nf">to_plotly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisualizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert molecular structure to Plotly figure.</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        config (VisualizationConfig, optional): Visualization configuration parameters.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        go.Figure: Interactive molecular visualization as Plotly figure.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating Plotly figure&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="k">return</span> <span class="n">create_visualization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
