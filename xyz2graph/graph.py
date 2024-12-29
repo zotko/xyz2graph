@@ -384,8 +384,23 @@ class MolGraph:
     def to_networkx(self) -> nx.Graph:
         """Convert molecular structure to NetworkX graph.
 
+        Creates a NetworkX graph representation of the molecular structure where atoms are nodes
+        and bonds are edges. Each node (atom) index corresponds to the atom's original index in
+        the molecular structure and contains element type and 3D coordinates as attributes. Each
+        edge (bond) connects two atoms using their indices and stores the bond length.
+
+        Node attributes:
+            - element (str): Chemical element symbol of the atom
+            - xyz (tuple): 3D coordinates of the atom as (x, y, z) floats
+
+        Edge attributes:
+            - length (float): Bond length between the two connected atoms in Angstroms
+
         Returns:
-            nx.Graph: NetworkX graph with atoms as nodes and bonds as edges.
+            nx.Graph: NetworkX undirected graph where:
+                - Nodes are atoms with their indices as node identifiers
+                - Edges are bonds between atoms
+                - Node and edge attributes contain chemical properties
         """
         logger.debug("Creating NetworkX graph")
 
@@ -401,7 +416,6 @@ class MolGraph:
 
         return G
 
-    # Define dummy method to_plotly()
     def to_plotly(self, config: Optional[VisualizationConfig] = None) -> go.Figure:
         """Convert molecular structure to Plotly figure.
 
@@ -446,15 +460,6 @@ class MolGraph:
         Returns:
             str: A string in the format "MolGraph(formula: num_atoms atoms, num_bonds bonds)"
                 or "MolGraph(empty)" for an empty molecule.
-
-        Examples:
-            >>> mol = MolGraph()  # empty molecule
-            >>> repr(mol)
-            'MolGraph(empty)'
-
-            >>> mol = MolGraph(atoms=[...])  # molecule with CH4 structure
-            >>> repr(mol)
-            'MolGraph(CH4: 5 atoms, 4 bonds)'
         """
         if not self.atoms:
             return "MolGraph(empty)"
