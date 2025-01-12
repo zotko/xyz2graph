@@ -65,6 +65,8 @@ class AtomConfig(TypedDict):
     border_color: str
     border_width: int
     hover_font_size: int
+    text_size: int
+    text_color: str
 
 
 class BondConfig(TypedDict):
@@ -76,7 +78,17 @@ class BondConfig(TypedDict):
 
 
 class LegendConfig(TypedDict):
-    """Legend display configuration."""
+    """Legend display configuration.
+
+    Attributes:
+        x (float): X-position of legend in paper coordinates (0-1)
+        y (float): Y-position of legend in paper coordinates (0-1)
+        xanchor (str): Horizontal anchor point ("left" or "right")
+        yanchor (str): Vertical anchor point ("top" or "bottom")
+        itemsizing (str): Controls how legend items are sized. When set to
+            "constant", all legend items have the same size regardless of
+            their corresponding trace size.
+    """
 
     x: float
     y: float
@@ -208,6 +220,8 @@ DEFAULT_ATOM_CONFIG = AtomConfig(
     border_color="black",
     border_width=4,
     hover_font_size=12,
+    text_size=12,
+    text_color="black",
 )
 
 DEFAULT_BOND_CONFIG = BondConfig(
@@ -370,7 +384,12 @@ class AtomShape:
     atoms: List[Atom]
     colors: Dict[str, str]
 
-    def to_trace(self, config: AtomConfig, coordinate_round_digits: int) -> List[go.Scatter3d]:
+    def to_trace(
+        self,
+        config: AtomConfig,
+        coordinate_round_digits: int,
+        label_type: str = "elements",
+    ) -> List[go.Scatter3d]:
         """Convert atoms to Plotly visualization traces.
 
         This method processes atoms into Plotly Scatter3d traces for visualization,
@@ -382,6 +401,11 @@ class AtomShape:
                 opacity, and border settings.
             coordinate_round_digits (int): Number of decimal places to round
                 coordinate values.
+            label_type (str): Type of labels to display. Options are:
+                - "elements": Show element symbols
+                - "indices": Show atom indices
+                - Any other value: Show no labels
+                Defaults to "elements".
 
         Returns:
             List[go.Scatter3d]: List of Plotly traces, one for each unique
@@ -401,14 +425,23 @@ class AtomShape:
             coords = np.array([[atom.x, atom.y, atom.z] for atom in atoms])
             coords = np.round(coords, coordinate_round_digits)
 
+            # Generate text labels based on label_type
+            if label_type == "elements":
+                text = [atom.element for atom in atoms]
+            elif label_type == "indices":
+                text = [str(atom.index) for atom in atoms]
+            else:
+                text = ["" for _ in atoms]
+
             traces.append(
                 go.Scatter3d(
                     x=coords[:, 0],
                     y=coords[:, 1],
                     z=coords[:, 2],
                     mode="markers",
-                    text=[atom.element for atom in atoms],
+                    text=text,
                     textposition="top center",
+                    textfont=dict(size=config["text_size"], color=config["text_color"]),
                     marker=dict(
                         size=config["size"],
                         color=self.colors.get(element, "pink"),
@@ -455,10 +488,9 @@ class BondShape:
                 bond length values displayed in the visualization.
 
         Returns:
-            List[go.Scatter3d]: List of Plotly traces where:
-                - Even-indexed traces represent bond lines
-                - Odd-indexed traces represent bond length labels
-                Each bond type (e.g., C-C, C-O) gets its own pair of traces.
+            List[go.Scatter3d]: List of Plotly traces containing both bond lines
+                and their associated length labels, organized by bond type. The
+                length labels are initially hidden and can be shown via UI controls.
         """
         # Group bonds by type
         bond_groups: Dict[str, List[Bond]] = {}
@@ -523,40 +555,63 @@ class BondShape:
 class ButtonFactory:
     """Factory for creating visualization control buttons."""
 
-    def __init__(self, buttons_config: ButtonsConfig) -> None:
+    def __init__(self, buttons_config: ButtonsConfig, mol_graph: "MolGraph") -> None:
         """Initialize the button factory.
 
         Args:
-            buttons_config: Configuration for button appearance and behavior.
+            buttons_config (ButtonsConfig): Configuration dictionary containing button appearance
+                settings and positional information for different button groups.
+            mol_graph (MolGraph): The molecular graph object containing the structure to be
+                visualized. Used to determine what controls should be available.
         """
         self.config = buttons_config
+        self.mol_graph = mol_graph
 
-    def create_atom_buttons(self, atom_traces: List[int]) -> List[Dict[str, Any]]:
+    def create_atom_buttons(self, trace_mapping: Dict[str, List[int]]) -> List[Dict[str, Any]]:
         """Create buttons for controlling atom visualization.
 
         Args:
-            atom_traces: List of trace indices corresponding to atom visualizations.
+            trace_mapping: Dictionary mapping button labels to lists of trace indices.
+                Example: {"Elements": [0,1,2], "Indices": [3,4,5]}
 
         Returns:
-            List of button configurations.
+            List of button configurations for atom visualization control.
         """
-        return [
-            {
-                "label": "Basic",
-                "method": "restyle",
-                "args": [{"mode": "markers", "visible": True}, atom_traces],
-            },
-            {
-                "label": "Detailed",
-                "method": "restyle",
-                "args": [{"mode": "markers+text", "visible": True}, atom_traces],
-            },
-            {
-                "label": "Hide",
-                "method": "restyle",
-                "args": [{"visible": False}, atom_traces],
-            },
-        ]
+        buttons = []
+        all_traces = list(set().union(*trace_mapping.values()))
+        first_trace_type = next(iter(trace_mapping))  # Get first trace type for Basic view
+
+        # Add buttons for each view type (Basic and labels)
+        for label in ["Basic"] + list(trace_mapping.keys()):
+            if label == "Basic":
+                # Basic view: Show first type of traces without text
+                visible_traces = trace_mapping[first_trace_type]
+                mode = "markers"
+            else:
+                # Other views: Show selected traces with text
+                visible_traces = trace_mapping[label]
+                mode = "markers+text"
+
+            buttons.append(
+                {
+                    "label": label,
+                    "method": "restyle",
+                    "args": [
+                        {
+                            "mode": [mode] * len(all_traces),
+                            "visible": [trace in visible_traces for trace in all_traces],
+                        },
+                        all_traces,
+                    ],
+                }
+            )
+
+        # Add Hide button
+        buttons.append(
+            {"label": "Hide", "method": "restyle", "args": [{"visible": False}, all_traces]}
+        )
+
+        return buttons
 
     def create_bond_buttons(self, bond_traces: List[int]) -> List[Dict[str, Any]]:
         """Create buttons for controlling bond visualization.
@@ -574,7 +629,7 @@ class ButtonFactory:
                 "args": [{"mode": ["lines", "none"], "visible": [True, True]}, bond_traces],
             },
             {
-                "label": "Detailed",
+                "label": "Distances",
                 "method": "restyle",
                 "args": [{"mode": ["lines", "text"], "visible": [True, True]}, bond_traces],
             },
@@ -609,15 +664,29 @@ class ButtonFactory:
     def create_button_group(
         self, group_name: str, buttons: List[Dict[str, Any]], active_index: int = 0
     ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-        """Create a group of related buttons with associated annotations.
+        """Create a button group with its associated title annotation.
+
+        Creates a configured button group that includes both the interactive buttons and
+        their title label, positioned according to the configuration settings. Button groups
+        are positioned in the visualization layout using paper coordinates (0-1 range).
 
         Args:
-            group_name: Name of the button group.
-            buttons: List of button configurations.
-            active_index: Index of the initially active button.
+            group_name (str): Name of the button group, must match a key in the buttons_config
+                groups dictionary (e.g., "atoms", "bonds", "grid").
+            buttons (List[Dict[str, Any]]): List of button configurations, where each button
+                is a dictionary containing Plotly button properties like label, method, and args.
+            active_index (int, optional): Zero-based index of the initially selected button
+                in the group. Defaults to 0 (first button).
 
         Returns:
-            Tuple of button group configuration and title annotation.
+            Tuple[Dict[str, Any], Dict[str, Any]]: A tuple containing:
+                - Button group configuration dictionary compatible with Plotly's updatemenus
+                - Title annotation configuration dictionary for the button group label
+
+        Example button group names and their purposes:
+            - "atoms": Controls atom visualization modes (Basic, Elements, Indices, Hide)
+            - "bonds": Controls bond visualization modes (Basic, Distances, Hide)
+            - "grid": Controls background grid visibility (Show, Hide)
         """
         group_config = self.config["groups"][group_name]
         appearance = self.config["appearance"]
@@ -652,35 +721,46 @@ class ButtonFactory:
 class VisualizationControls:
     """Manages the interactive controls for the visualization."""
 
-    def __init__(self, n_atoms: int, n_bonds: int, buttons_config: ButtonsConfig) -> None:
+    def __init__(self, buttons_config: ButtonsConfig, mol_graph: "MolGraph") -> None:
         """Initialize visualization controls.
 
         Args:
-            n_atoms: Number of atoms in the visualization.
-            n_bonds: Number of bonds in the visualization.
-            buttons_config: Configuration for control buttons.
+            buttons_config (ButtonsConfig): Configuration for control buttons appearance
+                and positioning.
+            mol_graph (MolGraph): Molecular graph containing the structure to be
+                visualized and its properties.
         """
-        self.n_atoms = n_atoms
-        self.n_bonds = n_bonds
-        self.button_factory = ButtonFactory(buttons_config)
-        self.atom_traces: List[int] = []
+        self.button_factory = ButtonFactory(buttons_config, mol_graph)
+        self.mol_graph = mol_graph
+        self.atom_traces: Dict[str, List[int]] = {}
         self.bond_traces: List[int] = []
 
-    def update_trace_indices(self, atom_traces: List[int], bond_traces: List[int]) -> None:
+    def update_trace_indices(
+        self, atom_traces: Dict[str, List[int]], bond_traces: List[int]
+    ) -> None:
         """Update the indices of atom and bond traces.
 
         Args:
-            atom_traces: List of atom trace indices.
+            atom_traces: Dictionary mapping button labels to lists of atom trace indices.
             bond_traces: List of bond trace indices.
         """
         self.atom_traces = atom_traces
         self.bond_traces = bond_traces
 
     def create_all_controls(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-        """Create all visualization controls.
+        """Create all visualization controls and their annotations.
+
+        Generates three types of controls:
+        - Atom controls: For toggling atom display modes (Basic, Elements, Indices, Hide)
+        - Bond controls: For toggling bond display modes (Basic, Distances, Hide)
+        - Grid controls: For toggling coordinate grid visibility (Show, Hide)
+
+        Bond controls are only created if the molecular structure contains bonds.
 
         Returns:
-            Tuple of button configurations and annotations.
+            Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]: A tuple containing:
+                - List of button group configurations for Plotly's updatemenus
+                - List of title annotations for each button group
         """
         buttons = []
         annotations = []
@@ -692,7 +772,7 @@ class VisualizationControls:
         annotations.append(annotation)
 
         # Bond controls
-        if self.n_bonds > 0:
+        if len(self.mol_graph.bonds) > 0:
             bond_buttons = self.button_factory.create_bond_buttons(self.bond_traces)
             button_group, annotation = self.button_factory.create_button_group(
                 "bonds", bond_buttons
@@ -726,9 +806,8 @@ class VisualizationManager:
         self.atom_component = AtomShape(atoms=mol_graph.atoms, colors=mol_graph.cpk_colors)
         self.bond_component = BondShape(bonds=mol_graph.bonds)
         self.controls = VisualizationControls(
-            n_atoms=len(mol_graph.atoms),
-            n_bonds=len(mol_graph.bonds),
             buttons_config=self.config_manager.buttons,
+            mol_graph=self.mol_graph,
         )
 
     def _create_axis_config(self) -> Dict[str, Dict[str, Any]]:
@@ -736,7 +815,10 @@ class VisualizationManager:
 
         Generates a configuration dictionary for the x, y, and z axes of the 3D
         scene, applying settings from the scene configuration including grid,
-        background, and visibility settings.
+        background, and visibility settings. Grid visibility is coupled with
+        background visibility for visual consistency - when the background is
+        shown, the grid is shown with a light gray color; when hidden, the grid
+        color matches the background.
 
         Returns:
             Dict[str, Dict[str, Any]]: Dictionary containing identical
@@ -751,12 +833,8 @@ class VisualizationManager:
             "visible": self.config_manager.scene["axis_visible"],
             "title": {"text": ""},
             "showgrid": self.config_manager.scene["showbackground"],
-            "gridcolor": "lightgray"
-            if self.config_manager.scene["showbackground"]
-            else "white",  # Added
-            "backgroundcolor": "white"
-            if self.config_manager.scene["showbackground"]
-            else None,  # Modified
+            "gridcolor": "lightgray" if self.config_manager.scene["showbackground"] else "white",
+            "backgroundcolor": "white" if self.config_manager.scene["showbackground"] else None,
         }
 
         return {axis: axis_config.copy() for axis in ["xaxis", "yaxis", "zaxis"]}
@@ -808,15 +886,30 @@ class VisualizationManager:
         """
         fig = go.Figure()
 
-        # Add atom traces
-        atom_traces = self.atom_component.to_trace(
+        # Create element-labeled traces
+        element_traces = self.atom_component.to_trace(
             config=self.config_manager.atoms,
             coordinate_round_digits=self.config_manager.style["coordinate_round_digits"],
+            label_type="elements",
         )
-        atom_trace_indices = []
-        for trace in atom_traces:
+        element_trace_indices = []
+        for trace in element_traces:
             fig.add_trace(trace)
-            atom_trace_indices.append(len(fig.data) - 1)
+            element_trace_indices.append(len(fig.data) - 1)
+
+        # Create index-labeled traces
+        index_traces = self.atom_component.to_trace(
+            config=self.config_manager.atoms,
+            coordinate_round_digits=self.config_manager.style["coordinate_round_digits"],
+            label_type="indices",
+        )
+        index_trace_indices = []
+        for trace in index_traces:
+            fig.add_trace(trace)
+            index_trace_indices.append(len(fig.data) - 1)
+
+        # Create trace mapping for buttons
+        atom_trace_mapping = {"Elements": element_trace_indices, "Indices": index_trace_indices}
 
         # Add bond traces
         bond_traces = self.bond_component.to_trace(
@@ -830,7 +923,7 @@ class VisualizationManager:
             bond_trace_indices.append(len(fig.data) - 1)
 
         # Update control indices
-        self.controls.update_trace_indices(atom_trace_indices, bond_trace_indices)
+        self.controls.update_trace_indices(atom_trace_mapping, bond_trace_indices)
 
         # Create buttons and control annotations
         buttons, control_annotations = self.controls.create_all_controls()

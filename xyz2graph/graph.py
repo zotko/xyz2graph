@@ -191,15 +191,23 @@ class MolGraph:
         try:
             lines = file_path.read_text().splitlines()
 
+            if len(lines) < 3:
+                raise ValueError(
+                    "XYZ file must contain at least 3 lines "
+                    "(number of atoms, comment, and coordinates)"
+                )
             try:
                 n_atoms = int(lines[0].strip())
             except (IndexError, ValueError) as err:
                 raise ValueError("First line must be an integer (number of atoms)") from err
 
-            self.comment = lines[1] if len(lines) > 1 else ""
+            self.comment = lines[1]
+
+            # Process coordinate lines
+            coordinate_lines = [line.strip() for line in lines[2:] if line.strip()]
 
             atoms = []
-            for i, line in enumerate(lines[2:], start=0):
+            for i, line in enumerate(coordinate_lines, start=0):
                 parts = line.split()
 
                 try:

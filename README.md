@@ -14,10 +14,6 @@
 
 A Python package to convert XYZ molecular files into NetworkX graphs with interactive 3D visualization using Plotly.
 
-<div align="center">
- <img src="https://raw.githubusercontent.com/zotko/xyz2graph/main/.github/images/mol.gif" width="1024">
-</div>
-
 <a href="https://zotko.github.io/xyz2graph/demo" target="_blank">Try it live 🚀</a>
 
 ## Features
