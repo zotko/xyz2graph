@@ -905,6 +905,8 @@ class VisualizationManager:
         )
         index_trace_indices = []
         for trace in index_traces:
+            # Prevent duplicates in legend
+            trace.visible = False
             fig.add_trace(trace)
             index_trace_indices.append(len(fig.data) - 1)
 
