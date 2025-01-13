@@ -197,16 +197,16 @@ class MolGraph:
                     "(number of atoms, comment, and coordinates)"
                 )
             try:
-                n_atoms = int(lines[0].strip())
+                n_atoms = int(lines[0])
             except (IndexError, ValueError) as err:
                 raise ValueError("First line must be an integer (number of atoms)") from err
 
-            self.comment = lines[1]
+            self.comment = lines[1].strip()
 
             # Process coordinate lines
-            coordinate_lines = [line.strip() for line in lines[2:] if line.strip()]
+            coordinate_lines = list(filter(None, map(str.strip, lines[2:])))
 
-            atoms = []
+            self.atoms = []
             for i, line in enumerate(coordinate_lines, start=0):
                 parts = line.split()
 
@@ -217,7 +217,7 @@ class MolGraph:
 
                     x, y, z = map(float, parts[1:4])
 
-                    atoms.append(
+                    self.atoms.append(
                         Atom(
                             element=element,
                             x=x,
@@ -232,13 +232,12 @@ class MolGraph:
                         f"Invalid format in line {i+3}, expected: element x y z"
                     ) from err
 
-            if len(atoms) != n_atoms:
+            if len(self.atoms) != n_atoms:
                 logger.warning(
-                    f"Number of atoms in file ({len(atoms)}) doesn't match the number specified "
-                    f"in the first line ({n_atoms})"
+                    f"Number of atoms in file ({len(self.atoms)}) doesn't match the number "
+                    f"specified in the first line ({n_atoms})"
                 )
 
-            self.atoms = atoms
             self._generate_bonds()
 
         except Exception as e:
