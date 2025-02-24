@@ -436,6 +436,35 @@ class MolGraph:
 
         return create_visualization(self, config)
 
+    def to_xyz(self) -> str:
+        """Convert MolGraph structure to XYZ string.
+
+        Returns:
+            str: Coordinates in XYZ format as string.
+        """
+        xyz_str = ""
+        xyz_str += f"{self[-1].index}\n"
+        xyz_str += "\n"
+        for i in self.indices:
+            row_str = ""
+            row_str += self[i - 1].element
+            row_str += f" {self[i-1].x} {self[i-1].y} {self[i-1].z}\n"
+            xyz_str += row_str
+        return xyz_str
+
+    def write_xyz(self, file_path: Union[str, Path]) -> None:
+        """Write MolGraph in XYZ format to file.
+
+        Args:
+            file_path (Union[str, Path]): Output filename of xyz file.
+
+        """
+        file_path = Path(file_path)
+
+        xyz = self.to_xyz()
+        with open(file_path, "w") as f:
+            f.write(xyz)
+
     def __len__(self) -> int:
         """Get the number of atoms in the molecule.
 
