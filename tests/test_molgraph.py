@@ -37,6 +37,16 @@ def test_read_xyz(tmp_path: Path) -> None:
     assert mol.elements == ["O", "H", "H"]
 
 
+def test_read_xyz_string(xyz_string=WATER_XYZ) -> None:
+    """Test reading a molecule from an XYZ string."""
+    mol = MolGraph()
+    mol.read_xyz_string(xyz_string)
+
+    assert len(mol) == 3
+    assert mol.comment == "Water molecule"
+    assert mol.elements == ["O", "H", "H"]
+
+
 def test_molecular_geometry(water_molecule: MolGraph) -> None:
     """Test molecular geometry properties."""
     mol = water_molecule

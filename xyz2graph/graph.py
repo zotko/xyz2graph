@@ -174,6 +174,72 @@ class MolGraph:
             matrix[i, j] = matrix[j, i] = 1
         return matrix
 
+    def read_xyz_string(self, xyz_string: str) -> None:
+        """Read molecular structure from XYZ string.
+
+        Args:
+            xyz_string (str): XYZ file as string.
+
+        Raises:
+            FileNotFoundError: If the specified file does not exist.
+            ValueError: If file format is invalid or contains unknown elements.
+        """
+        try:
+            lines = xyz_string.split("\n")
+
+            if len(lines) < 3:
+                raise ValueError(
+                    "XYZ string must contain at least 3 lines "
+                    "(number of atoms, comment, and coordinates)"
+                )
+            try:
+                n_atoms = int(lines[0])
+            except (IndexError, ValueError) as err:
+                raise ValueError("First line must be an integer (number of atoms)") from err
+
+            self.comment = lines[1].strip()
+
+            # Process coordinate lines
+            coordinate_lines = list(filter(None, map(str.strip, lines[2:])))
+
+            self.atoms = []
+            for i, line in enumerate(coordinate_lines, start=0):
+                parts = line.split()
+
+                try:
+                    element = parts[0]
+                    if element not in self.default_radii:
+                        raise ValueError(f"Unknown element symbol: {element}")
+
+                    x, y, z = map(float, parts[1:4])
+
+                    self.atoms.append(
+                        Atom(
+                            element=element,
+                            x=x,
+                            y=y,
+                            z=z,
+                            index=i,
+                            radius=self.default_radii[element],
+                        )
+                    )
+                except (IndexError, ValueError) as err:
+                    raise ValueError(
+                        f"Invalid format in line {i+3}, expected: element x y z"
+                    ) from err
+
+            if len(self.atoms) != n_atoms:
+                logger.warning(
+                    f"Number of atoms in file ({len(self.atoms)}) doesn't match the number "
+                    f"specified in the first line ({n_atoms})"
+                )
+
+            self._generate_bonds()
+
+        except Exception as e:
+            logger.error(f"Error reading XYZ string: {e}")
+            raise
+
     def read_xyz(self, file_path: Union[str, Path]) -> None:
         """Read molecular structure from XYZ file.
 
