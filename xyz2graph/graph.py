@@ -189,7 +189,29 @@ class MolGraph:
             raise FileNotFoundError(f"XYZ file not found: {file_path}")
 
         try:
-            lines = file_path.read_text().splitlines()
+            xyz_content = file_path.read_text()
+            self.from_string(xyz_content)
+        except Exception as e:
+            logger.error(f"Error reading XYZ file: {e}")
+            raise
+
+    def from_string(self, xyz_string: str) -> None:
+        """Parse molecular structure from string content in XYZ format.
+
+        The xyz_string must follow XYZ file format conventions:
+        - First line: Integer specifying the number of atoms
+        - Second line: Comment line (can be empty)
+        - Remaining lines: Atom coordinates in the format "element x y z"
+
+        Args:
+            xyz_string (str): String content in XYZ format, must include the number of
+                            atoms on the first line and a comment/empty line on the second.
+
+        Raises:
+            ValueError: If string format is invalid or contains unknown elements.
+        """
+        try:
+            lines = xyz_string.splitlines()
 
             if len(lines) < 3:
                 raise ValueError(
