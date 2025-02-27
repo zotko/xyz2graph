@@ -187,3 +187,35 @@ def test_formula(elements: List[str], expected_formula: str) -> None:
     for i, el in enumerate(elements):
         mol.atoms.append(Atom(element=el, x=float(i), y=0.0, z=0.0, index=i))
     assert mol.formula() == expected_formula
+
+
+def test_to_string(water_molecule: MolGraph) -> None:
+    """Test XYZ string generation."""
+    xyz_string = water_molecule.to_string()
+    lines = xyz_string.strip().split("\n")
+
+    assert lines[0] == "3"  # Atom count
+    assert lines[1] == "Water molecule"  # Comment
+    assert len(lines) == 5  # Header (2 lines) + 3 atoms
+
+    # Check atom formatting
+    assert lines[2].startswith("O 0.000000 0.000000 0.000000")
+    assert lines[3].startswith("H 0.757000 0.586000 0.000000")
+    assert lines[4].startswith("H -0.757000 0.586000 0.000000")
+
+
+def test_write_xyz(water_molecule: MolGraph, tmp_path: Path) -> None:
+    """Test writing a molecule to an XYZ file."""
+    output_path = tmp_path / "water_output.xyz"
+    water_molecule.write_xyz(output_path)
+
+    # Verify file exists
+    assert output_path.exists()
+
+    # Read back the file content
+    content = output_path.read_text()
+    lines = content.strip().split("\n")
+
+    assert lines[0] == "3"
+    assert lines[1] == "Water molecule"
+    assert len(lines) == 5

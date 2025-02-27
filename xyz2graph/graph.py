@@ -174,27 +174,6 @@ class MolGraph:
             matrix[i, j] = matrix[j, i] = 1
         return matrix
 
-    def read_xyz(self, file_path: Union[str, Path]) -> None:
-        """Read molecular structure from XYZ file.
-
-        Args:
-            file_path (Union[str, Path]): Path to XYZ format file.
-
-        Raises:
-            FileNotFoundError: If the specified file does not exist.
-            ValueError: If file format is invalid or contains unknown elements.
-        """
-        file_path = Path(file_path)
-        if not file_path.exists():
-            raise FileNotFoundError(f"XYZ file not found: {file_path}")
-
-        try:
-            xyz_content = file_path.read_text()
-            self.from_string(xyz_content)
-        except Exception as e:
-            logger.error(f"Error reading XYZ file: {e}")
-            raise
-
     def from_string(self, xyz_string: str) -> None:
         """Parse molecular structure from string content in XYZ format.
 
@@ -265,6 +244,54 @@ class MolGraph:
         except Exception as e:
             logger.error(f"Error reading XYZ file: {e}")
             raise
+
+    def read_xyz(self, file_path: Union[str, Path]) -> None:
+        """Read molecular structure from XYZ file.
+
+        Args:
+            file_path (Union[str, Path]): Path to XYZ format file.
+
+        Raises:
+            FileNotFoundError: If the specified file does not exist.
+            ValueError: If file format is invalid or contains unknown elements.
+        """
+        file_path = Path(file_path)
+        if not file_path.exists():
+            raise FileNotFoundError(f"XYZ file not found: {file_path}")
+
+        try:
+            xyz_content = file_path.read_text()
+            self.from_string(xyz_content)
+        except Exception as e:
+            logger.error(f"Error reading XYZ file: {e}")
+            raise
+
+    def to_string(self) -> str:
+        """Generate XYZ formatted string for the molecular structure.
+
+        Returns:
+            str: XYZ formatted string.
+        """
+        xyz_content = f"{len(self.atoms)}\n"
+        xyz_content += f"{self.comment}\n"
+
+        for atom in self.atoms:
+            xyz_content += f"{atom.element} {atom.x:.6f} {atom.y:.6f} {atom.z:.6f}\n"
+
+        return xyz_content
+
+    def write_xyz(self, file_path: Union[str, Path]) -> None:
+        """Write molecular structure to an XYZ file.
+
+        Args:
+            file_path (Union[str, Path]): Path to the XYZ file to write.
+        """
+        try:
+            file_path = Path(file_path)
+            xyz_content = self.to_string()
+            file_path.write_text(xyz_content)
+        except OSError as e:
+            print(f"Error writing to file: {e}")
 
     def _generate_bonds(self) -> None:
         """Generate bonds based on atomic distances.
