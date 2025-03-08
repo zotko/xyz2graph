@@ -7,7 +7,7 @@ name = "xyz2graph"
 dynamic = ["version"]
 description = "Package for reading of .xyz files and constructing of molecular graphs from atomic coordinates."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {file = "LICENSE" }
 authors = [
     { name = "Mykola Zotko", email = "dev.zotko@outlook.de" }
@@ -17,7 +17,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -28,9 +27,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "numpy>=1.21.0",
+    "numpy>=1.26.0,<2.2.0",
+    "networkx>=3.1.0,<3.4.0",
     "plotly>=5.0.0",
-    "networkx>=2.6.0",
 ]
 
 [tool.hatch.version]
