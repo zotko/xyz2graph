@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
     
     
       
@@ -839,7 +839,9 @@ geometry, and visualize the molecular structure using Plotly.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>atoms</code></td>
+            <td>
+                <code>atoms</code>
+            </td>
             <td>
                   <code><span title="typing.List">List</span>[<span title="xyz2graph.molecule.Atom">Atom</span>]</code>
             </td>
@@ -850,11 +852,13 @@ Defaults to an empty list.</p>
               </div>
             </td>
             <td>
-                  <code>list()</code>
+                  <code><span title="list">list</span>()</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>bonds</code></td>
+            <td>
+                <code>bonds</code>
+            </td>
             <td>
                   <code><span title="typing.List">List</span>[<span title="xyz2graph.molecule.Bond">Bond</span>]</code>
             </td>
@@ -865,13 +869,15 @@ Defaults to an empty list.</p>
               </div>
             </td>
             <td>
-                  <code>list()</code>
+                  <code><span title="list">list</span>()</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>comment</code></td>
             <td>
-                  <code>str</code>
+                <code>comment</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -884,9 +890,11 @@ Defaults to an empty string.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>default_radii</code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, float]</code>
+                <code>default_radii</code>
+            </td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -895,13 +903,15 @@ default atomic radii. Defaults to internal _DEFAULT_RADII.</p>
               </div>
             </td>
             <td>
-                  <code>lambda: dict(<span title="xyz2graph.constants._DEFAULT_RADII">_DEFAULT_RADII</span>)()</code>
+                  <code>lambda: <span title="dict">dict</span>(<span title="xyz2graph.constants._DEFAULT_RADII">_DEFAULT_RADII</span>)()</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>cpk_colors</code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                <code>cpk_colors</code>
+            </td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="str">str</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -910,13 +920,15 @@ CPK color scheme colors. Defaults to internal _DEFAULT_CPK_COLORS.</p>
               </div>
             </td>
             <td>
-                  <code>lambda: dict(<span title="xyz2graph.constants._DEFAULT_CPK_COLORS">_DEFAULT_CPK_COLORS</span>)()</code>
+                  <code>lambda: <span title="dict">dict</span>(<span title="xyz2graph.constants._DEFAULT_CPK_COLORS">_DEFAULT_CPK_COLORS</span>)()</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>cpk_color_rest</code></td>
             <td>
-                  <code>str</code>
+                <code>cpk_color_rest</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -945,7 +957,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.elements" href="#xyz2graph.graph.MolGraph.elements">elements</a></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[str]</code>
+                  <code><span title="typing.List">List</span>[<span title="str">str</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -956,7 +968,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.indices" href="#xyz2graph.graph.MolGraph.indices">indices</a></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[int]</code>
+                  <code><span title="typing.List">List</span>[<span title="int">int</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -967,7 +979,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.x" href="#xyz2graph.graph.MolGraph.x">x</a></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -978,7 +990,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.y" href="#xyz2graph.graph.MolGraph.y">y</a></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -989,7 +1001,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.z" href="#xyz2graph.graph.MolGraph.z">z</a></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1011,7 +1023,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.atomic_radii" href="#xyz2graph.graph.MolGraph.atomic_radii">atomic_radii</a></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1022,7 +1034,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.bond_lengths" href="#xyz2graph.graph.MolGraph.bond_lengths">bond_lengths</a></code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[<span title="typing.FrozenSet">FrozenSet</span>[int], float]</code>
+                  <code><span title="typing.Dict">Dict</span>[<span title="typing.FrozenSet">FrozenSet</span>[<span title="int">int</span>], <span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1033,7 +1045,7 @@ Defaults to "pink".</p>
           <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="xyz2graph.graph.MolGraph.adj_list" href="#xyz2graph.graph.MolGraph.adj_list">adj_list</a></code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[int, <span title="typing.Set">Set</span>[int]]</code>
+                  <code><span title="typing.Dict">Dict</span>[<span title="int">int</span>, <span title="typing.Set">Set</span>[<span title="int">int</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1055,6 +1067,11 @@ to sets of bonded atom indices.</p>
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>xyz2graph/graph.py</code></summary>
@@ -2086,7 +2103,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[str]</code>
+                  <code><span title="typing.List">List</span>[<span title="str">str</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2132,7 +2149,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[int]</code>
+                  <code><span title="typing.List">List</span>[<span title="int">int</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2178,7 +2195,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2224,7 +2241,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2270,7 +2287,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2362,7 +2379,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[float]</code>
+                  <code><span title="typing.List">List</span>[<span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2408,7 +2425,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[<span title="typing.FrozenSet">FrozenSet</span>[int], float]</code>
+                  <code><span title="typing.Dict">Dict</span>[<span title="typing.FrozenSet">FrozenSet</span>[<span title="int">int</span>], <span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2454,7 +2471,7 @@ to sets of bonded atom indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[int, <span title="typing.Set">Set</span>[int]]</code>
+                  <code><span title="typing.Dict">Dict</span>[<span title="int">int</span>, <span title="typing.Set">Set</span>[<span title="int">int</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2549,9 +2566,11 @@ are bonded and 0 otherwise.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>xyz_string</code></td>
             <td>
-                  <code>str</code>
+                <code>xyz_string</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2578,7 +2597,7 @@ are bonded and 0 otherwise.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>ValueError</code>
+                  <code><span title="ValueError">ValueError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2764,9 +2783,11 @@ are bonded and 0 otherwise.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>file_path</code></td>
             <td>
-                  <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]</code>
+                <code>file_path</code>
+            </td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="str">str</span>, <span title="pathlib.Path">Path</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2792,7 +2813,7 @@ are bonded and 0 otherwise.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>FileNotFoundError</code>
+                  <code><span title="FileNotFoundError">FileNotFoundError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2802,7 +2823,7 @@ are bonded and 0 otherwise.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                  <code>ValueError</code>
+                  <code><span title="ValueError">ValueError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2887,7 +2908,7 @@ are bonded and 0 otherwise.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>str</code></td>            <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2959,9 +2980,11 @@ are bonded and 0 otherwise.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>file_path</code></td>
             <td>
-                  <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]</code>
+                <code>file_path</code>
+            </td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="str">str</span>, <span title="pathlib.Path">Path</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3125,7 +3148,7 @@ Euclidean distance between atoms i and j in Angstroms.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>str</code></td>            <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3225,9 +3248,11 @@ Euclidean distance between atoms i and j in Angstroms.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>element</code></td>
             <td>
-                  <code>str</code>
+                <code>element</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3239,9 +3264,11 @@ Euclidean distance between atoms i and j in Angstroms.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>radius</code></td>
             <td>
-                  <code>float</code>
+                <code>radius</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3298,7 +3325,11 @@ Euclidean distance between atoms i and j in Angstroms.</p>
 
 
 </h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">remove</span><span class="p">(</span><span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MolGraph</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">remove</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">elements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MolGraph</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3318,9 +3349,11 @@ Euclidean distance between atoms i and j in Angstroms.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>indices</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[int]</code>
+                <code>indices</code>
+            </td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="int">int</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3332,9 +3365,11 @@ Euclidean distance between atoms i and j in Angstroms.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>elements</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[str]</code>
+                <code>elements</code>
+            </td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="str">str</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3346,9 +3381,11 @@ Euclidean distance between atoms i and j in Angstroms.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>inplace</code></td>
             <td>
-                  <code>bool</code>
+                <code>inplace</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3397,7 +3434,7 @@ Euclidean distance between atoms i and j in Angstroms.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>IndexError</code>
+                  <code><span title="IndexError">IndexError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3407,7 +3444,7 @@ Euclidean distance between atoms i and j in Angstroms.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                  <code>ValueError</code>
+                  <code><span title="ValueError">ValueError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3680,7 +3717,9 @@ edge (bond) connects two atoms using their indices and stores the bond length.</
 
 
 </h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_plotly</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisualizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_plotly</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VisualizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3700,7 +3739,9 @@ edge (bond) connects two atoms using their indices and stores the bond length.</
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>config</code></td>
+            <td>
+                <code>config</code>
+            </td>
             <td>
                   <code><span title="xyz2graph.visualization.VisualizationConfig">VisualizationConfig</span></code>
             </td>
@@ -3866,7 +3907,7 @@ edge (bond) connects two atoms using their indices and stores the bond length.</
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.footer", "content.code.copy"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
       
     
   </body>
