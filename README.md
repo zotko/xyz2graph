@@ -5,6 +5,8 @@
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://zotko.github.io/xyz2graph)
 [![DOI](https://zenodo.org/badge/144382005.svg)](https://doi.org/10.5281/zenodo.14569337)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zotko/xyz2graph/docs%2Fadd-jupyter-notebooks?filepath=binder/xyz2graph.ipynb&autorun=true)
+
 
 [![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
 [![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
