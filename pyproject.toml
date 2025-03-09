@@ -41,7 +41,7 @@ Repository = "https://github.com/zotko/xyz2graph"
 Documentation = "https://zotko.github.io/xyz2graph"
 "Bug Tracker" = "https://github.com/zotko/xyz2graph/issues"
 
-[project.optional-dependencies]
+[tool.pdm.dev-dependencies]
 docs = [
     "mkdocs>=1.6.0",
     "mkdocs-material>=9.5.0",
@@ -55,6 +55,7 @@ dev = [
     "mypy>=1.0.0,<2.0.0",
     "build>=1.0.0,<2.0.0",
     "twine>=4.0.0,<5.0.0",
+    "pre-commit>=4.1.0"
 ]
 
 [tool.ruff]
