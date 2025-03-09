@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://zotko.github.io/xyz2graph)
 [![DOI](https://zenodo.org/badge/144382005.svg)](https://doi.org/10.5281/zenodo.14569337)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zotko/xyz2graph/docs%2Fadd-jupyter-notebooks?filepath=binder/xyz2graph.ipynb&autorun=true)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zotko/xyz2graph/main?filepath=binder/xyz2graph.ipynb)
 
 
 [![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
@@ -16,11 +16,11 @@
 
 A Python package to convert XYZ molecular files into NetworkX graphs with interactive 3D visualization using Plotly.
 
-<a href="https://zotko.github.io/xyz2graph/demo" target="_blank">Try it live 🚀</a>
+<a href="https://mybinder.org/v2/gh/zotko/xyz2graph/main?filepath=binder/xyz2graph.ipynb" target="_blank">Try it live 🚀</a>
 
 ## Features
 
-- Interactive 3D molecular visualization using Plotly
+- [Interactive 3D molecular visualization using Plotly](https://zotko.github.io/xyz2graph/demo)
 - NetworkX graph conversion for analysis
 - Command-line interface
 
