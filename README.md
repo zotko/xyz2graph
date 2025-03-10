@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://zotko.github.io/xyz2graph)
 [![DOI](https://zenodo.org/badge/144382005.svg)](https://doi.org/10.5281/zenodo.14569337)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zotko/xyz2graph/main?filepath=binder/xyz2graph.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://notebooks.gesis.org/binder/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb)
 
 
 [![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
@@ -14,9 +14,9 @@
 
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 
-A Python package to convert XYZ molecular files into NetworkX graphs with interactive 3D visualization using Plotly.
+A Python package to convert XYZ molecular files into NetworkX graphs with interactive 3D visualization using Plotly. 
 
-<a href="https://mybinder.org/v2/gh/zotko/xyz2graph/main?filepath=binder/xyz2graph.ipynb" target="_blank">Try it live 🚀</a>
+<a href="https://notebooks.gesis.org/binder/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb" target="_blank">Try it live 🚀</a>
 
 ## Features
 

@@ -1,1 +1,1 @@
-xyz2graph
+xyz2graph==3.5.0
