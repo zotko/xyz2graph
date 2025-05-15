@@ -1,0 +1,30 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: xyz2graph
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Mykola
+    family-names: Zotko
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.14938937
+repository-code: 'https://github.com/zotko/xyz2graph'
+url: 'https://github.com'
+abstract: >-
+  Convert XYZ molecular files to NetworkX graphs with
+  interactive 3D visualization.
+keywords:
+  - computational chemistry
+  - chemoinformatics
+  - molecular modeling
+  - scientific computing
+  - molecular graph
+  - atomic coordinates
+license: ISC
+version: 3.5.0
+date-released: '2025-02-27'
