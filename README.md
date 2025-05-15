@@ -84,23 +84,3 @@ Read the [documentation](https://zotko.github.io/xyz2graph) for guides, API refe
 ## Contributing
 
 Contributions are welcome! Please see the [Contributing Guide](https://github.com/zotko/xyz2graph/tree/main/CONTRIBUTING.md) for guidelines.
-
-## Citation
-
-If you use xyz2graph in your research, please cite:
-
-```bibtex
-@misc{zotko2018xyz2graph,
-  author       = {Zotko, Mykola},
-  title        = {xyz2graph: Molecular Structure Visualization},
-  year         = {2018},
-  publisher    = {GitHub},
-  url          = {https://github.com/zotko/xyz2graph}
-}
-```
-
-<p align="center">
-  <a href="https://www.buymeacoffee.com/mykola_zotko">
-    <img src="https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png" alt="Buy Me A Coffee">
-  </a>
-</p>
