@@ -16,7 +16,7 @@
 
 A Python package to convert XYZ molecular files into NetworkX graphs with interactive 3D visualization using Plotly.
 
-Try it live 🚀: [Binder](https://mybinder.org/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb) | [GESIS Notebooks](https://notebooks.gesis.org/binder/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb)
+[Try it live](https://mybinder.org/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb) 🚀
 
 ## Features
 
