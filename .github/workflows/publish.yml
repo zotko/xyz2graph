@@ -15,14 +15,39 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.11'
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .[dev]
+      - name: Run tests
+        run: python -m pytest --cov=xyz2graph --cov-report=term-missing
+      - name: Run linter
+        run: python -m ruff check .
+      - name: Run type checker
+        run: python -m mypy .
       - name: Build package
         run: |
-          python -m pip install build
+          python -m pip install --upgrade pip
+          python -m pip install hatchling hatch-vcs
           python -m build
+      - name: Check package
+        run: |
+          python -m pip install twine
+          python -m twine check dist/*
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: CHANGELOG.md
           generate_release_notes: true
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
