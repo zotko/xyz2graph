@@ -1,42 +1,41 @@
-name: CI Pipeline
-
+name: CI
 on:
-  push:
-    branches:
-      - develop
   pull_request:
-    branches:
-      - develop
-
+    branches: [develop]
+  push:
+    branches: [develop]
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PDM
+      - uses: actions/checkout@v4
+      - name: Set up PDM
         uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: true
-          cache-dependency-path: '**/pdm.lock'
-
       - name: Install dependencies
-        run: pdm install -G dev
-
-      - name: Run pre-commit checks
-        run: pdm run pre-commit run --all-files
-
-      - name: Run tests with Pytest
-        run: pdm run pytest --cov=xyz2graph --cov-report=term-missing
-
-      - name: Run MyPy type checking
-        run: pdm run mypy .
-
-      - name: Run Ruff linting
-        run: pdm run ruff check .
+        run: |
+          pdm install -G dev
+      - name: Verify pytest
+        run: |
+          pdm run pytest --version
+      - name: Run pre-commit
+        run: |
+          pdm run pre-commit run --all-files
+      - name: Run tests
+        run: |
+          pdm run pytest --cov=xyz2graph --cov-report=xml
+      - name: Upload coverage
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+      - name: Run linter
+        run: |
+          pdm run ruff check .
+      - name: Run type checker
+        run: |
+          pdm run mypy .
