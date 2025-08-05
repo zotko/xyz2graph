@@ -8,7 +8,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb)
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zotko/xyz2graph/ci.yml?branch=main
-)](ithub.com/zotko/xyz2graph/actions/workflows/ci.yml)
+)](github.com/zotko/xyz2graph/actions/workflows/ci.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/zotko/xyz2graph/main)](https://codecov.io/gh/zotko/xyz2graph)
 [![Dependabot](https://img.shields.io/badge/dependabot-enabled-025E8C?logo=dependabot&logoColor=white)](https://github.com/zotko/xyz2graph/network/updates)
 
