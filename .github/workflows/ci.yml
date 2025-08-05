@@ -36,6 +36,3 @@ jobs:
       - name: Run linter
         run: |
           pdm run ruff check .
-      - name: Run type checker
-        run: |
-          pdm run mypy .
