@@ -25,7 +25,9 @@ jobs:
             ${{ runner.os }}-pip-${{ matrix.python-version }}-
             ${{ runner.os }}-pip-
       - name: Install dependencies
-        run: pdm install -G dev
+        run: |
+          pip install pdm
+          pdm install -G dev
       - name: Run pre-commit
         run: pre-commit run --all-files
       - name: Run tests
