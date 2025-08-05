@@ -55,7 +55,9 @@ dev = [
     "mypy>=1.0.0,<2.0.0",
     "build>=1.0.0,<2.0.0",
     "twine>=4.0.0,<5.0.0",
-    "pre-commit>=4.1.0"
+    "pre-commit>=4.1.0",
+    "types-networkx>=3.2.1",
+    "plotly-stubs>=0.0.5",
 ]
 
 [tool.ruff]
