@@ -80,7 +80,7 @@ Read the [documentation](https://zotko.github.io/xyz2graph) for guides, API refe
 ## Help & Discussion
 
 🪲 [Report a bug](https://github.com/zotko/xyz2graph/issues)  
-✨ [Request a feature](https://github.com/zotko/xyz2graph/discussions)
+✨ [Request a feature](https://github.com/zotko/xyz2graph/discussions/categories/ideas)
 
 ## Contributing
 
