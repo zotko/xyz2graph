@@ -23,12 +23,12 @@ jobs:
       - name: Run pre-commit
         run: |
           pdm run pre-commit run --all-files
-      - name: Run tests
-        run: |
-          pdm run pytest --cov --junitxml=junit.xml -o junit_family=legacy
       - name: Run linter
         run: |
           pdm run ruff check .
+      - name: Run tests
+        run: |
+          pdm run pytest --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() && matrix.python-version == '3.12' }}
         uses: codecov/codecov-action@v4
