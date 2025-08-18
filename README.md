@@ -8,7 +8,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb)
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zotko/xyz2graph/ci.yml)](https://github.com/zotko/xyz2graph/actions)
-[![Codecov](https://img.shields.io/codecov/c/github/zotko/xyz2graph/develop)](https://app.codecov.io/gh/zotko/xyz2graph/tree/develop)
+[![codecov](https://codecov.io/gh/zotko/xyz2graph/branch/develop/graph/badge.svg?token=TXP63VKUIP)](https://codecov.io/gh/zotko/xyz2graph)
 [![Dependabot](https://img.shields.io/badge/dependabot-enabled-025E8C?logo=dependabot&logoColor=white)](https://github.com/zotko/xyz2graph/network/updates)
 
 [![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
