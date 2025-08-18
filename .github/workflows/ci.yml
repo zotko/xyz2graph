@@ -25,7 +25,7 @@ jobs:
           pdm run pre-commit run --all-files
       - name: Run tests
         run: |
-          pdm pytest --cov --junitxml=junit.xml -o junit_family=legacy
+          pdm run pytest --cov --junitxml=junit.xml -o junit_family=legacy
       - name: Run linter
         run: |
           pdm run ruff check .
