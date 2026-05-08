@@ -9,7 +9,6 @@
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zotko/xyz2graph/ci.yml)](https://github.com/zotko/xyz2graph/actions)
 [![codecov](https://codecov.io/gh/zotko/xyz2graph/branch/develop/graph/badge.svg?token=TXP63VKUIP)](https://codecov.io/gh/zotko/xyz2graph)
-[![Dependabot](https://img.shields.io/badge/dependabot-enabled-025E8C?logo=dependabot&logoColor=white)](https://github.com/zotko/xyz2graph/network/updates)
 
 [![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
 [![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
@@ -33,7 +32,7 @@ pip install xyz2graph
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.9+
 - Dependencies: NumPy, Plotly, NetworkX
 
 ## Quick Start
