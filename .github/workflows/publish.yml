@@ -12,35 +12,24 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v4
         with:
           python-version: '3.11'
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install .[dev]
+        run: pdm install -G dev
       - name: Run tests
-        run: python -m pytest --cov=xyz2graph --cov-report=term-missing
+        run: pdm run pytest --cov=xyz2graph --cov-report=term-missing
       - name: Run linter
-        run: python -m ruff check .
+        run: pdm run ruff check .
       - name: Run type checker
-        run: python -m mypy xyz2graph
+        run: pdm run mypy xyz2graph
       - name: Build package
-        run: |
-          python -m pip install hatchling hatch-vcs
-          python -m build
+        run: pdm build
       - name: Check package
         run: |
-          python -m pip install twine
-          python -m twine check dist/*
+          pdm run pip install twine
+          pdm run twine check dist/*
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
