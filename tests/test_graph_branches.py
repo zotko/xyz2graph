@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import numpy as np
@@ -63,11 +64,11 @@ def test_distance_matrix_memory_error_fallback() -> None:
     real_einsum = np.einsum
     call_count = {"n": 0}
 
-    def fake_einsum(*args: object, **kwargs: object) -> np.ndarray:
+    def fake_einsum(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         call_count["n"] += 1
         if call_count["n"] == 1:
             raise MemoryError("simulated")
-        return real_einsum(*args, **kwargs)  # type: ignore[arg-type]
+        return real_einsum(*args, **kwargs)
 
     with patch("xyz2graph.graph.np.einsum", side_effect=fake_einsum):
         dist = mol.distance_matrix()

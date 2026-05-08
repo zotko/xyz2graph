@@ -1,5 +1,7 @@
 """Tests for the visualization module."""
 
+from typing import cast
+
 import plotly.graph_objects as go
 import pytest
 from xyz2graph.graph import MolGraph
@@ -9,8 +11,11 @@ from xyz2graph.visualization import (
     AtomShape,
     BondShape,
     ConfigurationManager,
+    SceneConfig,
+    StyleConfig,
     VisualizationConfig,
     VisualizationManager,
+    WatermarkConfig,
     create_visualization,
 )
 
@@ -96,9 +101,10 @@ def test_create_visualization_with_long_comment_is_shortened(water_molecule: Mol
 
 
 def test_create_visualization_axis_visible_off(water_molecule: MolGraph) -> None:
+    scene = cast(SceneConfig, {**DEFAULT_CONFIG["scene"], "showbackground": False})
     config: VisualizationConfig = {
         "style": DEFAULT_CONFIG["style"],
-        "scene": {**DEFAULT_CONFIG["scene"], "showbackground": False},
+        "scene": scene,
         "buttons": DEFAULT_CONFIG["buttons"],
     }
     manager = VisualizationManager(water_molecule, config)
@@ -108,8 +114,8 @@ def test_create_visualization_axis_visible_off(water_molecule: MolGraph) -> None
 
 
 def test_create_visualization_no_watermark(water_molecule: MolGraph) -> None:
-    style = {**DEFAULT_CONFIG["style"]}
-    style["watermark"] = {**style["watermark"], "show": False}
+    watermark = cast(WatermarkConfig, {**DEFAULT_CONFIG["style"]["watermark"], "show": False})
+    style = cast(StyleConfig, {**DEFAULT_CONFIG["style"], "watermark": watermark})
     config: VisualizationConfig = {
         "style": style,
         "scene": DEFAULT_CONFIG["scene"],
