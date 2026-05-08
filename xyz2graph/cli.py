@@ -6,7 +6,7 @@ import logging
 import sys
 import tempfile
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import Union
 
 import plotly.offline as offline
 from plotly.io import write_html
@@ -15,7 +15,7 @@ from .graph import MolGraph
 from .logging import logger
 
 
-def parse_remove_arg(remove_str: str) -> Tuple[List[int], List[str]]:
+def parse_remove_arg(remove_str: str) -> tuple[list[int], list[str]]:
     """Parse remove argument string into indices and elements.
 
     Args:
@@ -48,7 +48,7 @@ def parse_remove_arg(remove_str: str) -> Tuple[List[int], List[str]]:
     return indices, elements
 
 
-def format_remove_message(indices: List[int], elements: List[str]) -> str:
+def format_remove_message(indices: list[int], elements: list[str]) -> str:
     """Format the message showing which atoms will be removed.
 
     Args:

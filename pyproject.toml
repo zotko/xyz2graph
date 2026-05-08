@@ -41,35 +41,17 @@ Repository = "https://github.com/zotko/xyz2graph"
 Documentation = "https://zotko.github.io/xyz2graph"
 "Bug Tracker" = "https://github.com/zotko/xyz2graph/issues"
 
-[tool.pdm.dev-dependencies]
-docs = [
-    "mkdocs>=1.6.0",
-    "mkdocs-material>=9.5.0",
-    "mkdocstrings-python>=1.12.0",
-    "mkdocs-include-markdown-plugin>=7.1.5"
-]
-dev = [
-    "pytest>=7.0.0,<8.0.0",
-    "pytest-cov>=4.0.0,<5.0.0",
-    "ruff>=0.1.0,<1.0.0",
-    "mypy>=1.0.0,<2.0.0",
-    "build>=1.0.0,<2.0.0",
-    "twine>=4.0.0,<5.0.0",
-    "pre-commit>=4.1.0",
-]
-
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 line-length = 100
 src = ["xyz2graph"]
-include = ["test/test_*.py"]
 
 [tool.ruff.lint.per-file-ignores]
 "{__init__.py,tests/*,helpers.py,logging.py}" = ["D"]
 
 [tool.ruff.lint]
 select = ["D", "E", "F", "B", "I", "W", "C", "UP", "N", "ANN", "T20", "PT"]
-ignore = ["ANN101", "N806", "T201", "C408", "D401", "D417"]
+ignore = ["N806", "T201", "C408", "D401", "D417"]
 
 [tool.ruff.lint.isort]
 force-single-line = false
@@ -79,11 +61,16 @@ lines-after-imports = 2
 convention = "google"
 
 [tool.mypy]
+files = ["xyz2graph"]
 python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["plotly.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -92,3 +79,21 @@ addopts = "--cov=xyz2graph --cov-report=term-missing"
 
 [project.scripts]
 xyz2graph = "xyz2graph.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0,<8.0.0",
+    "pytest-cov>=4.0.0,<5.0.0",
+    "ruff>=0.1.0,<1.0.0",
+    "mypy>=1.0.0,<2.0.0",
+    "types-networkx>=3.4.2.20250509",
+    "build>=1.0.0,<2.0.0",
+    "twine>=4.0.0,<5.0.0",
+    "pre-commit>=4.1.0",
+]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings-python>=1.12.0",
+    "mkdocs-include-markdown-plugin>=7.1.5",
+]

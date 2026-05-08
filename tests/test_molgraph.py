@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pytest
@@ -181,7 +180,7 @@ def test_property_consistency() -> None:
         (["Fe", "C", "O", "O", "O", "O", "O"], "CFeO5"),  # Complex case
     ],
 )
-def test_formula(elements: List[str], expected_formula: str) -> None:
+def test_formula(elements: list[str], expected_formula: str) -> None:
     """Test molecular formula generation."""
     mol = MolGraph()
     for i, el in enumerate(elements):

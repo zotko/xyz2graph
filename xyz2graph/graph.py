@@ -10,11 +10,7 @@ from dataclasses import dataclass, field
 from itertools import compress
 from pathlib import Path
 from typing import (
-    Dict,
-    FrozenSet,
-    List,
     Optional,
-    Set,
     Union,
 )
 
@@ -64,17 +60,17 @@ class MolGraph:
         adj_matrix (NDArray[np.int_]): Square matrix representing molecular connectivity.
     """
 
-    atoms: List[Atom] = field(default_factory=list)
-    bonds: List[Bond] = field(default_factory=list)
+    atoms: list[Atom] = field(default_factory=list)
+    bonds: list[Bond] = field(default_factory=list)
     comment: str = field(default="")
 
     # Customizable parameters with defaults
-    default_radii: Dict[str, float] = field(default_factory=lambda: dict(_DEFAULT_RADII))
-    cpk_colors: Dict[str, str] = field(default_factory=lambda: dict(_DEFAULT_CPK_COLORS))
+    default_radii: dict[str, float] = field(default_factory=lambda: dict(_DEFAULT_RADII))
+    cpk_colors: dict[str, str] = field(default_factory=lambda: dict(_DEFAULT_CPK_COLORS))
     cpk_color_rest: str = field(default="pink")
 
     @property
-    def elements(self) -> List[str]:
+    def elements(self) -> list[str]:
         """Get list of elements in the molecule.
 
         Returns:
@@ -83,7 +79,7 @@ class MolGraph:
         return [atom.element for atom in self.atoms]
 
     @property
-    def indices(self) -> List[int]:
+    def indices(self) -> list[int]:
         """Get list of atom indices.
 
         Returns:
@@ -92,7 +88,7 @@ class MolGraph:
         return [atom.index for atom in self.atoms]
 
     @property
-    def x(self) -> List[float]:
+    def x(self) -> list[float]:
         """Get x coordinates of all atoms.
 
         Returns:
@@ -101,7 +97,7 @@ class MolGraph:
         return [atom.x for atom in self.atoms]
 
     @property
-    def y(self) -> List[float]:
+    def y(self) -> list[float]:
         """Get y coordinates of all atoms.
 
         Returns:
@@ -110,7 +106,7 @@ class MolGraph:
         return [atom.y for atom in self.atoms]
 
     @property
-    def z(self) -> List[float]:
+    def z(self) -> list[float]:
         """Get z coordinates of all atoms.
 
         Returns:
@@ -128,7 +124,7 @@ class MolGraph:
         return np.array([[atom.x, atom.y, atom.z] for atom in self.atoms])
 
     @property
-    def atomic_radii(self) -> List[float]:
+    def atomic_radii(self) -> list[float]:
         """Get atomic radii for all atoms.
 
         Returns:
@@ -137,7 +133,7 @@ class MolGraph:
         return [atom.radius for atom in self.atoms]
 
     @property
-    def bond_lengths(self) -> Dict[FrozenSet[int], float]:
+    def bond_lengths(self) -> dict[frozenset[int], float]:
         """Get dictionary of bond lengths.
 
         Returns:
@@ -146,13 +142,13 @@ class MolGraph:
         return {bond.indices: bond.length for bond in self.bonds}
 
     @property
-    def adj_list(self) -> Dict[int, Set[int]]:
+    def adj_list(self) -> dict[int, set[int]]:
         """Get adjacency list representation of molecular graph.
 
         Returns:
             Dict[int, Set[int]]: Dictionary mapping atom indices to sets of bonded atom indices.
         """
-        adj: Dict[int, Set[int]] = {}
+        adj: dict[int, set[int]] = {}
         for bond in self.bonds:
             i1, i2 = tuple(bond.indices)
             adj.setdefault(i1, set()).add(i2)
@@ -168,7 +164,7 @@ class MolGraph:
                 are bonded and 0 otherwise.
         """
         n = len(self.atoms)
-        matrix = np.zeros((n, n), dtype=np.int_)
+        matrix: NDArray[np.int_] = np.zeros((n, n), dtype=np.int_)
         for bond in self.bonds:
             i, j = tuple(bond.indices)
             matrix[i, j] = matrix[j, i] = 1
@@ -230,7 +226,7 @@ class MolGraph:
                     )
                 except (IndexError, ValueError) as err:
                     raise ValueError(
-                        f"Invalid format in line {i+3}, expected: element x y z"
+                        f"Invalid format in line {i + 3}, expected: element x y z"
                     ) from err
 
             if len(self.atoms) != n_atoms:
@@ -326,12 +322,13 @@ class MolGraph:
         """
         try:
             distances = self.xyz[:, np.newaxis, :] - self.xyz
-            return np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
+            result: NDArray[np.float64] = np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
+            return result
         except MemoryError:
             # Fall back to loop-based method
             n_atoms = len(self.atoms)
             logger.info("Using memory-efficient method for distance calculation")
-            distance_matrix = np.zeros((n_atoms, n_atoms), dtype=np.float64)
+            distance_matrix: NDArray[np.float64] = np.zeros((n_atoms, n_atoms), dtype=np.float64)
             for i in range(n_atoms):
                 diff = self.xyz[i] - self.xyz
                 distance_matrix[i] = np.sqrt(np.sum(diff * diff, axis=1))
@@ -382,8 +379,8 @@ class MolGraph:
 
     def remove(
         self,
-        indices: Optional[List[int]] = None,
-        elements: Optional[List[str]] = None,
+        indices: Optional[list[int]] = None,
+        elements: Optional[list[str]] = None,
         inplace: bool = False,
     ) -> Optional["MolGraph"]:
         """Remove atoms by indices and/or elements.
@@ -460,7 +457,7 @@ class MolGraph:
         """
         logger.debug("Creating NetworkX graph")
 
-        G = nx.Graph()
+        G: nx.Graph = nx.Graph()
 
         # Add nodes with attributes
         for atom in self.atoms:

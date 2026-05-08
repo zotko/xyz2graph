@@ -4,7 +4,7 @@ This module provides fundamental data structures for molecular modeling
 """
 
 from dataclasses import dataclass, field
-from typing import FrozenSet, cast
+from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -51,12 +51,12 @@ class Bond:
         self.length = round(np.sqrt(dx * dx + dy * dy + dz * dz), 5)
 
     @property
-    def atoms(self) -> FrozenSet[Atom]:
+    def atoms(self) -> frozenset[Atom]:
         """Get the atoms involved in the bond as an order-independent set."""
         return frozenset([self.atom1, self.atom2])
 
     @property
-    def indices(self) -> FrozenSet[int]:
+    def indices(self) -> frozenset[int]:
         """Get indices of bonded atoms."""
         return frozenset([self.atom1.index, self.atom2.index])
 
