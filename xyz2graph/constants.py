@@ -7,10 +7,7 @@ Constants:
         CPK colors.
 """
 
-from typing import Dict
-
-
-_DEFAULT_RADII: Dict[str, float] = {
+_DEFAULT_RADII: dict[str, float] = {
     "Ac": 1.88,
     "Ag": 1.59,
     "Al": 1.35,
@@ -100,7 +97,7 @@ _DEFAULT_RADII: Dict[str, float] = {
     "Zn": 1.45,
     "Zr": 1.56,
 }
-_DEFAULT_CPK_COLORS: Dict[str, str] = {
+_DEFAULT_CPK_COLORS: dict[str, str] = {
     "Ar": "cyan",
     "B": "salmon",
     "Ba": "darkgreen",

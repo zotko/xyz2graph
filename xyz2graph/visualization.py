@@ -10,10 +10,7 @@ from textwrap import shorten
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    List,
     Optional,
-    Tuple,
     TypedDict,
 )
 
@@ -54,7 +51,7 @@ class ButtonsConfig(TypedDict):
     """Complete button configuration."""
 
     appearance: ButtonAppearance
-    groups: Dict[str, ButtonPosition]
+    groups: dict[str, ButtonPosition]
 
 
 class AtomConfig(TypedDict):
@@ -185,7 +182,7 @@ DEFAULT_BUTTON_APPEARANCE = ButtonAppearance(
 DEFAULT_BUTTON_X = 0.04
 DEFAULT_LABEL_X = 0.0
 
-DEFAULT_BUTTON_GROUPS: Dict[str, ButtonPosition] = {
+DEFAULT_BUTTON_GROUPS: dict[str, ButtonPosition] = {
     "atoms": {
         "button_x": DEFAULT_BUTTON_X,
         "button_y": 1.0,
@@ -381,15 +378,15 @@ class ConfigurationManager:
 class AtomShape:
     """A class for managing atom shapes in the visualization."""
 
-    atoms: List[Atom]
-    colors: Dict[str, str]
+    atoms: list[Atom]
+    colors: dict[str, str]
 
     def to_trace(
         self,
         config: AtomConfig,
         coordinate_round_digits: int,
         label_type: str = "elements",
-    ) -> List[go.Scatter3d]:
+    ) -> list[go.Scatter3d]:
         """Convert atoms to Plotly visualization traces.
 
         This method processes atoms into Plotly Scatter3d traces for visualization,
@@ -413,7 +410,7 @@ class AtomShape:
                 coordinates, styling, and hover information for all atoms of
                 that element.
         """
-        element_groups: Dict[str, List[Atom]] = {}
+        element_groups: dict[str, list[Atom]] = {}
         for atom in self.atoms:
             element_groups.setdefault(atom.element, []).append(atom)
 
@@ -468,11 +465,11 @@ class BondShape:
     including grouping bonds by type and applying visual styling.
     """
 
-    bonds: List[Bond]
+    bonds: list[Bond]
 
     def to_trace(
         self, config: BondConfig, coordinate_round_digits: int, markdown_round_digits: int
-    ) -> List[go.Scatter3d]:
+    ) -> list[go.Scatter3d]:
         """Convert bonds to Plotly visualization traces.
 
         Processes molecular bonds into Plotly Scatter3d traces, grouping bonds by
@@ -493,7 +490,7 @@ class BondShape:
                 length labels are initially hidden and can be shown via UI controls.
         """
         # Group bonds by type
-        bond_groups: Dict[str, List[Bond]] = {}
+        bond_groups: dict[str, list[Bond]] = {}
         for bond in self.bonds:
             elements = sorted([bond.atom1.element, bond.atom2.element])
             bond_type = f"{elements[0]}-{elements[1]}"
@@ -567,7 +564,7 @@ class ButtonFactory:
         self.config = buttons_config
         self.mol_graph = mol_graph
 
-    def create_atom_buttons(self, trace_mapping: Dict[str, List[int]]) -> List[Dict[str, Any]]:
+    def create_atom_buttons(self, trace_mapping: dict[str, list[int]]) -> list[dict[str, Any]]:
         """Create buttons for controlling atom visualization.
 
         Args:
@@ -613,7 +610,7 @@ class ButtonFactory:
 
         return buttons
 
-    def create_bond_buttons(self, bond_traces: List[int]) -> List[Dict[str, Any]]:
+    def create_bond_buttons(self, bond_traces: list[int]) -> list[dict[str, Any]]:
         """Create buttons for controlling bond visualization.
 
         Args:
@@ -640,15 +637,15 @@ class ButtonFactory:
             },
         ]
 
-    def create_grid_buttons(self) -> List[Dict[str, Any]]:
+    def create_grid_buttons(self) -> list[dict[str, Any]]:
         """Create buttons for controlling grid visualization.
 
         Returns:
             List of button configurations.
         """
 
-        def make_args(show: bool) -> Dict[str, Any]:
-            args: Dict[str, Any] = {}
+        def make_args(show: bool) -> dict[str, Any]:
+            args: dict[str, Any] = {}
             for axis in ["xaxis", "yaxis", "zaxis"]:
                 args[f"scene.{axis}.showbackground"] = show
                 args[f"scene.{axis}.gridcolor"] = "lightgray" if show else "white"
@@ -662,8 +659,8 @@ class ButtonFactory:
         ]
 
     def create_button_group(
-        self, group_name: str, buttons: List[Dict[str, Any]], active_index: int = 0
-    ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        self, group_name: str, buttons: list[dict[str, Any]], active_index: int = 0
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
         """Create a button group with its associated title annotation.
 
         Creates a configured button group that includes both the interactive buttons and
@@ -732,11 +729,11 @@ class VisualizationControls:
         """
         self.button_factory = ButtonFactory(buttons_config, mol_graph)
         self.mol_graph = mol_graph
-        self.atom_traces: Dict[str, List[int]] = {}
-        self.bond_traces: List[int] = []
+        self.atom_traces: dict[str, list[int]] = {}
+        self.bond_traces: list[int] = []
 
     def update_trace_indices(
-        self, atom_traces: Dict[str, List[int]], bond_traces: List[int]
+        self, atom_traces: dict[str, list[int]], bond_traces: list[int]
     ) -> None:
         """Update the indices of atom and bond traces.
 
@@ -747,7 +744,7 @@ class VisualizationControls:
         self.atom_traces = atom_traces
         self.bond_traces = bond_traces
 
-    def create_all_controls(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    def create_all_controls(self) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         """Create all visualization controls and their annotations.
 
         Generates three types of controls:
@@ -810,7 +807,7 @@ class VisualizationManager:
             mol_graph=self.mol_graph,
         )
 
-    def _create_axis_config(self) -> Dict[str, Dict[str, Any]]:
+    def _create_axis_config(self) -> dict[str, dict[str, Any]]:
         """Create the configuration dictionary for scene axes.
 
         Generates a configuration dictionary for the x, y, and z axes of the 3D
@@ -848,7 +845,7 @@ class VisualizationManager:
         font_color: str,
         xanchor: str = "left",
         yanchor: str = "bottom",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a standardized annotation dictionary.
 
         Args:
