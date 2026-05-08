@@ -5,23 +5,7 @@ import pytest
 from xyz2graph.graph import MolGraph
 from xyz2graph.molecule import Atom
 
-
-WATER_XYZ = """3
-Water molecule
-O 0.0 0.0 0.0
-H 0.757 0.586 0.0
-H -0.757 0.586 0.0
-"""
-
-
-@pytest.fixture
-def water_molecule(tmp_path: Path) -> MolGraph:
-    """Create a simple water molecule for testing."""
-    file_path = tmp_path / "test.xyz"
-    file_path.write_text(WATER_XYZ)
-    mol = MolGraph()
-    mol.read_xyz(file_path)
-    return mol
+from .conftest import WATER_XYZ
 
 
 def test_read_xyz(tmp_path: Path) -> None:
