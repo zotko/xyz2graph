@@ -28,6 +28,7 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
+        files: ^xyz2graph/
 
   - repo: local
     hooks:
