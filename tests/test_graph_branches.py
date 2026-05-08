@@ -2,7 +2,6 @@
 
 import logging
 from pathlib import Path
-from typing import Any
 from unittest.mock import patch
 
 import numpy as np
@@ -64,7 +63,7 @@ def test_distance_matrix_memory_error_fallback() -> None:
     real_einsum = np.einsum
     call_count = {"n": 0}
 
-    def fake_einsum(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+    def fake_einsum(*args: object, **kwargs: object) -> np.ndarray:
         call_count["n"] += 1
         if call_count["n"] == 1:
             raise MemoryError("simulated")
