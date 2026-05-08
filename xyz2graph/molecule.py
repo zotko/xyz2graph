@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-@dataclass
+@dataclass(eq=False)
 class Atom:
     """Represents an atom in a molecular structure."""
 
