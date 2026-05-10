@@ -2,13 +2,13 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
 [![Python Version](https://img.shields.io/pypi/pyversions/xyz2graph.svg)](https://pypi.org/project/xyz2graph/)
-[![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/zotko/xyz2graph.svg)](https://github.com/zotko/xyz2graph/blob/main/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://zotko.github.io/xyz2graph)
 [![DOI](https://zenodo.org/badge/144382005.svg)](https://doi.org/10.5281/zenodo.14569337)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zotko/xyz2graph/main?urlpath=%2Fdoc%2Ftree%2Fbinder%2Fxyz2graph.ipynb)
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zotko/xyz2graph/ci.yml)](https://github.com/zotko/xyz2graph/actions)
-[![codecov](https://codecov.io/gh/zotko/xyz2graph/branch/develop/graph/badge.svg?token=TXP63VKUIP)](https://codecov.io/gh/zotko/xyz2graph)
+[![codecov](https://codecov.io/gh/zotko/xyz2graph/branch/main/graph/badge.svg?token=TXP63VKUIP)](https://codecov.io/gh/zotko/xyz2graph)
 
 [![PyPI Downloads](https://static.pepy.tech/badge/xyz2graph/month)](https://pepy.tech/projects/xyz2graph)
 [![GitHub Stars](https://img.shields.io/github/stars/zotko/xyz2graph)](https://github.com/zotko/xyz2graph/stargazers)
