@@ -41,14 +41,17 @@ print(f"Graph density: {nx.density(G)}")
 Remove atoms for better visualization.
 
 ```python
-# Remove all hydrogen atoms, modifying the original structure
+# Remove all hydrogen atoms in place
 mg.remove(elements=['H'], inplace=True)
+```
 
-# Remove both hydrogen and oxygen atoms, modifying the original structure
+```python
+# Remove all hydrogen and oxygen atoms in place
 mg.remove(elements=['H', 'O'], inplace=True)
+```
 
-# Create a new molecule by removing hydrogens and specific atoms
-# The original molecule remains unchanged since inplace=False (default)
+```python
+# Return a new molecule, leaving the original unchanged (inplace=False is the default)
 new_mg = mg.remove(elements=['H'], indices=[1, 5])
 ```
 
