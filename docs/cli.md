@@ -18,8 +18,9 @@ Custom output path for the HTML visualization. Defaults to input filename with .
 Launch visualization directly in default web browser instead of saving to file.
 
 **-r, --remove**  
-Remove specific atoms using comma-separated indices or element symbols (e.g., "1,2,H,O,5" removes atoms
-at positions 1,2,5 and all H,O atoms). Element symbols must be properly capitalized.
+Remove specific atoms using comma-separated atom indices (0-based) or element symbols (e.g., "1,2,H,O,5"
+removes atoms at indices 1, 2, 5 and all H, O atoms). A single value is also valid (e.g., "H" or "3").
+Element symbols should use proper capitalization; mis-cased or unknown elements are skipped with a warning.
 
 **--debug**  
 Enable verbose logging for troubleshooting and development.
